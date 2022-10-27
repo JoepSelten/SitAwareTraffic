@@ -1,0 +1,40 @@
+[
+  {
+    "@id": "http://example.org/people/Bob",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Person"
+    ],
+    "http://xmlns.com/foaf/0.1/age": [
+      {
+        "@value": 24
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/knows": [
+      {
+        "@id": "_:N737a1cd3146c44338b7621b4b05eef4c"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/name": [
+      {
+        "@value": "Bob"
+      }
+    ]
+  },
+  {
+    "@id": "_:N737a1cd3146c44338b7621b4b05eef4c",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Person"
+    ],
+    "http://xmlns.com/foaf/0.1/name": [
+      {
+        "@value": "Linda"
+      }
+    ]
+  },
+  {
+    "@id": "http://xmlns.com/foaf/0.1/name",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Person"
+    ]
+  }
+]
