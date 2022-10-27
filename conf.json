@@ -1,0 +1,14 @@
+{
+    "dt": 0.1,
+    "turtle_velocity": 8,
+    "turtle_length": 5,
+    "turtle_width": 4,
+    "prediction_horizon": 3,
+    "radius_turning_left": 15,
+    "radius_turning_right": 5,
+    "boundary_thickness": 1,
+    "road_width": 20,
+    "road_length": 140,
+    "stop_area_size": 10,
+    "intersection_monitor_size": 20
+}
