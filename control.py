@@ -37,7 +37,7 @@ class Control():
                 pass
 
             if monitor.subtask == 'Correct to the right':
-                
+                pass
 
             
             plt.plot(self.x_pred, self.y_pred, 'b--')

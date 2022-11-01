@@ -34,17 +34,17 @@ g.add((linda, FOAF.name, Literal("Linda")))
 #print(FOAF.name)
 #g.add((FOAF.name, RDF.type, FOAF.Person))
 
-# result = g 
-# G = rdflib_to_networkx_multidigraph(result)
+result = g 
+G = rdflib_to_networkx_multidigraph(result)
 
-# pos = nx.spring_layout(G, scale=2)
-# edge_labels = nx.get_edge_attributes(G, 'r')
-# nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-# nx.draw(G, with_labels=True)
+pos = nx.spring_layout(G, scale=2)
+edge_labels = nx.get_edge_attributes(G, 'r')
+nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+nx.draw(G, with_labels=True)
 
 
 #g.serialize(destination='output.txt', format="json-ld")
 print(g.serialize(format="json-ld"))
-#plt.show()
+plt.show()
 
 #model = ontospy.Ontospy('output.txt', verbose=True)

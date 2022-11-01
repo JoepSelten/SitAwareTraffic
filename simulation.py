@@ -3,7 +3,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
-from SitJoep.worldmodel2 import WorldModel, Robot, GlobalPlanner
+from worldmodel2 import WorldModel, Robot, GlobalPlanner
 import random
 import json
 
