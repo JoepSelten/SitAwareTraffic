@@ -8,7 +8,7 @@
     "radius_turning_right": 5,
     "boundary_thickness": 1,
     "road_width": 20,
-    "road_length": 140,
+    "road_length": 40,
     "stop_area_size": 10,
     "intersection_monitor_size": 20
 }

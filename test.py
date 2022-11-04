@@ -2,6 +2,7 @@ from perception import Perception
 from worldmodel import Worldmodel
 from monitor import Monitor
 from control import Control
+from simulator import Simulator, RobotSim
 
 import numpy as np
 import math
@@ -10,10 +11,13 @@ from matplotlib.pyplot import figure
 import json
 from shapely.geometry import Polygon, Point, LineString, CAP_STYLE, box
 from shapely import affinity
+from rdflib import Graph
+import pprint
 
 from basic_areas import *
 from robot import *
 from traffic_areas import *
+
 
 with open('conf2.json') as f:
     config = json.load(f)
@@ -34,6 +38,12 @@ perception = Perception()
 world = Worldmodel()
 monitor = Monitor()
 control= Control(dt, H)
+simulator = Simulator()
+g = Graph()
+g.parse("kg.json", format="json-ld")
+# for stmt in g:
+#     pprint.pprint(stmt)
+
 
 #rob_pos = [ROAD_LENGTH+0.75*ROAD_WIDTH, TURTLE_LENGTH]
 rob_pos = np.array([0.0, 0.0])
@@ -48,22 +58,24 @@ figure(num=1, figsize=(1, 6), dpi=80)
 waiting = True
 while True:
     plt.cla()
-    
+    simulator.simulate()
+
     #intersection.plot_area()
-    perception.recognize_sit(world)
-    perception.configure_sit(world)
-    world.set_behaviour_map(rob)
-    rob.get_robot_box()
-    monitor.check_area(rob.box, world)
-    control.move(rob, monitor, world)
+    
+    perception.recognize_sit(g)
+    #perception.configure_sit(world)
+    #world.set_behaviour_map(rob)
+    # rob.get_robot_box()
+    # monitor.check_area(rob.box, world)
+    # control.move(rob, monitor, world)
 
 
-    #road.plot_area()
-    world.behaviour_map.plot_area()
-    rob.plot_robot()
+    # #road.plot_area()
+    # world.behaviour_map.plot_area()
+    # rob.plot_robot()
 
-    #if rob.box.intersects(road.box):
-     #   print("True")
+    # #if rob.box.intersects(road.box):
+    #  #   print("True")
     
 
     plt.pause(dt/100)
