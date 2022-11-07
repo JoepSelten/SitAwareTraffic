@@ -1,8 +1,111 @@
 [
   {
+    "@id": "http://example.com/Distance_sides",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/has_argument": [
+      {
+        "@id": "http://example.com/side2"
+      },
+      {
+        "@id": "http://example.com/side1"
+      },
+      {
+        "@id": "http://example.com/value_distance_sides"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/conforms_to",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ]
+  },
+  {
+    "@id": "http://example.com/side2",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/lane",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ],
+    "http://example.com/connects_to": [
+      {
+        "@id": "http://example.com/side1"
+      },
+      {
+        "@id": "http://example.com/side2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/connects_to",
+    "@type": [
+      "http://example.com/relation",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ]
+  },
+  {
     "@id": "http://example.com/subject",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
+    ]
+  },
+  {
+    "@id": "http://example.com/relation",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://example.com/has_argument": [
+      {
+        "@id": "http://example.com/subject"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/has_argument",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ]
+  },
+  {
+    "@id": "http://example.com/side1",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/has_a",
+    "@type": [
+      "http://example.com/relation",
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ]
+  },
+  {
+    "@id": "http://example.com/value_distance_sides",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
+      {
+        "@value": 20
+      }
     ]
   },
   {
@@ -20,132 +123,16 @@
         "@id": "http://example.com/lane"
       },
       {
-        "@id": "http://example.com/left_side"
+        "@id": "http://example.com/side1"
       },
       {
-        "@id": "http://example.com/right_side"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/RelativePosition",
-    "@type": [
-      "http://example.com/relation",
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ]
-  },
-  {
-    "@id": "http://example.com/right_side",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/RelativePostion1",
-    "@type": [
-      "http://example.com/RelativePosition"
-    ]
-  },
-  {
-    "@id": "http://example.com/lane",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://example.com/RelativePostion": [
-      {
-        "@id": "http://example.com/left_side"
+        "@id": "http://example.com/side2"
       }
     ],
-    "http://example.com/ValueRelativePosition": [
+    "http://www.w3.org/2000/01/rdf-schema#label": [
       {
-        "@value": 1
+        "@value": "road"
       }
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ],
-    "http://example.com/connects_to": [
-      {
-        "@id": "http://example.com/left_side"
-      },
-      {
-        "@id": "http://example.com/right_side"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/left_side",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/connects_to",
-    "@type": [
-      "http://example.com/relation",
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ]
-  },
-  {
-    "@id": "http://example.com/Value",
-    "@type": [
-      "http://example.com/argument"
-    ]
-  },
-  {
-    "@id": "http://example.com/relation",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://example.com/has_argument": [
-      {
-        "@id": "http://example.com/subject"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/RelativePostion",
-    "http://example.com/has_argument": [
-      {
-        "@id": "http://example.com/Value"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/conforms_to",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ]
-  },
-  {
-    "@id": "http://example.com/has_a",
-    "@type": [
-      "http://example.com/relation",
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ]
-  },
-  {
-    "@id": "http://example.com/ValueRelativePostion",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ]
-  },
-  {
-    "@id": "http://example.com/has_argument",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
     ]
   }
 ]

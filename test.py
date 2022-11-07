@@ -17,9 +17,9 @@ import pprint
 from basic_areas import *
 from robot import *
 from traffic_areas import *
+from basic_functions import trans
 
-
-with open('conf2.json') as f:
+with open('conf.json') as f:
     config = json.load(f)
     f.close
 
@@ -31,14 +31,14 @@ ROAD_WIDTH = config['road_width']
 dt = config['dt']
 prediction_horizon = config['prediction_horizon']
 H = round(prediction_horizon/dt)
-
+b = config['boundary_thickness']
 
 
 perception = Perception()
 world = Worldmodel()
 monitor = Monitor()
 control= Control(dt, H)
-simulator = Simulator()
+simulator = Simulator("road")
 g = Graph()
 g.parse("kg.json", format="json-ld")
 # for stmt in g:
@@ -55,15 +55,25 @@ rob.add_resource('velocity control')
 #road = OneLaneRoad(np.array([0,0.5*ROAD_LENGTH]), ROAD_LENGTH, ROAD_WIDTH)
 
 figure(num=1, figsize=(1, 6), dpi=80)
+#figure(num=2, figsize=(1, 6), dpi=80)
+figure(num=2, figsize=(1,6), dpi=80)
 waiting = True
 while True:
+    plt.figure(1)
     plt.cla()
     simulator.simulate()
-
+    simulator.robot.yaw +=0.01*math.pi
     #intersection.plot_area()
-    
-    perception.recognize_sit(g)
-    #perception.configure_sit(world)
+
+    plt.figure(2)
+    plt.cla()
+    side = simulator.simulate_relative()
+
+    simulator.robot.get_robot_box()
+    perception.recognize_sit('road', side)      # traffic sign + sides of the road
+    perception.query_relations(g)
+    perception.configure_map(g)
+
     #world.set_behaviour_map(rob)
     # rob.get_robot_box()
     # monitor.check_area(rob.box, world)

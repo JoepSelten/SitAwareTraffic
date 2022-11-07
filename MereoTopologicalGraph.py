@@ -14,6 +14,19 @@ VISUALIZE = False
 EX = Namespace("http://example.com/")
 GEO = Namespace("http://www.opengis.net/ont/geosparql#")
 
+## Create IDs
+#relation = URIRef('relation')
+#has_argument = URIRef('has_argument')
+#subject = URIRef('subject')
+#conforms_to = URIRef('conforms_to')
+#has_a = URIRef('has_a')
+#connects_to = URIRef('connects_to')
+#road = URIRef('road')
+#lane = URIRef('lane')
+#side1 = URIRef('side1')
+#side2 = URIRef('side2')
+
+
 ## Creating graph
 g = Graph()
 g.bind('ex', EX)
@@ -39,49 +52,58 @@ g.add((EX.conforms_to, RDF.type, RDF.Property)) # should mean subject conforms_t
 ## Creating new URIs 
 # road = URIRef('Road')
 # lane = URIRef('DriveableSpace')
-# left_side = URIRef('LeftSide')
-# right_side = URIRef('rightSide')
+# side1 = URIRef('LeftSide')
+# side2 = URIRef('rightSide')
 
 ## classes
-g.add((EX.road, RDF.type, RDFS.Class))
+g.add((EX.road, RDF.type, RDFS.Class))      # of zijn dit subjects en relations?
 g.add((EX.lane, RDF.type, RDFS.Class))
-g.add((EX.left_side, RDF.type, RDFS.Class))
-g.add((EX.right_side, RDF.type, RDFS.Class))
+g.add((EX.side1, RDF.type, RDFS.Class))
+g.add((EX.side2, RDF.type, RDFS.Class))
+
+# labels
+g.add((EX.road, RDFS.label, Literal('road')))
 
 ## road meta models, assuming area has known entity, to be used by software
 g.add((EX.road, EX.conforms_to, GEO.Area)) # GEO.Geometry is a subclass of GEO.SpatialObject
 g.add((EX.lane, EX.conforms_to, GEO.Area)) 
-g.add((EX.left_side, EX.conforms_to, GEO.Area)) 
-g.add((EX.right_side, EX.conforms_to, GEO.Area)) 
+g.add((EX.side1, EX.conforms_to, GEO.Area)) 
+g.add((EX.side2, EX.conforms_to, GEO.Area)) 
 
 # MereoTopological graph
 g.add((EX.road, EX.has_a, EX.lane))
-g.add((EX.road, EX.has_a, EX.left_side))
-g.add((EX.road, EX.has_a, EX.right_side))
-g.add((EX.lane, EX.connects_to, EX.left_side))
-g.add((EX.lane, EX.connects_to, EX.right_side))
+g.add((EX.road, EX.has_a, EX.side1))
+g.add((EX.road, EX.has_a, EX.side2))
+g.add((EX.lane, EX.connects_to, EX.side1))
+g.add((EX.lane, EX.connects_to, EX.side2))
 
 # Meta model
 #g.add((lane, EX.conforms_to, GEO.SpatialObject))     # or GEO.Geometry, which is a subclass of GEO.SpatialObject
 # g.add((lane, EX.conforms_to, GEO.Geometry))
-# g.add((left_side, EX.conforms_to, GEO.Geometry))
-# g.add((right_side, EX.conforms_to, GEO.Geometry))
+# g.add((side1, EX.conforms_to, GEO.Geometry))
+# g.add((side2, EX.conforms_to, GEO.Geometry))
 
-# Geometric relations
-g.add((EX.RelativePosition, RDF.type, EX.relation))     # still conceptually
-g.add((EX.Value, RDF.type, EX.argument))
-g.add((EX.RelativePostion, EX.has_argument, EX.Value))
+# # Geometric relations
+g.add((EX.Distance_sides, RDF.type, EX.relation))     # still conceptually
+g.add((EX.Distance_sides, EX.has_argument, EX.side2))
+g.add((EX.Distance_sides, EX.has_argument, EX.side1))
+g.add((EX.Distance_sides, EX.has_argument, EX.value_distance_sides))
+g.add((EX.value_distance_sides, RDF.value, Literal(20)))
 
-g.add((EX.RelativePosition, RDF.type, RDF.Property))
-g.add((EX.ValueRelativePostion, RDF.type, RDF.Property))
+#g.add((EX.RelativePosition, RDF.type, EX.relation))     # still conceptually
+#g.add((EX.Value, RDF.type, EX.argument))
+#g.add((EX.RelativePostion, EX.has_argument, EX.Value))
 
-g.add((EX.RelativePostion1, RDF.type, EX.RelativePosition))
+# g.add((EX.RelativePosition, RDF.type, RDF.Property))
+# g.add((EX.ValueRelativePostion, RDF.type, RDF.Property))
 
-g.add((EX.lane, EX.RelativePostion, EX.left_side))
-g.add((EX.lane, EX.ValueRelativePosition, Literal(1)))
+# g.add((EX.RelativePostion1, RDF.type, EX.RelativePosition))
+
+# g.add((EX.lane, EX.RelativePostion, EX.side1))
+# g.add((EX.lane, EX.ValueRelativePosition, Literal(1)))
 
 #g.add((lane, GEO.asDGGS, Literal('CELLLIST ((R0 R10 R13 R16 R30 R31 R32 R40))')))
-#g.add((left_side, GEO.asDGGS, Literal('CELLLIST ((R06 R07 R30 R31))')))
+#g.add((side1, GEO.asDGGS, Literal('CELLLIST ((R06 R07 R30 R31))')))
 
 g.serialize(format="json-ld", destination="kg.json")
 
@@ -112,9 +134,9 @@ p = """
 #     pprint.pprint(stmt)
 
 
-for r in g.query(q):
+#for r in g.query(q):
     #print(q)
-    print(r)
+    #print(r)
     
 
 if VISUALIZE:

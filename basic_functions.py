@@ -17,6 +17,8 @@ def trans(pos, yaw, l, w, rel_pos=np.array([0,0])):
                         [-math.sin(yaw), math.cos(yaw)]])
         outline = (outline.T.dot(Rot1)).T
         rel_pos_rot = rel_pos.dot(Rot1)
+        #print(rel_pos)
+        #print(rel_pos_rot)
         outline[0, :] += pos[0] + rel_pos_rot[0]
         outline[1, :] += pos[1] + rel_pos_rot[1]
         box = convert_nparray_to_polygon(np.hstack((outline[0, :][:-1], outline[1, :][:-1])))  

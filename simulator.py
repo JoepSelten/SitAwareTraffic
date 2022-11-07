@@ -29,17 +29,46 @@ c = config['stop_area_size']
 
 
 class Simulator():
-    def __init__(self):
-        self.world = World()
+    def __init__(self, sit="intersection"):
+        self.world = World(sit)
         self.robot = RobotSim('down', TURTLE_LENGTH, TURTLE_WIDTH, 'turtle1')
 
     def simulate(self):
         self.world.plot_map()
         self.robot.plot_robot()
 
+    def simulate_relative(self):     
+        pos_right_side = np.array([60.0, 40.0])
+        pos_left_side = np.array([40.0, 40.0])
+
+        rel_pos_right = pos_right_side - self.robot.pos
+        rel_pos_left = pos_left_side - self.robot.pos
+
+        yaw = -0.5*math.pi
+        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+
+        rel_pos_rot_right = rel_pos_right.dot(Rot1)
+        rel_pos_rot_left = rel_pos_left.dot(Rot1)
+
+        rel_yaw = 0.5*math.pi-self.robot.yaw
+        
+        right_side = trans(np.array([0,0]), 0.5*math.pi+rel_yaw, 2*l, b, rel_pos_rot_right)
+        left_side = trans(np.array([0,0]), 0.5*math.pi+rel_yaw, 2*l, b, rel_pos_rot_left)
+
+        rel_rob = trans(np.array([0,0]), 0.5*math.pi, TURTLE_LENGTH, TURTLE_WIDTH)
+
+        plt.xlim([-20, 20])
+        plt.ylim([-20, 20])
+        plt.fill(*right_side.exterior.xy)
+        plt.fill(*left_side.exterior.xy)
+        plt.fill(*rel_rob.exterior.xy)
+
+        return right_side
+
 class World():
-    def __init__(self, Traffic_Situation = "Intersection"):
-        if Traffic_Situation == "Intersection" :
+    def __init__(self, Traffic_Situation = "intersection"):
+        if Traffic_Situation == "intersection" :
             self.map_dict =  {'0': {'type': 'on intersection',
                             'geometry': np.array([l, l+w, l+w, l, l, l, l+w, l+w]), 'color': 'lightblue', 'transparency': 1},
                         '1': {'type': 'lane', 'location': 'down', 'geometry': np.array([l, l+w, l+w, l, 0, 0, l, l]), 'color': 'lightblue', 'transparency': 1},
@@ -64,17 +93,17 @@ class World():
                             'geometry': np.array([l+w, 2*l+w, 2*l+w, l+w, l+w-0.5*b, l+w-0.5*b, l+w+0.5*b, l+w+0.5*b]), 'color': 'red', 'transparency': 1},
             }
 
-        elif Traffic_Situation == "Road":
+        elif Traffic_Situation == "road":
 
             self.map_dict =  {'0': {'type': 'lane', 'location': 'down', 'direction': [0, -1],
-                            'geometry': np.array([l, l+0.5*w, l+0.5*w, l, 0, 0, 2*l, 2*l]), 'color': 'sandybrown', 'transparency': 1},
-                        '1': {'type': 'lane', 'location': 'down', 'direction': [0, -1],
-                            'geometry': np.array([l+0.5*w, l+w, l+w, l+0.5*w, 0, 0, 2*l, 2*l]), 'color': 'lightblue', 'transparency': 1},
-                        '2': {'type': 'boundary', 'location': 'down', 
+                            'geometry': np.array([l, l+w, l+w, l, 0, 0, 2*l, 2*l]), 'color': 'lightblue', 'transparency': 1},
+                        '1': {'type': 'boundary', 'location': 'down', 
                             'geometry': np.array([l-0.5*b, l+0.5*b, l+0.5*b, l-0.5*b, 0, 0, 2*l, 2*l]), 'color': 'red', 'transparency': 1},
-                        '3': {'type': 'boundary', 'location': 'down', 
+                        '2': {'type': 'boundary', 'location': 'down', 
                             'geometry': np.array([l+w-0.5*b, l+w+0.5*b, l+w+0.5*b, l+w-0.5*b, 0, 0, 2*l, 2*l]), 'color': 'red', 'transparency': 1},
             }
+
+            
         
         for key, value in self.map_dict.items():
             self.map_dict[key]['poly'] = convert_nparray_to_polygon(self.map_dict[key]['geometry'])
@@ -113,19 +142,19 @@ class RobotSim():
         self.name = name
         self.color = color
         if start == 'down':
-            self.pos = [l+0.5*w, self.length/2]
+            self.pos = np.array([l+0.5*w, self.length/2])
             self.yaw = 0.5*math.pi
             self.lane_id_start = '2'
         elif start == 'up':
-            self.pos = [l+0.5*w,2*l+w-self.length/2]
+            self.pos = np.array([l+0.5*w,2*l+w-self.length/2])
             self.yaw = -0.5*math.pi
             self.lane_id_start = '3'
         elif start == 'left':
-            self.pos = [self.length/2,l+0.5*w]
+            self.pos = np.array([self.length/2,l+0.5*w])
             self.yaw = 0
             self.lane_id_start = '5'
         elif start == 'right':
-            self.pos = [2*l+w-self.length/2,l+0.5*w]
+            self.pos = np.array([2*l+w-self.length/2,l+0.5*w])
             self.yaw = math.pi
             self.lane_id_start = '8'
 
