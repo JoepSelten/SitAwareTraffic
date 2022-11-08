@@ -32,22 +32,26 @@ g = Graph()
 g.bind('ex', EX)
 g.bind('geo', GEO)
 
-# Relation
+## Relation
 g.add((EX.relation, RDF.type, RDFS.Class))
 g.add((EX.has_argument, RDF.type, RDF.Property))
 g.add((EX.subject, RDF.type, RDFS.Class))
 g.add((EX.relation, EX.has_argument, EX.subject))
 
 
+## Basic MereoTopological relations
+#g.add((EX.has_a, RDF.type, RDF.Property))       # should mean that if on object, it is also on subject
+#g.add((EX.connects_to, RDF.type, RDF.Property)) # should mean object is reachable when on subject (and also how)
+
+# or 
 g.add((EX.has_a, RDF.type, EX.relation))       # should mean that if on object, it is also on subject
 g.add((EX.connects_to, RDF.type, EX.relation)) # should mean object is reachable when on subject (and also how)
 
-# Basic MereoTopological relations
-g.add((EX.has_a, RDF.type, RDF.Property))       # should mean that if on object, it is also on subject
-g.add((EX.connects_to, RDF.type, RDF.Property)) # should mean object is reachable when on subject (and also how)
+## Conforms-to
+#g.add((EX.conforms_to, RDF.type, RDF.Property)) # should mean subject conforms_to to object
 
-# Conforms-to
-g.add((EX.conforms_to, RDF.type, RDF.Property)) # should mean subject conforms_to to object
+# or 
+g.add((EX.conforms_to, RDF.type, EX.relation)) # should mean subject conforms_to to object
 
 ## Creating new URIs 
 # road = URIRef('Road')
@@ -58,19 +62,34 @@ g.add((EX.conforms_to, RDF.type, RDF.Property)) # should mean subject conforms_t
 ## classes
 g.add((EX.road, RDF.type, RDFS.Class))      # of zijn dit subjects en relations?
 g.add((EX.lane, RDF.type, RDFS.Class))
-g.add((EX.side1, RDF.type, RDFS.Class))
-g.add((EX.side2, RDF.type, RDFS.Class))
+#g.add((EX.side1, RDF.type, RDFS.Class))
+#g.add((EX.side2, RDF.type, RDFS.Class))
 
-# labels
+# or
+g.add((EX.side, RDF.type, RDFS.Class))
+g.add((EX.side1, EX.conforms_to, EX.side))
+g.add((EX.side2, EX.conforms_to, EX.side))
+
+# or and
+g.add((EX.road1, EX.conforms_to, EX.road))
+g.add((EX.lane1, EX.conforms_to, EX.lane))
+
+## labels
 g.add((EX.road, RDFS.label, Literal('road')))
+g.add((EX.lane, RDFS.label, Literal('lane')))
+g.add((EX.side1, RDFS.label, Literal('side1')))
+g.add((EX.side2, RDFS.label, Literal('side2')))
 
 ## road meta models, assuming area has known entity, to be used by software
 g.add((EX.road, EX.conforms_to, GEO.Area)) # GEO.Geometry is a subclass of GEO.SpatialObject
 g.add((EX.lane, EX.conforms_to, GEO.Area)) 
-g.add((EX.side1, EX.conforms_to, GEO.Area)) 
-g.add((EX.side2, EX.conforms_to, GEO.Area)) 
+#g.add((EX.side1, EX.conforms_to, GEO.Area)) 
+#g.add((EX.side2, EX.conforms_to, GEO.Area))
 
-# MereoTopological graph
+# or
+g.add((EX.side, EX.conforms_to, GEO.Area))
+
+## MereoTopological graph
 g.add((EX.road, EX.has_a, EX.lane))
 g.add((EX.road, EX.has_a, EX.side1))
 g.add((EX.road, EX.has_a, EX.side2))
@@ -83,27 +102,28 @@ g.add((EX.lane, EX.connects_to, EX.side2))
 # g.add((side1, EX.conforms_to, GEO.Geometry))
 # g.add((side2, EX.conforms_to, GEO.Geometry))
 
-# # Geometric relations
+## How can it be perceived?
+
+g.add((EX.perceive_side, RDF.type, EX.relation))
+g.add((EX.perceive_side, EX.has_argument, EX.side))
+g.add((EX.perceive_side, EX.has_argument, EX.laser_scanner))
+
+# or?
+#g.add((EX.perceive, RDF.type, EX.relation))
+#g.add((EX.perceive, EX.has_argument, EX))
+
+## Geometric relations
 g.add((EX.Distance_sides, RDF.type, EX.relation))     # still conceptually
 g.add((EX.Distance_sides, EX.has_argument, EX.side2))
 g.add((EX.Distance_sides, EX.has_argument, EX.side1))
+
 g.add((EX.Distance_sides, EX.has_argument, EX.value_distance_sides))
 g.add((EX.value_distance_sides, RDF.value, Literal(20)))
 
-#g.add((EX.RelativePosition, RDF.type, EX.relation))     # still conceptually
-#g.add((EX.Value, RDF.type, EX.argument))
-#g.add((EX.RelativePostion, EX.has_argument, EX.Value))
-
-# g.add((EX.RelativePosition, RDF.type, RDF.Property))
-# g.add((EX.ValueRelativePostion, RDF.type, RDF.Property))
-
-# g.add((EX.RelativePostion1, RDF.type, EX.RelativePosition))
-
-# g.add((EX.lane, EX.RelativePostion, EX.side1))
-# g.add((EX.lane, EX.ValueRelativePosition, Literal(1)))
-
-#g.add((lane, GEO.asDGGS, Literal('CELLLIST ((R0 R10 R13 R16 R30 R31 R32 R40))')))
-#g.add((side1, GEO.asDGGS, Literal('CELLLIST ((R06 R07 R30 R31))')))
+# or
+#g.add((EX.value_distance_sides, RDF.type, EX.relation))
+#g.add((EX.value_distance_sides, EX.has_argument, EX.Distance_sides))
+#g.add((EX.value_distance_sides, EX.has_argument, Literal(20)))
 
 g.serialize(format="json-ld", destination="kg.json")
 

@@ -37,34 +37,28 @@ class Simulator():
         self.world.plot_map()
         self.robot.plot_robot()
 
-    def simulate_relative(self):     
-        pos_right_side = np.array([60.0, 40.0])
-        pos_left_side = np.array([40.0, 40.0])
-
-        rel_pos_right = pos_right_side - self.robot.pos
-        rel_pos_left = pos_left_side - self.robot.pos
-
+    def simulate_relative_obj(self, obj_pos, l, b):     
+        rel_pos = obj_pos - self.robot.pos
         yaw = -0.5*math.pi
         Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
                         [-math.sin(yaw), math.cos(yaw)]])
 
-        rel_pos_rot_right = rel_pos_right.dot(Rot1)
-        rel_pos_rot_left = rel_pos_left.dot(Rot1)
-
+        rel_pos_rot = rel_pos.dot(Rot1)
         rel_yaw = 0.5*math.pi-self.robot.yaw
         
-        right_side = trans(np.array([0,0]), 0.5*math.pi+rel_yaw, 2*l, b, rel_pos_rot_right)
-        left_side = trans(np.array([0,0]), 0.5*math.pi+rel_yaw, 2*l, b, rel_pos_rot_left)
-
-        rel_rob = trans(np.array([0,0]), 0.5*math.pi, TURTLE_LENGTH, TURTLE_WIDTH)
-
+        rel_object = trans(np.array([0,0]), 0.5*math.pi+rel_yaw, l, b, rel_pos_rot)
         plt.xlim([-20, 20])
         plt.ylim([-20, 20])
-        plt.fill(*right_side.exterior.xy)
-        plt.fill(*left_side.exterior.xy)
-        plt.fill(*rel_rob.exterior.xy)
+        plt.fill(*rel_object.exterior.xy)
 
-        return right_side
+        return rel_object
+
+    def plot_rel_obj(self, rel_obj):
+        plt.fill(*rel_obj['polygon'].exterior.xy)
+
+    def plot_rel_robot(self):
+        rel_rob = trans(np.array([0,0]), 0.5*math.pi, TURTLE_LENGTH, TURTLE_WIDTH)
+        plt.fill(*rel_rob.exterior.xy)
 
 class World():
     def __init__(self, Traffic_Situation = "intersection"):

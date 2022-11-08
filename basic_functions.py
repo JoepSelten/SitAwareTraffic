@@ -22,4 +22,19 @@ def trans(pos, yaw, l, w, rel_pos=np.array([0,0])):
         outline[0, :] += pos[0] + rel_pos_rot[0]
         outline[1, :] += pos[1] + rel_pos_rot[1]
         box = convert_nparray_to_polygon(np.hstack((outline[0, :][:-1], outline[1, :][:-1])))  
+        #print(box)
         return box
+
+def abs_to_rel(robot, obj_pos, l, b):     
+        rel_pos = obj_pos - robot.pos
+        yaw = -0.5*math.pi
+        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+
+        rel_pos_rot = rel_pos.dot(Rot1)
+        rel_yaw = 0.5*math.pi-robot.yaw
+        
+        rel_box = trans(np.array([0,0]), 0.5*math.pi+rel_yaw, l, b, rel_pos_rot)
+
+        rel_object = {'polygon': rel_box, 'abs_pos': obj_pos}
+        return rel_object

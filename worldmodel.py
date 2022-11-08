@@ -3,8 +3,21 @@ from traffic_areas import *
 
 class Worldmodel():
     def __init__(self):
-       pass
+        self.areas = {}
 
+    def set_KG(self, g):
+        self.g = g
+
+    def add_area(self, uri, area):
+        self.areas.update({uri: area})
+
+    def print_areas(self):
+        print(self.areas)
+
+    def plot_areas(self):
+        for x in self.areas.values():
+            plt.fill(*x['polygon'].exterior.xy)
+        
     def update_sit(self, sit):
         self.situation = sit
 

@@ -17,7 +17,7 @@ import pprint
 from basic_areas import *
 from robot import *
 from traffic_areas import *
-from basic_functions import trans
+from basic_functions import trans, abs_to_rel
 
 with open('conf.json') as f:
     config = json.load(f)
@@ -41,6 +41,7 @@ control= Control(dt, H)
 simulator = Simulator("road")
 g = Graph()
 g.parse("kg.json", format="json-ld")
+world.set_KG(g)
 # for stmt in g:
 #     pprint.pprint(stmt)
 
@@ -62,17 +63,26 @@ while True:
     plt.figure(1)
     plt.cla()
     simulator.simulate()
-    simulator.robot.yaw +=0.01*math.pi
-    #intersection.plot_area()
+    #simulator.robot.yaw +=0.01*math.pi
 
     plt.figure(2)
     plt.cla()
-    side = simulator.simulate_relative()
+    ## Assumed input feature
+    side_abs_pos = np.array([60.0, 40.0])
+    side = abs_to_rel(simulator.robot, side_abs_pos, 80, 1)
 
-    simulator.robot.get_robot_box()
-    perception.recognize_sit('road', side)      # traffic sign + sides of the road
-    perception.query_relations(g)
-    perception.configure_map(g)
+    simulator.plot_rel_obj(side)
+    
+
+    #side = simulator.simulate_relative_obj(side_abs_pos, 80, 1)
+    #lane_abs_pos = np.array([side_abs_pos[0]-10, side_abs_pos[1]])
+    #lane = simulator.simulate_relative_obj(lane_abs_pos, 80, 20)
+    
+   
+    perception.recognize_sit('road', side)      # traffic sign + side of the road
+    perception.query_relations(world)
+    perception.configure_map(world, simulator.robot)
+    simulator.plot_rel_robot()
 
     #world.set_behaviour_map(rob)
     # rob.get_robot_box()
