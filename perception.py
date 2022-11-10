@@ -44,4 +44,8 @@ class Perception():
         world.add_area(self.parts[0], lane)
         world.plot_areas()
 
+    def get_current_pos(self, world, robot):
+        for area in world.areas.values():
+            print(robot.intersection(area['polygon']))
+
  

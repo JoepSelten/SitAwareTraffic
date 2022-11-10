@@ -16,11 +16,11 @@ GEO = Namespace("http://www.opengis.net/ont/geosparql#")
 
 ## Create IDs
 #relation = URIRef('relation')
-#has_argument = URIRef('has_argument')
+#edge = URIRef('edge')
 #subject = URIRef('subject')
 #conforms_to = URIRef('conforms_to')
 #has_a = URIRef('has_a')
-#connects_to = URIRef('connects_to')
+#connects = URIRef('connects')
 #road = URIRef('road')
 #lane = URIRef('lane')
 #side1 = URIRef('side1')
@@ -32,26 +32,68 @@ g = Graph()
 g.bind('ex', EX)
 g.bind('geo', GEO)
 
-## Relation
-g.add((EX.relation, RDF.type, RDFS.Class))
-g.add((EX.has_argument, RDF.type, RDF.Property))
-g.add((EX.subject, RDF.type, RDFS.Class))
-g.add((EX.relation, EX.has_argument, EX.subject))
+
+
+## Basic graph structures
+g.add((EX.node, RDF.type, RDFS.Class))
+g.add((EX.edge, RDF.type, RDF.Property))
+
+## Implicit relations, assumed to be known by humans, is therefore represented as an edge in the KG
+g.add((EX.has_a, RDF.type, EX.edge))    # has_a is the highest level of abstraction: mereological relation
+g.add((EX.connects, RDF.type, EX.edge)) # connects and connects already provide some additional information: topological relations
+g.add((EX.contains, RDF.type, EX.edge)) # you can connect an argument to a role
+
+g.add((EX.conforms_to, RDF.type, EX.edge))  # conforms_to is a less restrictive form of the is_a relation
+
+# Property relation, implicit when talking about property graphs, but needed for reification for RDF triples
+g.add((EX.has_property, RDF.type, EX.edge))
+
+## Explicit relations, uses the implicit relations as building blocks
+g.add((EX.relation, RDF.type, EX.node))
+g.add((EX.property, RDF.type, EX.node))     # zijn dit laatste drie nodig? Kan ik niet alles als een relatie modeleren
+g.add((EX.argument, RDF.type, EX.node))
+g.add((EX.entity, RDF.type, EX.node))
+
+
+#g.add((EX.relation, EX.has_a, EX.entity))
+
+# g.add((EX.has_property, RDF.type, EX.edge))
+# g.add((EX.has_argument, RDF.type, EX.edge))
+
+
+#g.add((EX.role, RDF.type, EX.property))
+
+#g.add((EX.subject, RDF.type, RDFS.Class))
+#g.add((EX.relation, EX.edge, EX.subject))
 
 
 ## Basic MereoTopological relations
 #g.add((EX.has_a, RDF.type, RDF.Property))       # should mean that if on object, it is also on subject
-#g.add((EX.connects_to, RDF.type, RDF.Property)) # should mean object is reachable when on subject (and also how)
+#g.add((EX.connects, RDF.type, RDF.Property)) # should mean object is reachable when on subject (and also how)
 
 # or 
-g.add((EX.has_a, RDF.type, EX.relation))       # should mean that if on object, it is also on subject
-g.add((EX.connects_to, RDF.type, EX.relation)) # should mean object is reachable when on subject (and also how)
+#g.add((EX.has_a, RDF.type, EX.relation))       # should mean that if on object, it is also on subject
+#g.add((EX.connects, RDF.type, EX.relation)) # should mean object is reachable when on subject (and also how)
 
 ## Conforms-to
 #g.add((EX.conforms_to, RDF.type, RDF.Property)) # should mean subject conforms_to to object
 
 # or 
-g.add((EX.conforms_to, RDF.type, EX.relation)) # should mean subject conforms_to to object
+#g.add((EX.conforms_to, RDF.type, EX.relation)) # should mean subject conforms_to to object
+#g.add((EX.property_conforms_to, RDF.type, EX.property))
+#g.add((EX.conforms_to, EX.has_property, EX.property_conforms_to))
+
+#g.add((EX.role1_conforms_to, RDF.type, EX.role))
+
+
+
+
+
+g.add((EX.property_conforms_to, EX.edge, EX.model))
+
+g.add((EX.conforms_to, EX.edge, EX.model))
+g.add((EX.conforms_to, EX.edge, EX.metamodel))
+
 
 ## Creating new URIs 
 # road = URIRef('Road')
@@ -60,19 +102,22 @@ g.add((EX.conforms_to, RDF.type, EX.relation)) # should mean subject conforms_to
 # side2 = URIRef('rightSide')
 
 ## classes
-g.add((EX.road, RDF.type, RDFS.Class))      # of zijn dit subjects en relations?
-g.add((EX.lane, RDF.type, RDFS.Class))
+g.add((EX.road, RDF.type, EX.relation))      # of zijn dit subjects/enities en relations?
+g.add((EX.lane, RDF.type, EX.relation))
 #g.add((EX.side1, RDF.type, RDFS.Class))
 #g.add((EX.side2, RDF.type, RDFS.Class))
 
 # or
-g.add((EX.side, RDF.type, RDFS.Class))
+g.add((EX.side, RDF.type, EX.relation))
 g.add((EX.side1, EX.conforms_to, EX.side))
 g.add((EX.side2, EX.conforms_to, EX.side))
 
 # or and
 g.add((EX.road1, EX.conforms_to, EX.road))
 g.add((EX.lane1, EX.conforms_to, EX.lane))
+
+# or 
+g.add((EX.conforms_to, EX.road1, EX.road))
 
 ## labels
 g.add((EX.road, RDFS.label, Literal('road')))
@@ -90,11 +135,17 @@ g.add((EX.lane, EX.conforms_to, GEO.Area))
 g.add((EX.side, EX.conforms_to, GEO.Area))
 
 ## MereoTopological graph
-g.add((EX.road, EX.has_a, EX.lane))
-g.add((EX.road, EX.has_a, EX.side1))
-g.add((EX.road, EX.has_a, EX.side2))
-g.add((EX.lane, EX.connects_to, EX.side1))
-g.add((EX.lane, EX.connects_to, EX.side2))
+# g.add((EX.road, EX.has_a, EX.lane))
+# g.add((EX.road, EX.has_a, EX.side1))
+# g.add((EX.road, EX.has_a, EX.side2))
+g.add((EX.lane, EX.connects, EX.side1))         # is lane nu de argument slot die de connection aangeeft
+g.add((EX.lane, EX.connects, EX.side2))
+
+g.add((EX.has_a, EX.road, EX.lane))
+g.add((EX.has_a, EX.road, EX.side1))
+g.add((EX.has_a, EX.intersection, EX.traffic_light))
+
+#g.add((EX.connects, ))
 
 # Meta model
 #g.add((lane, EX.conforms_to, GEO.SpatialObject))     # or GEO.Geometry, which is a subclass of GEO.SpatialObject
@@ -105,27 +156,96 @@ g.add((EX.lane, EX.connects_to, EX.side2))
 ## How can it be perceived?
 
 g.add((EX.perceive_side, RDF.type, EX.relation))
-g.add((EX.perceive_side, EX.has_argument, EX.side))
-g.add((EX.perceive_side, EX.has_argument, EX.laser_scanner))
+g.add((EX.perceive_side, EX.edge, EX.side))
+g.add((EX.perceive_side, EX.edge, EX.laser_scanner))
 
 # or?
 #g.add((EX.perceive, RDF.type, EX.relation))
-#g.add((EX.perceive, EX.has_argument, EX))
+#g.add((EX.perceive, EX.edge, EX))
 
 ## Geometric relations
 g.add((EX.Distance_sides, RDF.type, EX.relation))     # still conceptually
-g.add((EX.Distance_sides, EX.has_argument, EX.side2))
-g.add((EX.Distance_sides, EX.has_argument, EX.side1))
+g.add((EX.Distance_sides, EX.edge, EX.side2))
+g.add((EX.Distance_sides, EX.edge, EX.side1))
 
-g.add((EX.Distance_sides, EX.has_argument, EX.value_distance_sides))
-g.add((EX.value_distance_sides, RDF.value, Literal(20)))
+#g.add((EX.Distance_sides, EX.edge, EX.value_distance_sides))
+#g.add((EX.value_distance_sides, RDF.value, Literal(20)))
+
+#or
+#g.add((EX.side1, EX.Distance_sides, EX.side2))
 
 # or
-#g.add((EX.value_distance_sides, RDF.type, EX.relation))
-#g.add((EX.value_distance_sides, EX.has_argument, EX.Distance_sides))
-#g.add((EX.value_distance_sides, EX.has_argument, Literal(20)))
+g.add((EX.value_distance_sides, RDF.type, EX.relation))
+g.add((EX.value_distance_sides, EX.edge, EX.Distance_sides))
+g.add((EX.value_distance_sides, EX.edge, Literal(20)))
 
-g.serialize(format="json-ld", destination="kg.json")
+## task
+g.add((EX.task, RDF.type, EX.relation))
+g.add((EX.task_road, EX.conforms_to, EX.task))
+g.add((EX.task_road, EX.edge, EX.road))
+g.add((EX.task_road, EX.edge, EX.drive_straight))
+
+#g.add((EX.drive))
+
+## behaviour
+g.add((EX.behaviour, RDF.type, EX.relation))
+
+g.add((EX.behaviour_lane, EX.conforms_to, EX.behaviour))
+g.add((EX.behaviour_lane, EX.edge, EX.lane))
+g.add((EX.behaviour_lane, EX.edge, EX.drivable_space))
+
+#g.add((EX.drivable_space, RDF.type, EX.relation))
+#g.add((EX.drivable_space, EX.edge, ))
+
+g.add((EX.behaviour_side, EX.conforms_to, EX.behaviour))
+g.add((EX.behaviour_side, EX.edge, EX.side))
+g.add((EX.behaviour_side, EX.edge, EX.no_enter))
+
+# or affordances
+g.add((EX.affordance, RDF.type, EX.relation))
+
+g.add((EX.affordance_lane, EX.conforms_to, EX.affordance))
+g.add((EX.affordance_lane, EX.edge, EX.lane))
+g.add((EX.affordance_lane, EX.edge, EX.drivable_space))
+
+## skills/resources
+g.add((EX.resource, RDF.type, EX.relation))
+
+g.add((EX.resource_velocity_control, EX.conforms_to, EX.resource))
+g.add((EX.resource_velocity_control, EX.edge, EX.robot))
+g.add((EX.resource_velocity_control, EX.edge, EX.velocity_control))
+
+g.add((EX.skill, RDF.type, EX.relation))
+g.add((EX.skill_move_on_road, EX.conforms_to, EX.skill))
+#g.add((EX.skill_move_on_road, EX.edge, EX.requirements))
+
+g.add((EX.requirements, RDF.type, EX.relation))
+g.add((EX.requirements_move_on_road, EX.conforms_to, EX.requirements))
+g.add((EX.requirements_move_on_road, EX.edge, EX.velocity_control))
+g.add((EX.requirements_move_on_road, EX.edge, EX.requirements))
+
+#or
+# g.add((EX.resource, RDF.type, EX.relation))
+# g.add((EX.resource, EX.edge, EX.robot))
+
+# g.add((EX.resource_vel_control, EX.conforms_to, EX.resource))
+# g.add((EX.resource_vel_control, EX.edge, EX.velocity_control))
+
+g.add((EX.driving_vel_control, RDF.type, EX.relation))
+g.add((EX.driving_vel_control, EX.edge, EX.drivable_space))
+g.add((EX.driving_vel_control, EX.edge, EX.velocity_control))
+
+g.add((EX.actions, RDF.type, EX.relation))
+
+g.add((EX.resource, RDF.type, EX.relation))
+g.add((EX.resource, EX.edge, EX.robot))
+g.add((EX.resource, EX.edge, EX.laser_scanner))
+
+
+
+
+
+g.serialize(format="json-ld", destination="kg2.json")
 
 q = """
     PREFIX ex: <http://example.com/>

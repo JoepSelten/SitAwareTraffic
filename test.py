@@ -52,6 +52,8 @@ rob_pos = np.array([0.0, 0.0])
 rob = Robot(rob_pos, 0.7*math.pi, TURTLE_VELOCITY, TURTLE_LENGTH, TURTLE_WIDTH) 
 rob.add_resource('velocity control')
 
+rel_rob = trans(np.array([0,0]), 0.5*math.pi, TURTLE_LENGTH, TURTLE_WIDTH)
+
 #intersection = Intersection(np.array([ROAD_LENGTH+0.5*ROAD_WIDTH, ROAD_LENGTH+0.5*ROAD_WIDTH]), ROAD_LENGTH, ROAD_WIDTH)
 #road = OneLaneRoad(np.array([0,0.5*ROAD_LENGTH]), ROAD_LENGTH, ROAD_WIDTH)
 
@@ -72,6 +74,8 @@ while True:
     side = abs_to_rel(simulator.robot, side_abs_pos, 80, 1)
 
     simulator.plot_rel_obj(side)
+
+
     
 
     #side = simulator.simulate_relative_obj(side_abs_pos, 80, 1)
@@ -82,6 +86,10 @@ while True:
     perception.recognize_sit('road', side)      # traffic sign + side of the road
     perception.query_relations(world)
     perception.configure_map(world, simulator.robot)
+
+    perception.get_current_pos(world, rel_rob)
+    
+
     simulator.plot_rel_robot()
 
     #world.set_behaviour_map(rob)

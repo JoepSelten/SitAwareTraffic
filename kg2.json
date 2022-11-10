@@ -1,0 +1,355 @@
+[
+  {
+    "@id": "http://example.com/side1",
+    "http://example.com/Distance_sides": [
+      {
+        "@id": "http://example.com/side2"
+      }
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/side"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "side1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/arg",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ]
+  },
+  {
+    "@id": "http://example.com/behaviour_lane",
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/lane"
+      },
+      {
+        "@id": "http://example.com/drivable_space"
+      }
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/behaviour"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/behaviour_side",
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/side"
+      },
+      {
+        "@id": "http://example.com/no_enter"
+      }
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/behaviour"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/value_distance_sides",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value": [
+      {
+        "@value": 20
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/task",
+    "@type": [
+      "http://example.com/relation"
+    ]
+  },
+  {
+    "@id": "http://example.com/Distance_sides",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/side2"
+      },
+      {
+        "@id": "http://example.com/side1"
+      },
+      {
+        "@id": "http://example.com/value_distance_sides"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/road",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "road"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/has_a",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/intersection": [
+      {
+        "@id": "http://example.com/traffic_light"
+      }
+    ],
+    "http://example.com/road": [
+      {
+        "@id": "http://example.com/lane"
+      },
+      {
+        "@id": "http://example.com/side1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/conforms_to",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/road1": [
+      {
+        "@id": "http://example.com/road"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/driving_vel_control",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/drivable_space"
+      },
+      {
+        "@id": "http://example.com/velocity_control"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/resource_velocity_control",
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/robot"
+      },
+      {
+        "@id": "http://example.com/velocity_control"
+      }
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/resource"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/task_road",
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/road"
+      },
+      {
+        "@id": "http://example.com/drive_straight"
+      }
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/task"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/connects_to",
+    "@type": [
+      "http://example.com/relation"
+    ]
+  },
+  {
+    "@id": "http://example.com/skill",
+    "@type": [
+      "http://example.com/relation"
+    ]
+  },
+  {
+    "@id": "http://example.com/requirements",
+    "@type": [
+      "http://example.com/relation"
+    ]
+  },
+  {
+    "@id": "http://example.com/lane1",
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/lane"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/resource",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/robot"
+      },
+      {
+        "@id": "http://example.com/laser_scanner"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/road1",
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/road"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/affordance",
+    "@type": [
+      "http://example.com/relation"
+    ]
+  },
+  {
+    "@id": "http://example.com/relation",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ]
+  },
+  {
+    "@id": "http://example.com/actions",
+    "@type": [
+      "http://example.com/relation"
+    ]
+  },
+  {
+    "@id": "http://example.com/lane",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ],
+    "http://example.com/connects_to": [
+      {
+        "@id": "http://example.com/side1"
+      },
+      {
+        "@id": "http://example.com/side2"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "lane"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/side",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/skill_move_on_road",
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/skill"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/behaviour",
+    "@type": [
+      "http://example.com/relation"
+    ]
+  },
+  {
+    "@id": "http://example.com/affordance_lane",
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/lane"
+      },
+      {
+        "@id": "http://example.com/drivable_space"
+      }
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/affordance"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/perceive_side",
+    "@type": [
+      "http://example.com/relation"
+    ],
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/side"
+      },
+      {
+        "@id": "http://example.com/laser_scanner"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/side2",
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/side"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "side2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/requirements_move_on_road",
+    "http://example.com/arg": [
+      {
+        "@id": "http://example.com/velocity_control"
+      },
+      {
+        "@id": "http://example.com/requirements"
+      }
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://example.com/requirements"
+      }
+    ]
+  }
+]

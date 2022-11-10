@@ -152,9 +152,11 @@ class RobotSim():
             self.yaw = math.pi
             self.lane_id_start = '8'
 
-    def get_robot_box(self): 
         self.box = trans(self.pos, self.yaw, self.length, self.width)
 
+    #def get_robot_box(self): 
+    #   self.box = trans(self.pos, self.yaw, self.length, self.width)
+
     def plot_robot(self):
-        self.get_robot_box()
+        #self.get_robot_box()
         plt.fill(*self.box.exterior.xy, color=self.color)
