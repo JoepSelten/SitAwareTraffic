@@ -26,12 +26,10 @@ GEO = Namespace("http://www.opengis.net/ont/geosparql#")
 #side1 = URIRef('side1')
 #side2 = URIRef('side2')
 
-
 ## Creating graph
 g = Graph()
 g.bind('ex', EX)
 g.bind('geo', GEO)
-
 
 
 ## Basic graph structures
@@ -39,7 +37,7 @@ g.add((EX.node, RDF.type, RDFS.Class))
 g.add((EX.edge, RDF.type, RDF.Property))
 
 ## Implicit relations, assumed to be known by humans, is therefore represented as an edge in the KG
-g.add((EX.has_a, RDF.type, EX.edge))    # has_a is the highest level of abstraction: mereological relation
+g.add((EX.has_a, RDF.type, EX.edge))    # has_a is the highest level of abstraction: mereological relation. 
 g.add((EX.connects, RDF.type, EX.edge)) # connects and connects already provide some additional information: topological relations
 g.add((EX.contains, RDF.type, EX.edge)) # you can connect an argument to a role
 
@@ -84,9 +82,6 @@ g.add((EX.entity, RDF.type, EX.node))
 #g.add((EX.conforms_to, EX.has_property, EX.property_conforms_to))
 
 #g.add((EX.role1_conforms_to, RDF.type, EX.role))
-
-
-
 
 
 g.add((EX.property_conforms_to, EX.edge, EX.model))
@@ -135,15 +130,83 @@ g.add((EX.lane, EX.conforms_to, GEO.Area))
 g.add((EX.side, EX.conforms_to, GEO.Area))
 
 ## MereoTopological graph
-# g.add((EX.road, EX.has_a, EX.lane))
-# g.add((EX.road, EX.has_a, EX.side1))
-# g.add((EX.road, EX.has_a, EX.side2))
+g.add((EX.road, EX.has_a, EX.lane))
+g.add((EX.road, EX.has_a, EX.side1))
+g.add((EX.road, EX.has_a, EX.side2))
+
+## point
+g.add((EX.point, RDF.type, EX.entity))
+
+g.add((EX.pos, RDF.type, EX.relation))      # of is dit n property?
+g.add((EX.point, EX.has_property, EX.pos))  # dit is een relative pos, heeft vgm geen zin om n frame te defineren en hier een vector voor te pakken
+
+#g.add((EX.pos, EX.connects, EX.start_vec))          # is de input van een property ook een connects relatie?
+#g.add((EX.pos, EX.connects, EX.end_vec)) 
+
+g.add((EX.value_pos, RDF.type, EX.relation))
+g.add((EX.pos, EX.has_property, EX.value_pos))
+
+## line
+g.add((EX.line, RDF.type, EX.relation))
+g.add((EX.line, EX.connects, EX.point1))
+g.add((EX.line, EX.connects, EX.point2))
+
+g.add((EX.point1, RDF.type, EX.point))
+g.add((EX.point2, RDF.type, EX.point))
+
+g.add((EX.pos_point1, RDF.type, EX.pos))
+g.add((EX.pos_point2, RDF.type, EX.pos))
+
+g.add((EX.value_pos_point1, RDF.type, EX.value_pos1))
+g.add((EX.value_pos_point2, RDF.type, EX.value_pos2))
+
+g.add((EX.point1, EX.has_property, EX.pos_point1))          # instead of redoing this, can I reason that it should inherit the properties of point
+g.add((EX.pos_point1, EX.has_property, EX.value_pos_point1))    # hoe refereer ik in dat geval naar de positie van een specifiek punt
+
+g.add((EX.point2, EX.has_property, EX.pos_point2))
+g.add((EX.pos_point2, EX.has_property, EX.value_pos_point2))
+
+g.add((EX.length, RDF.type, EX.relation))
+g.add((EX.orientation, RDF.type, EX.relation))
+
+g.add((EX.line, EX.has_property, EX.length))        # met welke properties zou ik de points automatisch kunnen definieren
+g.add((EX.line, EX.has_property, EX.orientation))   # moet eigenlijk met een point en deze eigenschappen de andere kunnen bepalen
+
+g.add((EX.length, EX.connects, EX.pos_point1))             # of moet hier de value_pos_point1 staan?
+g.add((EX.length, EX.connects, EX.pos_point2))          # uiteindelijk wijst het naar een wiskundige formule?
+g.add((EX.length, EX.has_property, EX.value_length))
+
+
+
+## corner
+g.add((EX.corner, RDF.type, EX.relation))
+g.add((EX.corner, EX.connects, EX.line1))
+g.add((EX.corner, EX.connects, EX.line2))
+
+g.add((EX.line1, RDF.type, EX.line))
+g.add((EX.line2, RDF.type, EX.line))
+
+g.add((EX.length1, RDF.type, EX.length))
+g.add((EX.length2, RDF.type, EX.length))
+
+g.add(EX.line1, EX.has_property, EX.length1)
+g.add(EX.line2, EX.has_property, EX.length2)
+
+
+
+
+
 g.add((EX.lane, EX.connects, EX.side1))         # is lane nu de argument slot die de connection aangeeft
 g.add((EX.lane, EX.connects, EX.side2))
 
-g.add((EX.has_a, EX.road, EX.lane))
-g.add((EX.has_a, EX.road, EX.side1))
-g.add((EX.has_a, EX.intersection, EX.traffic_light))
+g.add((EX.lane, EX.has_property, EX.distance))
+
+g.add((EX.side, EX.has_property, EX.length))
+
+
+#g.add((EX.has_a, EX.road, EX.lane))
+#g.add((EX.has_a, EX.road, EX.side1))
+#g.add((EX.has_a, EX.intersection, EX.traffic_light))
 
 #g.add((EX.connects, ))
 
