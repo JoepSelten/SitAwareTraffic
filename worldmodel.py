@@ -5,26 +5,22 @@ class Worldmodel():
     def __init__(self):
         self.areas = {}
 
-    def set_KG(self, g):
-        self.g = g
-
-    def add_area(self, uri, area):
-        self.areas.update({uri: area})
+    def add_area(self, area, uri=0):
+        self.areas.update({uri: area})  # dit kan later iets van geopackage of sqlite/spatialite zijn
 
     def print_areas(self):
         print(self.areas)
 
     def plot_areas(self):
+        ## ik zou hier later de kleuren nog kunnen veranderen
         for x in self.areas.values():
             plt.fill(*x['polygon'].exterior.xy)
         
     def update_sit(self, sit):
         self.situation = sit
 
-    def config_sit(self, road_width, road_yaw):
-        self.road_width = road_width
-        self.road_yaw = road_yaw
-
-    def set_behaviour_map(self, robot):
-        l = 20
-        self.behaviour_map = OneLaneRoad(np.array([0,l+robot.pos[1]]), 0.5*math.pi, 2*l+2*robot.length, self.road_width)
+    def current_area(self, robot):     
+        for uri, area in self.areas.items():
+            if robot.rel_box.intersection(area['polygon']).area > 0.7*robot.rel_box.area:
+                return uri
+            

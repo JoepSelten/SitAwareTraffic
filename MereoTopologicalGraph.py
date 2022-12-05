@@ -14,18 +14,187 @@ VISUALIZE = False
 EX = Namespace("http://example.com/")
 GEO = Namespace("http://www.opengis.net/ont/geosparql#")
 
-## Create IDs
-#relation = URIRef('relation')
-#edge = URIRef('edge')
-#subject = URIRef('subject')
-#conforms_to = URIRef('conforms_to')
-#has_a = URIRef('has_a')
-#connects = URIRef('connects')
-#road = URIRef('road')
-#lane = URIRef('lane')
-#side1 = URIRef('side1')
-#side2 = URIRef('side2')
+class Relation():
+    def __init__(self, label):
+        self.properties = []
+        self.label = label
 
+    def add_property(self, property):
+        self.properties.append(property)
+
+    def conforms_to(self, metamodel, properties):   # is miss niet nodig
+        for props in metamodel.properties:
+            if props in properties:
+                self.properties.append(props)
+
+
+class has_a(Relation):
+    def __init__(args, g, self):
+        super().__init__()
+        g.add((EX.has_a, RDF.type, EX.relation))
+        g.add((EX.has_a, EX.has_property, EX.arg1))
+
+       
+
+class PropertyGraph():
+    def __init__(self):
+        self.g = Graph()
+        self.g.bind('ex', EX)
+        self.add_axioms()
+
+    def add_axioms(self):
+        ## Basic graph structures
+        self.g.add((EX.node, RDF.type, RDFS.Class))
+        self.g.add((EX.edge, RDF.type, RDF.Property))
+
+        ## Implicit relations, assumed to be known by humans, is therefore represented as an edge in the KG
+        self.g.add((EX.has_a, RDF.type, EX.edge))    # has_a is the highest level of abstraction: mereological relation. 
+        self.g.add((EX.connects, RDF.type, EX.edge)) # connects and connects already provide some additional information: topological relations
+        self.g.add((EX.contains, RDF.type, EX.edge)) # you can connect an argument to a role
+
+        self.g.add((EX.conforms_to, RDF.type, EX.edge))  # conforms_to is a less restrictive form of the is_a relation
+
+        # Property relation, implicit when talking about property graphs, but needed for reification for RDF triples
+        self.g.add((EX.has_property, RDF.type, EX.edge))
+
+        ## Explicit relations, uses the implicit relations as building blocks
+        self.g.add((EX.relation, RDF.type, EX.node))
+        self.g.add((EX.property, RDF.type, EX.node))     # zijn dit laatste drie nodig? Kan ik niet alles als een relatie modeleren
+        self.g.add((EX.argument, RDF.type, EX.node))
+        self.g.add((EX.entity, RDF.type, EX.node))
+
+    def add_relation(self, relation):
+        pass
+        
+    def area(self, label='area'):
+        self.g.add((EX.area, RDF.type, EX.entity))
+        self.g.add((EX.length, RDF.type, EX.attribute))
+        self.g.add((EX.width, RDF.type, EX.attribute))
+        self.g.add((EX.pos, RDF.type, EX.attribute))
+        self.g.add((EX.orientation, RDF.type, EX.attribute))
+
+    def lane(self):
+        self.g.add((EX.lane, RDF.type, EX.relation))
+        self.g.add((EX.lane, RDFS.label, Literal('lane')))
+
+        self.area(EX.area1, EX.lane)
+        self.line(EX.line1, EX.lane)
+
+        self.g.add((EX.lane, EX.connects, EX.area1))
+        self.g.add((EX.lane, EX.connects, EX.line1))
+
+    def point(self, new_point, value_pos):
+        self.g.add((new_point, RDF.type, EX.point))
+        self.g.add((EX.point, RDF.type, EX.entity))
+        self.g.add((EX.pos, RDF.type, EX.relation))      # of is dit n property?
+        self.g.add((EX.point, EX.has_property, EX.pos))  # dit is een relative pos, heeft vgm geen zin om n frame te defineren en hier een vector voor te pakken
+
+
+        #g.add((EX.pos, EX.connects, EX.start_vec))          # is de input van een property ook een connects relatie?
+        #g.add((EX.pos, EX.connects, EX.end_vec)) 
+
+        #self.g.add((EX.value_pos, RDF.type, EX.relation))
+        #self.g.add((EX.pos, EX.has_property, EX.value_pos))
+
+    def pos(self):
+        self.g.add((EX.pos, RDF.type, EX.relation))
+        self.g.add((EX.value_pos, RDF.type, EX.attribute))
+        self.g.add((EX.pos, EX.has_attribute, EX.value_pos))
+
+    def line(self, new_line):
+        self.g.add((new_line, RDF.type, EX.line))
+        self.g.add((EX.line, RDF.type, EX.relation))
+        #self.g.add((EX.orientation, RDF.type, EX.relation))
+        #self.g.add((EX.length, RDF.type, EX.relation))
+        self.g.add((EX.line, EX.has_property, EX.orientation))
+        self.g.add((EX.line, EX.has_property, EX.length))
+
+        self.point(EX.point1, EX.line)
+        self.point(EX.point2, EX.line)
+
+        #self.g.add((EX.point1, RDF.type, EX.point))
+        #self.g.add((EX.point2, RDF.type, EX.point))
+
+        self.g.add((EX.line, EX.connects, EX.point1))
+        self.g.add((EX.line, EX.connects, EX.point2))
+
+    def orientation(self):
+        self.g.add((EX.orientation, RDF.type, EX.relation))
+        self.g.add((EX.orientation, EX.property_of, EX.line))
+
+
+    def corner(self):
+        ## connects two lines
+        self.g.add((EX.corner, RDF.type, EX.relation))
+
+        #self.g.add((EX.angle, RDF.type, EX.relation))
+
+        #self.g.add((EX.shares_point, RDF))
+        
+        self.g.add((EX.corner, EX.has_property, EX.angle))
+        self.g.add((EX.corner, EX.has_property, EX.sharing_point))
+
+
+        self.line(EX.line1)
+        self.line(EX.line2)
+
+        #query_point(EX.line1)   # zoiets miss
+
+
+        ## hoe link ik twee points van de lijnen
+
+        #self.g.add((EX.line1, RDF.type, EX.line))
+        #self.g.add((EX.line2, RDF.type, EX.line))
+
+        self.g.add((EX.corner, EX.connects, EX.line1))
+        self.g.add((EX.corner, EX.connects, EX.line2))
+
+    def sharing_point(self):
+        self.g.add((EX.sharing_point, RDF.type, EX.relation))
+
+        query_corner = '''
+        PREFIX ex: <http://example.com/>
+        SELECT ?corner
+        WHERE {
+            ?corner ex:connects ex:line1 .
+            ?corner ex:connects ex:line2 .
+        }
+        '''
+        for r in self.g.query(query_corner):
+            print(r)
+            corner = r
+
+        query = """
+        PREFIX ex: <http://example.com/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        SELECT ?pos1
+        WHERE {
+            ?corner ex:connects ?line1 .
+            ?line1 rdf:type ?line .
+            ?line ex:connects ?point2 .
+            ?point2 ex:has_property ?pos1 .
+        }
+        """
+        #for r in self.g.query(query, initBindings={'corner': URIRef(*corner)}):
+            #print(r)
+        for r in self.g.query(query):
+            print(r)
+
+    
+    def add_relation(self):
+        pass
+
+
+    def rules(self):
+        pass
+    
+
+pg = PropertyGraph()
+pg.corner()
+print(pg.g.serialize())
+pg.sharing_point()
+
+'''
 ## Creating graph
 g = Graph()
 g.bind('ex', EX)
@@ -350,3 +519,5 @@ if VISUALIZE:
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
     nx.draw(G, with_labels=True)
     plt.show()
+
+'''

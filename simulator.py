@@ -7,35 +7,30 @@ from matplotlib.pyplot import figure
 import json
 from traffic_areas import *
 from basic_functions import *
-
-with open('conf.json') as f:
-    config = json.load(f)
-    f.close
-
-# with open('map.json') as f:
-#     map_dict = json.load(f)
-#     f.close
-
-TURTLE_LENGTH = config['turtle_length']
-TURTLE_WIDTH = config['turtle_width']
-TURTLE_VELOCITY = config['turtle_velocity']
-dt = config['dt']
-prediction_horizon = config['prediction_horizon']
-H = round(prediction_horizon/dt)
-b = config['boundary_thickness']
-l = config['road_length']
-w = config['road_width']
-c = config['stop_area_size']
+from global_variables import b, l, w, c
+## This script should be replaceble by real robots
 
 
 class Simulator():
     def __init__(self, sit="intersection"):
-        self.world = World(sit)
-        self.robot = RobotSim('down', TURTLE_LENGTH, TURTLE_WIDTH, 'turtle1')
+        self.robots = []
+        self.num_robots = 0
+
+    def set_map(self, sit):
+        self.map = Map(sit)
+        
+    def add_robot(self, turtle_name, goal, l, w, vel, start='down'):
+        robot = Robot(turtle_name, goal, l, w, vel, start)
+        self.robots.append(robot)
+        self.num_robots += 1
 
     def simulate(self):
-        self.world.plot_map()
-        self.robot.plot_robot()
+        self.map.plot_map()
+        self.plot_robots()
+        
+    def plot_robots(self):
+        for robot in self.robots:
+            robot.plot_robot()
 
     def simulate_relative_obj(self, obj_pos, l, b):     
         rel_pos = obj_pos - self.robot.pos
@@ -53,14 +48,7 @@ class Simulator():
 
         return rel_object
 
-    def plot_rel_obj(self, rel_obj):
-        plt.fill(*rel_obj['polygon'].exterior.xy)
-
-    def plot_rel_robot(self):
-        rel_rob = trans(np.array([0,0]), 0.5*math.pi, TURTLE_LENGTH, TURTLE_WIDTH)
-        plt.fill(*rel_rob.exterior.xy)
-
-class World():
+class Map():
     def __init__(self, Traffic_Situation = "intersection"):
         if Traffic_Situation == "intersection" :
             self.map_dict =  {'0': {'type': 'on intersection',
@@ -102,20 +90,12 @@ class World():
         for key, value in self.map_dict.items():
             self.map_dict[key]['poly'] = convert_nparray_to_polygon(self.map_dict[key]['geometry'])
 
-                
-        # for key, value in self.road_dict.items():
-        #     self.road_dict[key]['poly'] = convert_nparray_to_polygon(self.road_dict[key]['geometry'])
-        
         self.turtles = []
         self.number_of_turtles = 0
 
     def plot_map(self):
         for key, value in self.map_dict.items():
             plt.fill(*self.map_dict[key]['poly'].exterior.xy, color=self.map_dict[key]['color'], alpha=self.map_dict[key]['transparency'])
-
-    # def plot_road(self):
-    #     for key, value in self.road_dict.items():
-    #         plt.fill(*self.road_dict[key]['poly'].exterior.xy, color=self.road_dict[key]['color'], alpha=self.road_dict[key]['transparency'])
 
     def add_robot(self, turtle):
         self.turtles.append(turtle)
@@ -128,13 +108,16 @@ class World():
         print(self.turtles[0].current_areas)
     
 
-class RobotSim():
-    def __init__(self, start, length, width, name, color='cyan'):
-        self.start = start
+class Robot():
+    def __init__(self, name, goal, length, width, vel, start, color='cyan'):
+        self.name = name
+        self.goal = goal
         self.length = length
         self.width = width
-        self.name = name
+        self.velocity = vel
+        self.start = start
         self.color = color
+        
         if start == 'down':
             self.pos = np.array([l+0.5*w, self.length/2])
             self.yaw = 0.5*math.pi
@@ -151,12 +134,13 @@ class RobotSim():
             self.pos = np.array([2*l+w-self.length/2,l+0.5*w])
             self.yaw = math.pi
             self.lane_id_start = '8'
-
         self.box = trans(self.pos, self.yaw, self.length, self.width)
-
-    #def get_robot_box(self): 
-    #   self.box = trans(self.pos, self.yaw, self.length, self.width)
+        self.rel_box = trans(np.array([0,0]), 0.5*math.pi, self.length, self.width)
+        #print(self.yaw)
 
     def plot_robot(self):
-        #self.get_robot_box()
+        self.box = trans(self.pos, self.yaw, self.length, self.width)
         plt.fill(*self.box.exterior.xy, color=self.color)
+
+    def plot_rel_robot(self):
+        plt.fill(*self.rel_box.exterior.xy)

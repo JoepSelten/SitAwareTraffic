@@ -1,0 +1,70 @@
+from rdflib import Graph, URIRef, Literal, BNode, Namespace, RDF, RDFS
+from rdflib.namespace import GEO
+
+## Namespaces
+EX = Namespace("http://example.com/")
+GEO = Namespace("http://www.opengis.net/ont/geosparql#")
+
+class Relation():
+    def __init__(self, label):
+        self.properties = []
+        self.label = label
+
+    def add_property(self, property):
+        self.properties.append(property)
+
+    def conforms_to(self, metamodel, properties):   # is miss niet nodig
+        for props in metamodel.properties:
+            if props in properties:
+                self.properties.append(props)
+
+def Relation(g, IRI):
+    g.add((IRI, RDF.type, EX.relation))
+    g.add((IRI, ))
+
+def has_a(g, arg1, arg2):
+    IRI = EX.has_a
+    g.add((IRI, RDF.type, EX.relation))
+    g.add((arg1, EX.has_argument))
+
+class has_a(Relation):
+    def __init__(args, g, self):
+        super().__init__()
+        IRI = EX.has_a
+        g.add((IRI, RDF.type, EX.relation))
+        Relation(g, IRI)
+        g.add((EX.has_a, EX.has_property, EX.arg1))
+
+        g.add((E))
+
+
+class PropertyGraph():
+    def __init__(self):
+        self.g = Graph()
+        self.g.bind('ex', EX)
+        self.add_axioms()
+
+    def add_axioms(self):
+        ## Basic graph structures
+        self.g.add((EX.node, RDF.type, RDFS.Class))
+        self.g.add((EX.edge, RDF.type, RDF.Property))
+
+        ## Implicit relations, assumed to be known by humans, is therefore represented as an edge in the KG
+        #self.g.add((EX.has_a, RDF.type, EX.edge))    # has_a is the highest level of abstraction: mereological relation. 
+        #self.g.add((EX.connects, RDF.type, EX.edge)) # connects and connects already provide some additional information: topological relations
+        #self.g.add((EX.contains, RDF.type, EX.edge)) # you can connect an argument to a role
+
+        self.g.add((EX.conforms_to, RDF.type, EX.edge))  # conforms_to is a less restrictive form of the is_a relation
+
+        # Property relation, implicit when talking about property graphs, but needed for reification for RDF triples
+        self.g.add((EX.has_property, RDF.type, EX.edge))
+
+        ## Explicit relations, uses the implicit relations as building blocks
+        self.g.add((EX.relation, RDF.type, EX.node))
+        self.g.add((EX.property, RDF.type, EX.node))     # zijn dit laatste drie nodig? Kan ik niet alles als een relatie modeleren
+        self.g.add((EX.argument, RDF.type, EX.node))
+        self.g.add((EX.entity, RDF.type, EX.node))
+
+g = PropertyGraph()
+
+has_a(g, EX.road, EX.lane)

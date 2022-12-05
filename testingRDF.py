@@ -1,5 +1,6 @@
 from rdflib import Graph, URIRef, Literal, BNode, Namespace
 from rdflib.namespace import FOAF, RDF, RDFS, GEO
+from owlrl import DeductiveClosure, OWLRL_Semantics, RDFS_Semantics
 
 ## Namespaces
 EX = Namespace("http://example.com/")
@@ -18,6 +19,12 @@ g.add((EX.relation, RDF.type, EX.node))
 g.add((EX.property, RDF.type, EX.node))     # relations that always hold
 g.add((EX.argument, RDF.type, EX.node))
 
+print(g.serialize())
+
+g_entail = DeductiveClosure(RDFS_Semantics).expand(g)
+
+print(g.serialize())
+
 
 query = """
         PREFIX ex: <http://example.com/>
@@ -27,8 +34,8 @@ query = """
             ex:relation ex:edge ?node
         }
         """
-for r in g.query(query):
-    print(r)
+#for r in g.query(query):
+#    print(r)
 
 # g.add((EX.has_property, RDF.type, EX.edge))     # kan ik wel informatie in de edge brengen?? 
 # g.add((EX.has_argument, RDF.type, EX.edge))
@@ -66,4 +73,4 @@ for r in g.query(query):
 
 
 
-#print(g.serialize())
+print(g.serialize())

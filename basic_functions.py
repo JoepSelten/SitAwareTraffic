@@ -25,7 +25,7 @@ def trans(pos, yaw, l, w, rel_pos=np.array([0,0])):
         #print(box)
         return box
 
-def abs_to_rel(robot, obj_pos, l, b):     
+def abs_to_rel(robot, obj_pos, l, w):
         rel_pos = obj_pos - robot.pos
         yaw = -0.5*math.pi
         Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
@@ -34,7 +34,15 @@ def abs_to_rel(robot, obj_pos, l, b):
         rel_pos_rot = rel_pos.dot(Rot1)
         rel_yaw = 0.5*math.pi-robot.yaw
         
-        rel_box = trans(np.array([0,0]), 0.5*math.pi+rel_yaw, l, b, rel_pos_rot)
+        rel_box = trans(np.array([0,0]), 0.5*math.pi+rel_yaw, l, w, rel_pos_rot)
 
         rel_object = {'polygon': rel_box, 'abs_pos': obj_pos}
         return rel_object
+
+def coordinate_transform(robot, abs_pos):
+        rel_pos = abs_pos - robot.pos
+        yaw = 0.5*math.pi-robot.yaw
+        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
+                        [-math.sin(yaw), math.cos(yaw)]])
+        rel_pos_rot = rel_pos.dot(Rot1)
+        return rel_pos_rot
