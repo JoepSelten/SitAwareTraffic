@@ -1,9 +1,7 @@
 from rdflib import Graph, URIRef, Literal, BNode, Namespace, RDF, RDFS
-from rdflib.namespace import GEO
-from global_variables import g
+from global_variables import g, EX, GEO
 from closure_graph import Semantics
 from owlrl import DeductiveClosure
-EX = Namespace("http://example.com/")
 
 def uri_from_label(label):
     query = """
@@ -30,7 +28,7 @@ def has_a(subject):
         }"""
 
     parts = []
-    for r in g.query(query, initBindings={'subject': URIRef(*subject)}):
+    for r in g.query(query, initBindings={'subject': URIRef(subject)}):
             parts.append(*r)
 
     return parts
@@ -118,24 +116,54 @@ def query_part_of(part):
         }"""
 
     whole = []
-    for r in g.query(query, initBindings={'subject': URIRef(*part)}):
-            whole.append(*r)
+    for r in g.query(query, initBindings={'subject': URIRef(part)}):
+            whole.append(r)
 
     return whole
 
-def query_geometrical_location(subject):
-    print(subject)
+def simple_check(subject, predicate, object):
     query = """
         PREFIX ex: <http://example.com/>
+        PREFIX geo: <http://www.opengis.net/ont/geosparql#>
 
         SELECT ?subject
         WHERE {
-            ?subject ex:conforms_to geo:area .
+            ?subject ?predicate ?object .
         }"""
-
     answer = []
-    for r in g.query(query, initBindings={'subject': URIRef(subject)}):
-            answer.append(r)
-
-    print(answer)       # if empty, go abstraction level higher and try again
+    for r in g.query(query, initBindings={'subject': URIRef(subject), 'predicate': URIRef(predicate), 'object': URIRef(object)}):
+            answer.append(*r)
+    # if empty, go abstraction level higher and try again
     return answer
+
+def query_check_conforms_to(subject, object):
+    return simple_check(subject, EX.conforms_to, object)
+
+def query_check_affordance(subject, object):
+    return simple_check(subject, EX.affordance, object)
+
+def query_check_geometrical(subject):
+    return query_check_conforms_to(subject, GEO.Area)
+
+def query_check_driveable(subject):
+    return query_check_affordance(subject, EX.driveable)
+
+def query_driveable_location(subject):
+    drive_loc = query_check_geometrical(subject)
+    n = 0
+    while not drive_loc:
+        parts = has_a(subject)
+        for part in parts:
+            geom_part = query_check_geometrical(part)
+            if not geom_part:
+                continue
+            drive_part = query_check_driveable(geom_part[0])
+            if drive_part:
+                drive_loc.append(drive_part[0])
+        n+=1
+        if n > 3:   # for preventing an infinite loop
+            print("NO GEOMETRICAL AREA FOUND")
+            break
+    return drive_loc[0]
+
+ 

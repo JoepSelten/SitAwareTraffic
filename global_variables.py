@@ -22,6 +22,7 @@ c = config['stop_area_size']
 
 
 ## load property graph , later miss met externe server doen oid
+#g = Graph(store="Oxigraph")
 g = Graph()
 g.parse("kg3.json", format="json-ld")
 EX = Namespace("http://example.com/") 

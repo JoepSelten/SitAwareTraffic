@@ -1,29 +1,60 @@
 [
   {
-    "@id": "http://example.com/attribute",
+    "@id": "http://example.com/lane",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/affordance": [
+      {
+        "@id": "http://example.com/driveable"
+      }
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/side1"
+      },
+      {
+        "@id": "http://example.com/side2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/affordance",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
     ],
     "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
       {
-        "@id": "http://example.com/attribute"
+        "@id": "http://example.com/affordance"
       }
     ]
   },
   {
-    "@id": "http://example.com/width",
+    "@id": "http://www.opengis.net/ont/geosparql#Area",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
-    "@id": "http://example.com/conforms_to",
+    "@id": "http://example.com/road1",
     "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+    "http://example.com/has_a": [
       {
-        "@id": "http://example.com/conforms_to"
+        "@id": "http://example.com/side1"
+      },
+      {
+        "@id": "http://example.com/side2"
+      },
+      {
+        "@id": "http://example.com/lane"
       }
     ]
   },
@@ -47,6 +78,46 @@
     ]
   },
   {
+    "@id": "http://example.com/road4",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/lane"
+      },
+      {
+        "@id": "http://example.com/side1"
+      },
+      {
+        "@id": "http://example.com/side2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/has_a",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/has_a"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/attribute",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/attribute"
+      }
+    ]
+  },
+  {
     "@id": "http://example.com/side1",
     "@type": [
       "http://example.com/side",
@@ -55,6 +126,70 @@
     "http://example.com/conforms_to": [
       {
         "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/node2"
+      },
+      {
+        "@id": "http://example.com/node1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/connects",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/connects"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/side2",
+    "@type": [
+      "http://example.com/side",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/node2"
+      },
+      {
+        "@id": "http://example.com/node1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/middle",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/road1"
+      },
+      {
+        "@id": "http://example.com/road2"
+      },
+      {
+        "@id": "http://example.com/road3"
+      },
+      {
+        "@id": "http://example.com/road4"
       }
     ]
   },
@@ -86,24 +221,54 @@
     ]
   },
   {
-    "@id": "http://example.com/connects",
+    "@id": "http://example.com/width",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/conforms_to",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
     ],
     "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
       {
-        "@id": "http://example.com/connects"
+        "@id": "http://example.com/conforms_to"
       }
     ]
   },
   {
-    "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf",
+    "@id": "http://example.com/driveable",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/road2",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/lane"
+      },
+      {
+        "@id": "http://example.com/side1"
+      },
+      {
+        "@id": "http://example.com/side2"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
     ],
     "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
       {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf"
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
       }
     ]
   },
@@ -114,28 +279,21 @@
     ]
   },
   {
-    "@id": "http://example.com/road4",
-    "@type": [
-      "http://example.com/road",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/has_a",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://example.com/has_a"
-      }
-    ]
-  },
-  {
     "@id": "http://example.com/road3",
     "@type": [
       "http://example.com/road",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/lane"
+      },
+      {
+        "@id": "http://example.com/side1"
+      },
+      {
+        "@id": "http://example.com/side2"
+      }
     ]
   },
   {
@@ -150,78 +308,14 @@
     ]
   },
   {
-    "@id": "http://example.com/side2",
+    "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf",
     "@type": [
-      "http://example.com/side",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
     ],
-    "http://example.com/conforms_to": [
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
       {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
+        "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf"
       }
-    ]
-  },
-  {
-    "@id": "http://example.com/node1",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/lane",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/side1"
-      },
-      {
-        "@id": "http://example.com/side2"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/road2",
-    "@type": [
-      "http://example.com/road",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/middle",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/road1"
-      },
-      {
-        "@id": "http://example.com/road2"
-      },
-      {
-        "@id": "http://example.com/road3"
-      },
-      {
-        "@id": "http://example.com/road4"
-      }
-    ]
-  },
-  {
-    "@id": "http://www.opengis.net/ont/geosparql#Area",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
@@ -253,21 +347,9 @@
     ]
   },
   {
-    "@id": "http://example.com/road1",
+    "@id": "http://example.com/node1",
     "@type": [
-      "http://example.com/road",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-      }
     ]
   }
 ]

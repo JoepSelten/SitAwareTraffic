@@ -57,6 +57,9 @@ g.add((EX.lane, EX.conforms_to, GEO.Area))
 g.add((EX.side, EX.conforms_to, GEO.Area))
 g.add((EX.middle, EX.conforms_to, GEO.Area))
 
+## Affordances
+g.add((EX.lane, EX.affordance, EX.driveable))
+
 DeductiveClosure(Semantics).expand(g)
 
 #print(g.serialize())

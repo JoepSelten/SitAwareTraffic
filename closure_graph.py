@@ -159,6 +159,9 @@ class Semantics(Core):
         if p == RDF.type:
             for Z, Y, xxx in self.graph.triples((o, EX.conforms_to, None)):
                 self.store_triple((s, EX.conforms_to, xxx))
+            
+            for Z, Y, xxx in self.graph.triples((o, EX.has_a, None)):
+                self.store_triple((s, EX.has_a, xxx))
     
 
         
