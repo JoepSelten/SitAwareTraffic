@@ -1,5 +1,5 @@
 import rdflib
-from rdflib import Literal, Namespace
+from rdflib import Literal, Namespace, URIRef
 from rdflib.namespace import RDF, RDFS
 from itertools import product
 from owlrl.Closure import Core
@@ -156,14 +156,25 @@ class Semantics(Core):
             self.store_triple((s, RDFS.subClassOf, RDFS.Literal))
         
         ## added rules
-        if p == RDF.type:
+        if p == RDF.type:          
+            for Z, Y, xxx in self.graph.triples((o, EX.has_a, None)):
+                new_uri = URIRef(xxx.replace(o,s))
+                self.store_triple((s, EX.has_a, new_uri))
+                xxx_type = self.query_type(xxx)
+                self.store_triple((new_uri, RDF.type, xxx_type))
+
+            # for Z, Y, xxx in self.graph.triples((o, EX.connects, None)):
+            #     new_uri = URIRef(xxx.replace(o,s))
+            #     self.store_triple((s, EX.connects, new_uri))
+
             for Z, Y, xxx in self.graph.triples((o, EX.conforms_to, None)):
                 self.store_triple((s, EX.conforms_to, xxx))
             
-            for Z, Y, xxx in self.graph.triples((o, EX.has_a, None)):
-                self.store_triple((s, EX.has_a, xxx))
+            for Z, Y, xxx in self.graph.triples((o, EX.affordance, None)):
+                self.store_triple((s, EX.affordance, xxx))
     
 
+    #def unique_uri()
         
 
     def _literals(self):
@@ -171,3 +182,17 @@ class Semantics(Core):
         Get all literals defined in the graph.
         """
         return set(o for s, p, o in self.graph if isinstance(o, Literal))
+
+    def query_type(self, subject):
+        query = """
+            PREFIX ex: <http://example.com/>
+            PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+
+            SELECT ?object
+            WHERE {
+                ?subject rdf:type ?object .
+            }"""
+        answer = []
+        for r in self.graph.query(query, initBindings={'subject': URIRef(subject)}):
+                answer.append(*r)
+        return answer[0]

@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import geopandas
 from shapely.geometry import Polygon
+from rdflib import URIRef
 from global_variables import EX
+
 
 class Perception():
     def __init__(self):
@@ -57,9 +59,9 @@ class Perception():
             lane = abs_to_rel(robot, np.array([50.0, 40.0]), 80, 20)
             side2 = abs_to_rel(robot, np.array([40.0, 40.0]), 80, 1)
             areas = [lane, side1, side2]
-            side1_uri = EX.side1
-            lane_uri = EX.lane
-            side2_uri = EX.side2
+            lane_uri = URIRef(uri_road + "/lane")
+            side1_uri = URIRef(uri_road + "/side1")
+            side2_uri = URIRef(uri_road + "/side2")
             uris = [lane_uri, side1_uri, side2_uri]
         #print(areas)
         elif uri_sign == uri_intersection:
@@ -78,19 +80,19 @@ class Perception():
             middle = abs_to_rel(robot, np.array([50.0, 50.0]), 20, 20)
 
             areas = [middle, lane1, lane2, lane3, lane4, side1, side2, side3, side4, side5, side6, side7, side8]
-            middle_uri = EX.middle
-            lane1_uri = EX.lane1
-            lane2_uri = EX.lane2
-            lane3_uri = EX.lane3
-            lane4_uri = EX.lane4
-            side1_uri = EX.side1
-            side2_uri = EX.side2
-            side3_uri = EX.side3
-            side4_uri = EX.side4
-            side5_uri = EX.side5
-            side6_uri = EX.side6
-            side7_uri = EX.side7
-            side8_uri = EX.side8
+            middle_uri = URIRef(uri_intersection + "/middle")
+            lane1_uri = URIRef(uri_intersection + "/road1/lane")
+            lane2_uri = URIRef(uri_intersection + "/road2/lane")
+            lane3_uri = URIRef(uri_intersection + "/road3/lane")
+            lane4_uri = URIRef(uri_intersection + "/road4/lane")
+            side1_uri = URIRef(uri_intersection + "/road1/side1")
+            side2_uri = URIRef(uri_intersection + "/road1/side2")
+            side3_uri = URIRef(uri_intersection + "/road2/side1")
+            side4_uri = URIRef(uri_intersection + "/road2/side2")
+            side5_uri = URIRef(uri_intersection + "/road3/side1")
+            side6_uri = URIRef(uri_intersection + "/road3/side2")
+            side7_uri = URIRef(uri_intersection + "/road4/side1")
+            side8_uri = URIRef(uri_intersection + "/road4/side2")
 
             uris = [middle_uri, lane1_uri, lane2_uri, lane3_uri, lane4_uri, side1_uri, side2_uri, side3_uri, side4_uri, side5_uri, side6_uri, side7_uri, side8_uri]
         return areas, uris

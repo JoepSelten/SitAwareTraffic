@@ -104,7 +104,8 @@ def add_resource(name, resource):
 
 def query_connectivity(start, goal):    # zou met zowel uris als labels moeten werken
     ## later met topology doen
-    return [start, EX.middle, goal]
+    middle = URIRef("http://example.com/intersection/middle")
+    return [start, middle, goal]
 
 def query_part_of(part):
     query = """
@@ -166,4 +167,13 @@ def query_driveable_location(subject):
             break
     return drive_loc[0]
 
- 
+def query_plan(connectivity):
+    plan = []
+    for i in range(len(connectivity)-1):
+        action = query_action(connectivity[i], connectivity[i+1])
+        plan.append(action)
+    return plan
+
+def query_action(pre, post):
+    action = "move"
+    return action

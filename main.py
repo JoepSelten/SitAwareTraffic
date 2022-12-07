@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import json
+from rdflib import URIRef
 from shapely.geometry import Polygon, Point, LineString, CAP_STYLE, box
 from basic_functions import trans, abs_to_rel
 from perception import Perception
@@ -21,7 +22,8 @@ sit = 'intersection'
 world = Worldmodel()
 simulator = Simulator(sit)       # configure global map
 simulator.set_map(sit)
-simulator.add_robot('turtle1', EX.road4, TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 'down')
+goal = URIRef("http://example.com/intersection/road4")
+simulator.add_robot('turtle1', goal, TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 'down')
 add_robot('turtle1', 'laser_range_finder', 'velocity_control', 'encoders')
 #print(g.serialize())
 
