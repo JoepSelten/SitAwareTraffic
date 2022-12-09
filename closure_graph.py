@@ -156,7 +156,7 @@ class Semantics(Core):
             self.store_triple((s, RDFS.subClassOf, RDFS.Literal))
         
         ## added rules
-        if p == RDF.type:          
+        if p == RDF.type or p == EX.conforms_to:          
             for Z, Y, xxx in self.graph.triples((o, EX.has_a, None)):
                 new_uri = URIRef(xxx.replace(o,s))
                 self.store_triple((s, EX.has_a, new_uri))
@@ -172,6 +172,10 @@ class Semantics(Core):
             
             for Z, Y, xxx in self.graph.triples((o, EX.affordance, None)):
                 self.store_triple((s, EX.affordance, xxx))
+
+
+        if p == EX.connects:
+            self.store_triple((o, EX.connects, s))
     
 
     #def unique_uri()

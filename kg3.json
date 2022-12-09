@@ -1,13 +1,151 @@
 [
   {
-    "@id": "http://example.com/lane",
+    "@id": "http://example.com/intersection/road3/lane",
     "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "http://example.com/lane"
     ],
     "http://example.com/affordance": [
       {
         "@id": "http://example.com/driveable"
       }
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/middle",
+    "@type": [
+      "http://example.com/middle",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/road1"
+      },
+      {
+        "@id": "http://example.com/intersection/road2"
+      },
+      {
+        "@id": "http://example.com/intersection/road3"
+      },
+      {
+        "@id": "http://example.com/intersection/road4"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/side",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/road/side2",
+    "@type": [
+      "http://example.com/side",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/road/lane"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road4/side1",
+    "@type": [
+      "http://example.com/side"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.opengis.net/ont/geosparql#Area",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/affordance",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/affordance"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/has_a",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/has_a"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road3",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/middle"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road3/side2"
+      },
+      {
+        "@id": "http://example.com/intersection/road3/side1"
+      },
+      {
+        "@id": "http://example.com/intersection/road3/lane"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road1/side1",
+    "@type": [
+      "http://example.com/side"
     ],
     "http://example.com/conforms_to": [
       {
@@ -27,27 +165,14 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road2",
+    "@id": "http://example.com/driveable",
     "@type": [
-      "http://example.com/road",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road2/side2"
-      },
-      {
-        "@id": "http://example.com/intersection/road2/lane"
-      },
-      {
-        "@id": "http://example.com/intersection/road2/side1"
-      }
     ]
   },
   {
-    "@id": "http://example.com/road/lane",
+    "@id": "http://example.com/lane",
     "@type": [
-      "http://example.com/lane",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ],
     "http://example.com/affordance": [
@@ -59,18 +184,27 @@
       {
         "@id": "http://www.opengis.net/ont/geosparql#Area"
       }
+    ]
+  },
+  {
+    "@id": "http://example.com/road/side1",
+    "@type": [
+      "http://example.com/side",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
+      }
     ],
     "http://example.com/connects": [
       {
-        "@id": "http://example.com/road/side1"
-      },
-      {
-        "@id": "http://example.com/road/side2"
+        "@id": "http://example.com/road/lane"
       }
     ]
   },
   {
-    "@id": "http://example.com/intersection/road4/side1",
+    "@id": "http://example.com/intersection/road2/side2",
     "@type": [
       "http://example.com/side"
     ],
@@ -81,42 +215,13 @@
     ]
   },
   {
-    "@id": "http://example.com/connects",
+    "@id": "http://example.com/middle",
     "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://example.com/connects"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road3",
-    "@type": [
-      "http://example.com/road",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ],
-    "http://example.com/has_a": [
+    "http://example.com/conforms_to": [
       {
-        "@id": "http://example.com/intersection/road3/side2"
-      },
-      {
-        "@id": "http://example.com/intersection/road3/side1"
-      },
-      {
-        "@id": "http://example.com/intersection/road3/lane"
-      }
-    ]
-  },
-  {
-    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
       }
     ]
   },
@@ -137,13 +242,13 @@
     ]
   },
   {
-    "@id": "http://example.com/conforms_to",
+    "@id": "http://example.com/intersection/road2/side1",
     "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+      "http://example.com/side"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+    "http://example.com/conforms_to": [
       {
-        "@id": "http://example.com/conforms_to"
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
       }
     ]
   },
@@ -164,47 +269,35 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road2/side2",
+    "@id": "http://example.com/road",
     "@type": [
-      "http://example.com/side"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road4/lane",
-    "@type": [
-      "http://example.com/lane"
-    ],
-    "http://example.com/affordance": [
-      {
-        "@id": "http://example.com/driveable"
-      }
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road4",
-    "@type": [
-      "http://example.com/road",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ],
     "http://example.com/has_a": [
       {
-        "@id": "http://example.com/intersection/road4/side1"
+        "@id": "http://example.com/road/lane"
       },
       {
-        "@id": "http://example.com/intersection/road4/lane"
+        "@id": "http://example.com/road/side1"
       },
       {
-        "@id": "http://example.com/intersection/road4/side2"
+        "@id": "http://example.com/road/side2"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "road"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/conforms_to",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/conforms_to"
       }
     ]
   },
@@ -237,113 +330,6 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road1/side1",
-    "@type": [
-      "http://example.com/side"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road1",
-    "@type": [
-      "http://example.com/road",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road1/side2"
-      },
-      {
-        "@id": "http://example.com/intersection/road1/side1"
-      },
-      {
-        "@id": "http://example.com/intersection/road1/lane"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/side",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://www.opengis.net/ont/geosparql#Area",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road3/lane",
-    "@type": [
-      "http://example.com/lane"
-    ],
-    "http://example.com/affordance": [
-      {
-        "@id": "http://example.com/driveable"
-      }
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road3/side1",
-    "@type": [
-      "http://example.com/side"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/middle",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/road/side2",
-    "@type": [
-      "http://example.com/side",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf"
-      }
-    ]
-  },
-  {
     "@id": "http://www.w3.org/2000/01/rdf-schema#label",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
@@ -351,67 +337,6 @@
     "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
       {
         "@id": "http://www.w3.org/2000/01/rdf-schema#label"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/road",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/road/lane"
-      },
-      {
-        "@id": "http://example.com/road/side1"
-      },
-      {
-        "@id": "http://example.com/road/side2"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@value": "road"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/has_a",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://example.com/has_a"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road3/side2",
-    "@type": [
-      "http://example.com/side"
-    ],
-    "http://example.com/conforms_to": [
-      {
-        "@id": "http://www.opengis.net/ont/geosparql#Area"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/driveable",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/affordance",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://example.com/affordance"
       }
     ]
   },
@@ -427,10 +352,14 @@
     ]
   },
   {
-    "@id": "http://example.com/road/side1",
+    "@id": "http://example.com/intersection/road4/lane",
     "@type": [
-      "http://example.com/side",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "http://example.com/lane"
+    ],
+    "http://example.com/affordance": [
+      {
+        "@id": "http://example.com/driveable"
+      }
     ],
     "http://example.com/conforms_to": [
       {
@@ -439,7 +368,64 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road2/side1",
+    "@id": "http://example.com/connects",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/connects"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road2",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/middle"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road2/lane"
+      },
+      {
+        "@id": "http://example.com/intersection/road2/side1"
+      },
+      {
+        "@id": "http://example.com/intersection/road2/side2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road1",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/middle"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road1/side1"
+      },
+      {
+        "@id": "http://example.com/intersection/road1/side2"
+      },
+      {
+        "@id": "http://example.com/intersection/road1/lane"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road3/side1",
     "@type": [
       "http://example.com/side"
     ],
@@ -450,10 +436,15 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/middle",
+    "@id": "http://example.com/road/lane",
     "@type": [
-      "http://example.com/middle",
+      "http://example.com/lane",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/affordance": [
+      {
+        "@id": "http://example.com/driveable"
+      }
     ],
     "http://example.com/conforms_to": [
       {
@@ -462,16 +453,55 @@
     ],
     "http://example.com/connects": [
       {
-        "@id": "http://example.com/intersection/road1"
+        "@id": "http://example.com/road/side1"
       },
       {
-        "@id": "http://example.com/intersection/road2"
+        "@id": "http://example.com/road/side2"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road4",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/middle"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road4/side2"
       },
       {
-        "@id": "http://example.com/intersection/road3"
+        "@id": "http://example.com/intersection/road4/lane"
       },
       {
-        "@id": "http://example.com/intersection/road4"
+        "@id": "http://example.com/intersection/road4/side1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road3/side2",
+    "@type": [
+      "http://example.com/side"
+    ],
+    "http://example.com/conforms_to": [
+      {
+        "@id": "http://www.opengis.net/ont/geosparql#Area"
       }
     ]
   }

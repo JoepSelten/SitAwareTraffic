@@ -20,6 +20,7 @@ class Perception():
         if not self.spotted_sign:
             self.set_map(world, input_features)
         elif self.spotted_sign:                         # we will asume it does spot a sign (road or intersection)
+            world.update_sit(self.spotted_sign)
             areas, uris = self.query_topology(robot, sign)
             self.set_map(world, areas, uris)
 

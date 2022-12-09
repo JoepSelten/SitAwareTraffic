@@ -22,7 +22,8 @@ sit = 'intersection'
 world = Worldmodel()
 simulator = Simulator(sit)       # configure global map
 simulator.set_map(sit)
-goal = URIRef("http://example.com/intersection/road4")
+
+goal = URIRef("http://example.com/intersection/road4") # "At the intersection go left"
 simulator.add_robot('turtle1', goal, TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 'down')
 add_robot('turtle1', 'laser_range_finder', 'velocity_control', 'encoders')
 #print(g.serialize())
@@ -57,7 +58,8 @@ while True:
     perception.perceive(simulator, world, sit, side['polygon'])
     simulator.robots[0].plot_rel_robot()
 
-    planner.plan(world, simulator.robots[0])
+    planner.meta_plan(monitor, world, simulator.robots[0], simulator.robots[0].goal)
+    planner.plan(monitor, world, simulator.robots[0])
     control.move(simulator.robots[0], monitor)
     #simulator.robot.yaw += 0.01*math.pi
     plt.pause(dt/100)

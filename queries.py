@@ -14,7 +14,7 @@ def uri_from_label(label):
         """
     answer = 0
     for r in g.query(query, initBindings={'label': Literal(label)}):
-            answer = r
+        answer = r
     
     return answer
 
@@ -29,7 +29,7 @@ def has_a(subject):
 
     parts = []
     for r in g.query(query, initBindings={'subject': URIRef(subject)}):
-            parts.append(*r)
+        parts.append(*r)
 
     return parts
 
@@ -45,7 +45,7 @@ def has_sides(subject):
 
     parts = []
     for r in g.query(query, initBindings={'subject': URIRef(*subject)}):
-            parts.append(*r)
+        parts.append(*r)
 
     return parts
 
@@ -61,7 +61,7 @@ def distance_sides_road():
             ?value_distance_sides rdf:value ?distance .
         }"""
     for r in g.query(query):
-            answer = r
+        answer = r
     return answer
 
 def conforms_to_area(subject):
@@ -73,7 +73,7 @@ def conforms_to_area(subject):
         }
         """
         for r in g.query(query, initBindings={'x': subject}):
-                answer = r
+            answer = r
         return answer
 
 def add_robot(name, *resources):
@@ -102,10 +102,40 @@ def add_resource(name, resource):
     g.add((uri_res, RDFS.label, resource))
     g.add((uri, EX.resource, uri_res))
 
+def query_one_link_connection(start, goal):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?connection
+        WHERE {
+            ?start ex:connects ?connection .
+            ?connection ex:connects ?goal .
+        }"""
+
+    connection = []
+    for r in g.query(query, initBindings={'start': start, 'goal': goal}):
+        connection.append(*r)
+        
+    return connection[0]
+
 def query_connectivity(start, goal):    # zou met zowel uris als labels moeten werken
-    ## later met topology doen
-    middle = URIRef("http://example.com/intersection/middle")
-    return [start, middle, goal]
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        ASK { ?start ex:connects* ?goal }
+        """
+
+    for r in g.query(query, initBindings={'start': start, 'goal': goal}):
+        connection = r
+
+    if connection:      ## beetje beun manier maargoed, moet eigenlijk met een bepaalde search (miss indoorgml)
+        connectivity = query_one_link_connection(start, goal)
+        if not connectivity:
+            print("There is a connection but I cannot find it!")
+    else:
+        print("NO connection found!")
+
+    return [start, connectivity, goal]
 
 def query_part_of(part):
     query = """
@@ -118,7 +148,7 @@ def query_part_of(part):
 
     whole = []
     for r in g.query(query, initBindings={'subject': URIRef(part)}):
-            whole.append(r)
+        whole.append(r)
 
     return whole
 
@@ -133,7 +163,7 @@ def simple_check(subject, predicate, object):
         }"""
     answer = []
     for r in g.query(query, initBindings={'subject': URIRef(subject), 'predicate': URIRef(predicate), 'object': URIRef(object)}):
-            answer.append(*r)
+        answer.append(*r)
     # if empty, go abstraction level higher and try again
     return answer
 
@@ -169,7 +199,7 @@ def query_driveable_location(subject):
 
 def query_plan(connectivity):
     plan = []
-    for i in range(len(connectivity)-1):
+    for i in range(len(connectivity)-1):    # dit doe je eigenlijk ook al met alleen start en goal
         action = query_action(connectivity[i], connectivity[i+1])
         plan.append(action)
     return plan
@@ -177,3 +207,20 @@ def query_plan(connectivity):
 def query_action(pre, post):
     action = "move"
     return action
+
+def query_mereology(goal, current_area):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?whole1
+        WHERE {
+            ?meta_whole ex:has_a ?whole2 .
+            ?meta_whole ex:has_a ?whole1 .
+            ?whole1 ex:has_a ?part .
+        }"""
+
+    whole = []
+    for r in g.query(query, initBindings={'part': current_area, 'whole2': goal}):
+        whole.append(*r)
+
+    return whole[0]
