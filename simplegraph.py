@@ -23,17 +23,6 @@ g.add((EX.road, RDFS.label, Literal('road')))
 g.add((EX.intersection, RDFS.label, Literal('intersection')))
 
 ## Mereology
-road_lane = add_has_a(g, EX.road, EX.lane)
-road_side1 = add_has_a(g, EX.road, EX.side1)
-road_side2 = add_has_a(g, EX.road, EX.side2)
-g.add((road_lane, RDF.type, EX.lane))
-g.add((road_side1, RDF.type, EX.side))
-g.add((road_side2, RDF.type, EX.side))
-
-## miss moet ik dit met een closure & query doen
-#g.add((EX.intersection, EX.has_a, EX.road1))
-
-
 intersection_middle = add_has_a(g, EX.intersection, EX.middle)
 intersection_road1 = add_has_a(g, EX.intersection, EX.road1)
 intersection_road2 = add_has_a(g, EX.intersection, EX.road2)
@@ -46,6 +35,13 @@ g.add((intersection_road2, RDF.type, EX.road))
 g.add((intersection_road3, RDF.type, EX.road))
 g.add((intersection_road4, RDF.type, EX.road))
 
+road_lane = add_has_a(g, EX.road, EX.lane)
+road_side1 = add_has_a(g, EX.road, EX.side1)
+road_side2 = add_has_a(g, EX.road, EX.side2)
+g.add((road_lane, RDF.type, EX.lane))
+g.add((road_side1, RDF.type, EX.side))
+g.add((road_side2, RDF.type, EX.side))
+
 ## Topology
 g.add((road_lane, EX.connects, road_side1))
 g.add((road_lane, EX.connects, road_side2))
@@ -55,11 +51,8 @@ g.add((intersection_middle, EX.connects, intersection_road2))
 g.add((intersection_middle, EX.connects, intersection_road3))
 g.add((intersection_middle, EX.connects, intersection_road4))
 
-# g.add((EX.lane, EX.conforms_to, EX.polyon))
-# g.add((EX.middle, EX.conforms_to, EX.polygon))
-# g.add((EX.side, EX.conforms_to, EX.line))
-
-g.add((EX.lane, RDF.type, EX.polyon))
+## lower level
+g.add((EX.lane, RDF.type, EX.polygon))
 g.add((EX.middle, RDF.type, EX.polygon))
 g.add((EX.side, RDF.type, EX.line))
 
@@ -75,19 +68,31 @@ g.add((polygon_line2, RDF.type, EX.line))
 g.add((polygon_line3, RDF.type, EX.line))
 g.add((polygon_line4, RDF.type, EX.line))
 
-# g.add((EX.interior, RDF.type, EX.polygon))
-# g.add((EX.line1, RDF.type, EX.line))
-# g.add((EX.line2, RDF.type, EX.line))
-# g.add((EX.line3, RDF.type, EX.line))
-# g.add((EX.line4, RDF.type, EX.line))
-
-
 # ## Affordances
 g.add((EX.lane, EX.affordance, EX.driveable))
 
 DeductiveClosure(Semantics).expand(g)
 
-print(g.serialize())
-#g.serialize(format="json-ld", destination="kg3.json")
+## moet de uris eigenlijk queryen
+intersection_road1_lane_line1 = URIRef("http://example.com/intersection/road1/lane/line1")
+intersection_road2_lane_line1 = URIRef("http://example.com/intersection/road2/lane/line1")
+intersection_road3_lane_line1 = URIRef("http://example.com/intersection/road3/lane/line1")
+intersection_road4_lane_line1 = URIRef("http://example.com/intersection/road4/lane/line1")
+
+intersection_middle_line1 = URIRef("http://example.com/intersection/middle/line1")
+intersection_middle_line2 = URIRef("http://example.com/intersection/middle/line2")
+intersection_middle_line3 = URIRef("http://example.com/intersection/middle/line3")
+intersection_middle_line4 = URIRef("http://example.com/intersection/middle/line4")
+
+g.add((intersection_road1_lane_line1, EX.connects, intersection_middle_line1))
+g.add((intersection_road2_lane_line1, EX.connects, intersection_middle_line2))
+g.add((intersection_road3_lane_line1, EX.connects, intersection_middle_line3))
+g.add((intersection_road4_lane_line1, EX.connects, intersection_middle_line4))
+
+DeductiveClosure(Semantics).expand(g)
+
+#print(g.serialize())
+g.serialize(format="json-ld", destination="kg3.json")
+#g.serialize(destination="kg3.txt")
 
 #print(EX.road)
