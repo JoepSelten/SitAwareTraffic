@@ -190,7 +190,6 @@ class Semantics(Core):
     def query_type(self, subject):
         query = """
             PREFIX ex: <http://example.com/>
-            PREFIX geo: <http://www.opengis.net/ont/geosparql#>
 
             SELECT ?object
             WHERE {
