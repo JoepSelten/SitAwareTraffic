@@ -14,6 +14,9 @@ class Monitor():
         self.task_number = 0
         self.subtask = self.plan[self.task_number]
 
+    def set_direction(self, direction):
+        self.direction = direction
+
     def meta_monitor(self, world): # check if mereology changes or if goal succesful
         pass
 

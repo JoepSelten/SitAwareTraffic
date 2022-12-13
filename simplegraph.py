@@ -70,10 +70,21 @@ g.add((polygon_line4, RDF.type, EX.line))
 
 # ## Affordances
 g.add((EX.lane, EX.affordance, EX.driveable))
+g.add((EX.side, EX.affordance, EX.perceivable))
 
 DeductiveClosure(Semantics).expand(g)
 
-## moet de uris eigenlijk queryen
+## moet de uris eigenlijk queryen, dit kan miss ook uit de lagere level gehaald worden ipv los allemaal gedefinieerd
+intersection_road1_lane = URIRef("http://example.com/intersection/road1/lane")
+intersection_road2_lane = URIRef("http://example.com/intersection/road2/lane")
+intersection_road3_lane = URIRef("http://example.com/intersection/road3/lane")
+intersection_road4_lane = URIRef("http://example.com/intersection/road4/lane")
+
+g.add((intersection_road1_lane, EX.connects, intersection_middle))
+g.add((intersection_road2_lane, EX.connects, intersection_middle))
+g.add((intersection_road3_lane, EX.connects, intersection_middle))
+g.add((intersection_road4_lane, EX.connects, intersection_middle))
+
 intersection_road1_lane_line1 = URIRef("http://example.com/intersection/road1/lane/line1")
 intersection_road2_lane_line1 = URIRef("http://example.com/intersection/road2/lane/line1")
 intersection_road3_lane_line1 = URIRef("http://example.com/intersection/road3/lane/line1")
@@ -93,6 +104,6 @@ DeductiveClosure(Semantics).expand(g)
 
 #print(g.serialize())
 g.serialize(format="json-ld", destination="kg3.json")
-#g.serialize(destination="kg3.txt")
+g.serialize(destination="kg3.txt")
 
 #print(EX.road)

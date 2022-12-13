@@ -163,6 +163,9 @@ class Semantics(Core):
                 xxx_type = self.query_type(xxx)
                 self.store_triple((new_uri, RDF.type, xxx_type))
 
+            for Z, Y, xxx in self.graph.triples((o, RDF.type, None)):
+                self.store_triple((s, RDF.type, xxx))
+
             # for Z, Y, xxx in self.graph.triples((o, EX.connects, None)):
             #     new_uri = URIRef(xxx.replace(o,s))
             #     self.store_triple((s, EX.connects, new_uri))
@@ -172,6 +175,8 @@ class Semantics(Core):
             
             for Z, Y, xxx in self.graph.triples((o, EX.affordance, None)):
                 self.store_triple((s, EX.affordance, xxx))
+
+        
 
 
         if p == EX.connects:

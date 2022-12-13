@@ -1,4 +1,4 @@
-from queries import *
+from queries import uri_from_label, has_a, distance_sides_road, conforms_to_area, has_sides
 from basic_functions import abs_to_rel
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,31 +12,17 @@ class Perception():
     def __init__(self):
         self.spotted_sign = False
 
-    def perceive(self, simulator, world, inputs):       # de skills moeten eigenlijk vragen wat nodig is
-        road = world.robot_pos[1]
-        #robot_pos_polygon = query_if_polygon(robot_pos)
-        road_parts = has_a(road)
-        for part in road_parts:
-            perceivable = query_if_perceivable(part)
-            if perceivable:
-                print(part)
-
-        # link sides met linestrings, gebruik relaties tussen sides en lane om de lane te plotten, het is in dit geval simpel maar moet altijd werken
-
-        #print(inputs)
-        #print(road_parts)
-
-
-        # robot = simulator.robots[0]
-        # input_strings = list(filter(lambda x: isinstance(x, str), args))
-        # input_features = list(filter(lambda x: isinstance(x, Polygon), args))
-        # sign = self.check_labels_in_graph(input_strings)
-        # if not self.spotted_sign:
-        #     self.set_map(world, input_features)
-        # elif self.spotted_sign:                         # we will asume it does spot a sign (road or intersection)
-        #     world.update_sit(self.spotted_sign)
-        #     areas, uris = self.query_topology(robot, sign)
-        #     self.set_map(world, areas, uris)
+    def perceive(self, simulator, world, *args):
+        robot = simulator.robots[0]
+        input_strings = list(filter(lambda x: isinstance(x, str), args))
+        input_features = list(filter(lambda x: isinstance(x, Polygon), args))
+        sign = self.check_labels_in_graph(input_strings)
+        if not self.spotted_sign:
+            self.set_map(world, input_features)
+        elif self.spotted_sign:                         # we will asume it does spot a sign (road or intersection)
+            world.update_sit(self.spotted_sign)
+            areas, uris = self.query_topology(robot, sign)
+            self.set_map(world, areas, uris)
 
     def check_labels_in_graph(self, input_strings):
         uris = []

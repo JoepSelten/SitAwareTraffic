@@ -1,4 +1,4 @@
-from shapely.geometry import Polygon, Point, LineString, CAP_STYLE, box
+from shapely.geometry import Polygon, Point, LineString, CAP_STYLE, box, MultiPolygon
 from shapely import affinity
 import numpy as np
 import math
@@ -15,6 +15,7 @@ class Simulator():
     def __init__(self, sit="intersection"):
         self.robots = []
         self.num_robots = 0
+        self.input_features = []
 
     def set_map(self, sit):
         self.map = Map(sit)
@@ -48,9 +49,55 @@ class Simulator():
 
         return rel_object
 
+    def perceived_features(self):   # gives all features inside a certain radius, maybe later use a part of the circle
+        robot = self.robots[0]
+        perception_area = trans(robot.pos, robot.yaw, 60, 60)       # maybe later a circle or hexagon
+        #map_features = MultiPolygon(self.map.polygon_list)
+        for polygon in self.map.polygon_list:
+            if polygon.geom_type=='LineString':
+                overlap = polygon.intersection(perception_area)
+                if overlap:
+                    self.input_features.append(overlap)            
+        return self.input_features
+
+    def plot_input_features(self):
+        for feature in self.input_features:
+            if feature.geom_type=='Polygon':
+                plt.fill(*feature.exterior.xy)
+            elif feature.geom_type=='LineString':
+                plt.plot(*feature.xy)
+        
+    
+# 'poly': Polygon([(40, 40), (60, 40), (60, 60), (40, 60)])
+
 class Map():
     def __init__(self, Traffic_Situation = "intersection"):
         if Traffic_Situation == "intersection" :
+            self.map_dict =  {'0': {'type': 'on intersection',
+                            'poly': Polygon([(l, l), (l+w, l), (l+w, l+w), (l, l+w)]), 'color': 'lightblue', 'transparency': 1},
+                        '1': {'type': 'lane', 'location': 'down', 'poly': Polygon([(l, 0), (l+w, 0), (l+w, l), (l, l)]), 'color': 'lightblue', 'transparency': 1},
+                        '2': {'type': 'lane', 'location': 'up', 'poly': Polygon([(l, l+w), (l+w, l+w), (l+w, 2*l+w), (l, 2*l+w)]), 'color': 'lightblue', 'transparency': 1},
+                        '3': {'type': 'lane', 'location': 'left', 'poly': Polygon([(0, l), (l, l), (l, l+w), (0, l+w)]), 'color': 'lightblue', 'transparency': 1},
+                        '4': {'type': 'lane', 'location': 'right', 'poly': Polygon([(l+w, l), (2*l+w, l), (2*l+w, l+w), (l+w, l+w)]), 'color': 'lightblue', 'transparency': 1},
+                        '5': {'type': 'boundary', 'location': 'down', 
+                            'poly': LineString([(l, 0), (l, l)]), 'color': 'red', 'transparency': 1},
+                        '6': {'type': 'boundary', 'location': 'down', 
+                            'poly': LineString([(l+w, 0), (l+w, l)]), 'color': 'red', 'transparency': 1},
+                        '7': {'type': 'boundary', 'location': 'up', 
+                            'poly': LineString([(l, l+w), (l, 2*l+w)]), 'color': 'red', 'transparency': 1},
+                        '8': {'type': 'boundary', 'location': 'up', 
+                            'poly': LineString([(l+w, l+w), (l+w, 2*l+w)]), 'color': 'red', 'transparency': 1},
+                        '9': {'type': 'boundary', 'location': 'left', 
+                            'poly': LineString([(0, l), (l, l)]), 'color': 'red', 'transparency': 1},
+                        '10': {'type': 'boundary', 'location': 'left', 
+                            'poly': LineString([(0, l+w), (l, l+w)]), 'color': 'red', 'transparency': 1},
+                        '11': {'type': 'boundary', 'location': 'right', 
+                            'poly': LineString([(l+w, l), (2*l+w, l)]), 'color': 'red', 'transparency': 1},
+                        '12': {'type': 'boundary', 'location': 'right', 
+                            'poly': LineString([(l+w, l+w), (2*l+w, l+w)]), 'color': 'red', 'transparency': 1},
+            }
+
+        if Traffic_Situation == "intersection2" :
             self.map_dict =  {'0': {'type': 'on intersection',
                             'geometry': np.array([l, l+w, l+w, l, l, l, l+w, l+w]), 'color': 'lightblue', 'transparency': 1},
                         '1': {'type': 'lane', 'location': 'down', 'geometry': np.array([l, l+w, l+w, l, 0, 0, l, l]), 'color': 'lightblue', 'transparency': 1},
@@ -86,16 +133,22 @@ class Map():
             }
 
             
-        
+        self.polygon_list = []
         for key, value in self.map_dict.items():
-            self.map_dict[key]['poly'] = convert_nparray_to_polygon(self.map_dict[key]['geometry'])
+            #self.map_dict[key]['poly'] = convert_nparray_to_polygon(self.map_dict[key]['geometry'])
+            #print(self.map_dict[key]['geometry'])
+            #print(self.map_dict[key]['poly'])
+            self.polygon_list.append(self.map_dict[key]['poly'])
 
         self.turtles = []
         self.number_of_turtles = 0
 
     def plot_map(self):
         for key, value in self.map_dict.items():
-            plt.fill(*self.map_dict[key]['poly'].exterior.xy, color=self.map_dict[key]['color'], alpha=self.map_dict[key]['transparency'])
+            if self.map_dict[key]['poly'].geom_type=='Polygon':
+                plt.fill(*self.map_dict[key]['poly'].exterior.xy, color=self.map_dict[key]['color'], alpha=self.map_dict[key]['transparency'])
+            elif self.map_dict[key]['poly'].geom_type=='LineString':
+                plt.plot(*self.map_dict[key]['poly'].xy, color=self.map_dict[key]['color'], alpha=self.map_dict[key]['transparency'])
 
     def add_robot(self, turtle):
         self.turtles.append(turtle)
