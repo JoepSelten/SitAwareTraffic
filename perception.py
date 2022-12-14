@@ -37,27 +37,15 @@ class Perception():
             sub_parts = has_a(part)
             for sub_part in sub_parts:
                 for perceivable_part in perceivable_road_parts:
-                    #print(perceivable_part)
-                    #print(sub_part)
                     is_equal = query_if_equal(sub_part, perceivable_part)
                     if is_equal:
                         #print('hello')
                         sub_part_areas.append(world.get_area(perceivable_part))
                         
-
-        print(sub_part_areas[0].bounds)
-        
-        #lane_polygon = Polygon([*sub_part_areas[0].bounds], *sub_part_areas[1].bounds)
-        #print(lane_polygon)
-
-
-        
-
-        world.plot_areas()
-
-        
-
-
+       
+        lane_polygon = Polygon([sub_part_areas[0].bounds[:2], sub_part_areas[0].bounds[2:], sub_part_areas[1].bounds[2:], sub_part_areas[1].bounds[:2]])
+        world.add_area(lane_polygon, not_perceivable_road_parts[0])   
+        world.plot_areas()      
 
         # link sides met linestrings, gebruik relaties tussen sides en lane om de lane te plotten, het is in dit geval simpel maar moet altijd werken (intersection)
 
