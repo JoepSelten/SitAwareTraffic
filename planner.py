@@ -87,57 +87,7 @@ class Planner():
             else:
                 plan = query_connectivity(sub_start, sub_goal)
 
-            
-
-
-        # if not polygon1:
-        #     parts1 = has_a(self.plan[str(current_plans)][0])
-        #     #current_plans += 1
-        #     #plan[str(current_plans+1)][0] = URIRef("http://example.com/intersection/road1/lane")
-        
-        # if not polygon2:
-        #     parts2 = has_a(self.plan[str(current_plans)][1])
-        #     #print(middle_parts)
-
-
-        # welke part ben ik en welke part moet ik na toe, heb hier vgm nieuwe info van perceptie nodig
-        # de aanname dat ik op road ben is niet genoeg, kan op verschillend lanes zijn namelijk
-
-        #new_start = world.position(self.plan[str(current_plans)][0]) # zou ik dit als een request sturen naar perceptie?
-        #current_plans += 1
-        #self.plan[str(current_plans)][0] = URIRef("http://example.com/intersection/road1/lane") # als perceptie/world model af is kun je deze invullen voor connectivity query
-
-        # for part in parts1:
-        #     answer = query_connectivity(part, self.plan[str(current_plans)][1])
-        #     if answer:
-        #         new_connection = answer
-        # print(new_connection)
-        # current_plans += 1
-        # self.plan[str(current_plans)] = new_connection
-        # print(self.plan)
-
-            #lane_polygon = query_if_polygon(new_connection[0])
-            #middle_polygon = query_if_polygon(new_connection[1])
-
-        #     if lane_polygon and middle_polygon:
-        #         #self.line_connection = query_line_connection(new_connection[0], new_connection[1]) # moet dit niet eigenlijk dezelfde functie zijn?
-        #         lane_parts = has_a(new_connection[0])
-        #         middle_parts = has_a(new_connection[1])
-        #         for lane_part in lane_parts:        # is het loopen wel nodig, je kunt het wss ook gelijk uit de graph halen, dit is niet schaalbaar zo
-        #             for middle_part in middle_parts:
-        #                 answer = query_connectivity(lane_part, middle_part)
-        #                 if answer:
-        #                     line_connection = answer
-        #         #self.line_connection = query_connectivity(new_connection[0], new_connection[1]) # moet dit niet eigenlijk dezelfde functie zijn?
-        #         plan[str(current_plans)] = line_connection
-        #         current_plans += 1
-
-        #     current_task = plan[str(current_task_number)]
-        #     #print(current_task)
-        #     is_line = query_if_line(current_task[0])
-        #     #print(is_line)
-
-        # print(plan)
+        #print(plan)
         return plan
 
     def meta_plan(self, monitor, world, robot, goal): # dit voelt zo niet composable, ik neem iig aan dat de goal is naar een bepaalde plek te gaan, maar hier zou nog een abstractie laag op kunnen

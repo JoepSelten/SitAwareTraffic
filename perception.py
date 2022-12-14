@@ -1,5 +1,5 @@
 from queries import *
-from basic_functions import abs_to_rel
+from basic_functions import abs_to_rel, coordinate_transform_polygon
 import matplotlib.pyplot as plt
 import numpy as np
 import geopandas
@@ -16,12 +16,50 @@ class Perception():
         road = world.robot_pos[1]
         #robot_pos_polygon = query_if_polygon(robot_pos)
         road_parts = has_a(road)
+        perceivable_road_parts = []
+        not_perceivable_road_parts = []
+        n = 0
+        polygon_uri = URIRef("http://example.com/polygon")
+        line_uri = URIRef("http://example.com/line")
         for part in road_parts:
             perceivable = query_if_perceivable(part)
             if perceivable:
-                print(part)
+                #print(part)
+                perceivable_road_parts.append(part)
+                transform_input = coordinate_transform_polygon(simulator.robots[0], inputs[n])
+                world.add_area(transform_input, part)
+                n += 1
+            if not perceivable:
+                not_perceivable_road_parts.append(part)
+        
+        sub_part_areas = []
+        for part in not_perceivable_road_parts:
+            sub_parts = has_a(part)
+            for sub_part in sub_parts:
+                for perceivable_part in perceivable_road_parts:
+                    #print(perceivable_part)
+                    #print(sub_part)
+                    is_equal = query_if_equal(sub_part, perceivable_part)
+                    if is_equal:
+                        #print('hello')
+                        sub_part_areas.append(world.get_area(perceivable_part))
+                        
 
-        # link sides met linestrings, gebruik relaties tussen sides en lane om de lane te plotten, het is in dit geval simpel maar moet altijd werken
+        print(sub_part_areas[0].bounds)
+        
+        #lane_polygon = Polygon([*sub_part_areas[0].bounds], *sub_part_areas[1].bounds)
+        #print(lane_polygon)
+
+
+        
+
+        world.plot_areas()
+
+        
+
+
+
+        # link sides met linestrings, gebruik relaties tussen sides en lane om de lane te plotten, het is in dit geval simpel maar moet altijd werken (intersection)
 
         #print(inputs)
         #print(road_parts)

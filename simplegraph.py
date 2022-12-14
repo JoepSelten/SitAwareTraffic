@@ -56,6 +56,9 @@ g.add((EX.lane, RDF.type, EX.polygon))
 g.add((EX.middle, RDF.type, EX.polygon))
 g.add((EX.side, RDF.type, EX.line))
 
+g.add((EX.polygon, RDF.type, EX.geometry))
+g.add((EX.line, RDF.type, EX.geometry))
+
 polygon_interior = add_has_a(g, EX.polygon, EX.interior)
 polygon_line1 = add_has_a(g, EX.polygon, EX.line1)
 polygon_line2 = add_has_a(g, EX.polygon, EX.line2)
@@ -75,6 +78,7 @@ g.add((EX.side, EX.affordance, EX.perceivable))
 DeductiveClosure(Semantics).expand(g)
 
 ## moet de uris eigenlijk queryen, dit kan miss ook uit de lagere level gehaald worden ipv los allemaal gedefinieerd
+## nu is namelijk niet schaalbaar
 intersection_road1_lane = URIRef("http://example.com/intersection/road1/lane")
 intersection_road2_lane = URIRef("http://example.com/intersection/road2/lane")
 intersection_road3_lane = URIRef("http://example.com/intersection/road3/lane")
@@ -90,15 +94,51 @@ intersection_road2_lane_line1 = URIRef("http://example.com/intersection/road2/la
 intersection_road3_lane_line1 = URIRef("http://example.com/intersection/road3/lane/line1")
 intersection_road4_lane_line1 = URIRef("http://example.com/intersection/road4/lane/line1")
 
+intersection_road1_lane_line2 = URIRef("http://example.com/intersection/road1/lane/line2")
+intersection_road2_lane_line2 = URIRef("http://example.com/intersection/road2/lane/line2")
+intersection_road3_lane_line2 = URIRef("http://example.com/intersection/road3/lane/line2")
+intersection_road4_lane_line2 = URIRef("http://example.com/intersection/road4/lane/line2")
+
+intersection_road1_lane_line3 = URIRef("http://example.com/intersection/road1/lane/line3")
+intersection_road2_lane_line3 = URIRef("http://example.com/intersection/road2/lane/line3")
+intersection_road3_lane_line3 = URIRef("http://example.com/intersection/road3/lane/line3")
+intersection_road4_lane_line3 = URIRef("http://example.com/intersection/road4/lane/line3")
+
+intersection_road1_lane_line4 = URIRef("http://example.com/intersection/road1/lane/line4")
+intersection_road2_lane_line4 = URIRef("http://example.com/intersection/road2/lane/line4")
+intersection_road3_lane_line4 = URIRef("http://example.com/intersection/road3/lane/line4")
+intersection_road4_lane_line4 = URIRef("http://example.com/intersection/road4/lane/line4")
+
 intersection_middle_line1 = URIRef("http://example.com/intersection/middle/line1")
 intersection_middle_line2 = URIRef("http://example.com/intersection/middle/line2")
 intersection_middle_line3 = URIRef("http://example.com/intersection/middle/line3")
 intersection_middle_line4 = URIRef("http://example.com/intersection/middle/line4")
 
-g.add((intersection_road1_lane_line1, EX.connects, intersection_middle_line1))
-g.add((intersection_road2_lane_line1, EX.connects, intersection_middle_line2))
-g.add((intersection_road3_lane_line1, EX.connects, intersection_middle_line3))
-g.add((intersection_road4_lane_line1, EX.connects, intersection_middle_line4))
+intersection_road1_side1 = URIRef("http://example.com/intersection/road1/side1")
+intersection_road1_side2 = URIRef("http://example.com/intersection/road1/side2")
+
+intersection_road2_side1 = URIRef("http://example.com/intersection/road2/side1")
+intersection_road2_side2 = URIRef("http://example.com/intersection/road2/side2")
+
+intersection_road3_side1 = URIRef("http://example.com/intersection/road3/side1")
+intersection_road3_side2 = URIRef("http://example.com/intersection/road3/side2")
+
+intersection_road4_side1 = URIRef("http://example.com/intersection/road4/side1")
+intersection_road4_side2 = URIRef("http://example.com/intersection/road4/side2")
+
+g.add((intersection_road1_lane_line1, EX.equals, intersection_middle_line1))
+g.add((intersection_road2_lane_line1, EX.equals, intersection_middle_line2))
+g.add((intersection_road3_lane_line1, EX.equals, intersection_middle_line3))
+g.add((intersection_road4_lane_line1, EX.equals, intersection_middle_line4))
+
+g.add((intersection_road1_side1, EX.equals, intersection_road1_lane_line2))
+g.add((intersection_road1_side2, EX.equals, intersection_road1_lane_line3))
+g.add((intersection_road2_side1, EX.equals, intersection_road2_lane_line2))
+g.add((intersection_road2_side2, EX.equals, intersection_road2_lane_line3))
+g.add((intersection_road3_side1, EX.equals, intersection_road3_lane_line2))
+g.add((intersection_road3_side2, EX.equals, intersection_road3_lane_line3))
+g.add((intersection_road4_side1, EX.equals, intersection_road4_lane_line2))
+g.add((intersection_road4_side2, EX.equals, intersection_road4_lane_line3))
 
 DeductiveClosure(Semantics).expand(g)
 

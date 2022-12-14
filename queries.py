@@ -202,6 +202,20 @@ def query_check_geometrical(subject):
 def query_check_driveable(subject):
     return query_check_affordance(subject, EX.driveable)
 
+def query_type(subject):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?object
+        WHERE {
+            ?subject rdf:type ?object .
+        }"""
+    answer = []
+    for r in g.query(query, initBindings={'subject': URIRef(subject)}):
+        answer.append(r[0])
+    # if empty, go abstraction level higher and try again
+    return answer
+
 def query_driveable_part(parts):
     for part in parts:
         answer = query_check_driveable(part)
@@ -265,7 +279,7 @@ def query_line_connection(start, goal):    # dit is ook een beetje n beun manier
             ?goal ex:has_a ?part2 .
             ?part1 rdf:type ex:line .
             ?part2 rdf:type ex:line .
-            ?part1 ex:connects ?part2 .
+            ?part1 ex:equals ?part2 .
 
         }"""
 
@@ -341,6 +355,43 @@ def query_if_perceivable(subject):    # zou met zowel uris als labels moeten wer
         """
 
     for r in g.query(query, initBindings={'subject': subject}):
+        answer = r
+
+    return answer
+
+def query_geom_type(subject):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?object
+        WHERE {
+            ?subject rdf:type ?object .
+            ?object rdf:type ex:geometry .
+        }"""
+    answer = []
+    for r in g.query(query, initBindings={'subject': URIRef(subject)}):
+        answer.append(r[0])
+    # if empty, go abstraction level higher and try again
+    return answer
+
+def query_equivalance(part):
+    polygon_uri = URIRef("http://example.com/polygon")
+    line_uri = URIRef("http://example.com/line")
+    is_line = query_if_line(part)
+    part_type = query_type(part)
+    if polygon_uri in part_type:
+        print(f'part: {part}')
+    #print(part_type)
+    return part_type
+
+def query_if_equal(subject, object):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        ASK { ?subject ex:equals ?object }
+        """
+
+    for r in g.query(query, initBindings={'subject': subject, 'object': object}):
         answer = r
 
     return answer

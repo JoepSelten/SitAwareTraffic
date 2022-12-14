@@ -30,6 +30,9 @@ class Worldmodel():
 
     def add_area(self, area, uri=0):
         self.areas.update({uri: area})  # dit kan later iets van geopackage of sqlite/spatialite zijn
+    
+    def get_area(self, uri):
+        return self.areas[uri]
 
     def print_areas(self):
         print(self.areas)
@@ -37,7 +40,10 @@ class Worldmodel():
     def plot_areas(self):
         ## ik zou hier later de kleuren nog kunnen veranderen
         for x in self.areas.values():
-            plt.fill(*x['polygon'].exterior.xy)
+            if x.geom_type == 'Polygon':
+                plt.fill(*x.exterior.xy)
+            elif x.geom_type == 'LineString':
+                plt.plot(*x.xy)
         
     def update_sit(self, sit):
         self.situation = sit

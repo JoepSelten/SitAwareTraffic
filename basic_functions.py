@@ -1,6 +1,11 @@
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, Point, LineString
 import math
 import numpy as np
+import pyproj
+from shapely.ops import transform
+from shapely import affinity
+import matplotlib
+import matplotlib.pyplot as plt
 
 def convert_nparray_to_polygon(poly_ndarray):
         array_tmp = poly_ndarray.squeeze()
@@ -46,3 +51,22 @@ def coordinate_transform(robot, abs_pos):
                         [-math.sin(yaw), math.cos(yaw)]])
         rel_pos_rot = rel_pos.dot(Rot1)
         return rel_pos_rot
+
+def coordinate_transform_polygon(robot, polygon):
+        yaw = robot.yaw-0.5*math.pi
+        pos = robot.pos
+        rot = affinity.rotate(polygon, -yaw, (pos[0], pos[1]), use_radians=True)
+        trans = affinity.translate(rot, -pos[0], -pos[1])
+        return trans
+
+def move_figure(f, x, y):
+    """Move figure's upper left corner to pixel (x, y)"""
+    backend = matplotlib.get_backend()
+    if backend == 'TkAgg':
+        f.canvas.manager.window.wm_geometry("+%d+%d" % (x, y))
+    elif backend == 'WXAgg':
+        f.canvas.manager.window.SetPosition((x, y))
+    else:
+        # This works for QT and GTK
+        # You can also use window.setGeometry
+        f.canvas.manager.window.move(x, y)

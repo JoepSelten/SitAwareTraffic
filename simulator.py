@@ -51,7 +51,10 @@ class Simulator():
 
     def perceived_features(self):   # gives all features inside a certain radius, maybe later use a part of the circle
         robot = self.robots[0]
-        perception_area = trans(robot.pos, robot.yaw, 60, 60)       # maybe later a circle or hexagon
+        perception_radius = 50
+        p = Point(robot.pos)
+        perception_area = p.buffer(perception_radius)
+        
         #map_features = MultiPolygon(self.map.polygon_list)
         for polygon in self.map.polygon_list:
             if polygon.geom_type=='LineString':
@@ -67,9 +70,6 @@ class Simulator():
             elif feature.geom_type=='LineString':
                 plt.plot(*feature.xy)
         
-    
-# 'poly': Polygon([(40, 40), (60, 40), (60, 60), (40, 60)])
-
 class Map():
     def __init__(self, Traffic_Situation = "intersection"):
         if Traffic_Situation == "intersection" :

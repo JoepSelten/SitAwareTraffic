@@ -5,7 +5,7 @@ from matplotlib.pyplot import figure
 import json
 from rdflib import URIRef
 from shapely.geometry import Polygon, Point, LineString, CAP_STYLE, box
-from basic_functions import trans, abs_to_rel
+from basic_functions import trans, abs_to_rel, coordinate_transform_polygon, move_figure
 from perception import Perception
 from worldmodel import Worldmodel
 from planner import Planner
@@ -14,6 +14,7 @@ from monitor import Monitor
 from control import Control
 from global_variables import g, dt, TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, EX     
 from queries import add_robot, uri_from_label         
+import time
 
 ## Situation to test
 sit = 'intersection'
@@ -27,22 +28,26 @@ simulator.set_map(sit)
 goal = URIRef("http://example.com/intersection/road4") # "At the intersection go left"
 simulator.add_robot('turtle1', goal, TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 'down')
 add_robot('turtle1', 'laser_range_finder', 'velocity_control', 'encoders')
-#print(g.serialize())
 
 perception = Perception()
 planner = Planner()
 monitor = Monitor()
 control = Control()
 
-#rel_rob = trans(np.array([0,0]), 0.5*math.pi, TURTLE_LENGTH, TURTLE_WIDTH)
 
 figure(num=1, figsize=(6, 6), dpi=80)
+fig = figure(1)
+move_figure(fig, 200, 400)
 figure(num=2, figsize=(6, 6), dpi=80)
+fig = figure(2)
+move_figure(fig, 700, 400)
 figure(num=3, figsize=(6, 6), dpi=80)
+fig = figure(3)
+move_figure(fig, 1200, 400)
 
 waiting = True
 while True:
-    plt.figure(1)
+    plt.figure(1)   
     plt.cla()
     plt.title('Simulator')
     simulator.simulate()
@@ -54,7 +59,10 @@ while True:
 
     #p = LineString([(0, 0), (1, 0)])
     #plt.plot(*p.xy)
+    #start = time.time()
     perception_inputs = simulator.perceived_features()
+    #end = time.time()
+    #print(f'Time to run perception inputs: {end-start}')
     simulator.plot_input_features()
 
     plt.figure(3)
@@ -72,17 +80,17 @@ while True:
     #perception.perceive(simulator, world, sit, side['polygon'])
     
 
-    planner.set_plan(world)
-    planner.iterative_planning(world)
-
+    #planner.set_plan(world)
+    #planner.iterative_planning(world)
     perception.perceive(simulator, world, perception_inputs)
+
     simulator.robots[0].plot_rel_robot()
     #planner.skill(world, simulator.robots[0], simulator.robots[0].goal)
     #planner.meta_plan(monitor, world, simulator.robots[0], simulator.robots[0].goal)
     #planner.plan(monitor, world, simulator.robots[0])
     #planner.sub_plan(monitor)
     #control.move(simulator.robots[0], monitor)
-    #simulator.robot.yaw += 0.01*math.pi
+    simulator.robots[0].yaw += 0.01*math.pi
     plt.pause(dt/100)
     
     if waiting:

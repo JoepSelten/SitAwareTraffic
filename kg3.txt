@@ -18,6 +18,10 @@ ex:connects a rdf:Property,
         rdfs:Resource ;
     rdfs:subPropertyOf ex:connects .
 
+ex:equals a rdf:Property,
+        rdfs:Resource ;
+    rdfs:subPropertyOf ex:equals .
+
 ex:has_a a rdf:Property,
         rdfs:Resource ;
     rdfs:subPropertyOf ex:has_a .
@@ -28,107 +32,52 @@ ex:has_a a rdf:Property,
 <http://example.com/intersection/road1/lane/interior> a ex:interior,
         rdfs:Resource .
 
-<http://example.com/intersection/road1/lane/line2> a ex:line,
+<http://example.com/intersection/road1/lane/line4> a ex:geometry,
+        ex:line,
         rdfs:Resource .
-
-<http://example.com/intersection/road1/lane/line3> a ex:line,
-        rdfs:Resource .
-
-<http://example.com/intersection/road1/lane/line4> a ex:line,
-        rdfs:Resource .
-
-<http://example.com/intersection/road1/side1> a ex:line,
-        ex:side,
-        rdfs:Resource ;
-    ex:affordance ex:perceivable .
-
-<http://example.com/intersection/road1/side2> a ex:line,
-        ex:side,
-        rdfs:Resource ;
-    ex:affordance ex:perceivable .
 
 <http://example.com/intersection/road2/lane/interior> a ex:interior,
         rdfs:Resource .
 
-<http://example.com/intersection/road2/lane/line2> a ex:line,
+<http://example.com/intersection/road2/lane/line4> a ex:geometry,
+        ex:line,
         rdfs:Resource .
-
-<http://example.com/intersection/road2/lane/line3> a ex:line,
-        rdfs:Resource .
-
-<http://example.com/intersection/road2/lane/line4> a ex:line,
-        rdfs:Resource .
-
-<http://example.com/intersection/road2/side1> a ex:line,
-        ex:side,
-        rdfs:Resource ;
-    ex:affordance ex:perceivable .
-
-<http://example.com/intersection/road2/side2> a ex:line,
-        ex:side,
-        rdfs:Resource ;
-    ex:affordance ex:perceivable .
 
 <http://example.com/intersection/road3/lane/interior> a ex:interior,
         rdfs:Resource .
 
-<http://example.com/intersection/road3/lane/line2> a ex:line,
+<http://example.com/intersection/road3/lane/line4> a ex:geometry,
+        ex:line,
         rdfs:Resource .
-
-<http://example.com/intersection/road3/lane/line3> a ex:line,
-        rdfs:Resource .
-
-<http://example.com/intersection/road3/lane/line4> a ex:line,
-        rdfs:Resource .
-
-<http://example.com/intersection/road3/side1> a ex:line,
-        ex:side,
-        rdfs:Resource ;
-    ex:affordance ex:perceivable .
-
-<http://example.com/intersection/road3/side2> a ex:line,
-        ex:side,
-        rdfs:Resource ;
-    ex:affordance ex:perceivable .
 
 <http://example.com/intersection/road4/lane/interior> a ex:interior,
         rdfs:Resource .
 
-<http://example.com/intersection/road4/lane/line2> a ex:line,
+<http://example.com/intersection/road4/lane/line4> a ex:geometry,
+        ex:line,
         rdfs:Resource .
-
-<http://example.com/intersection/road4/lane/line3> a ex:line,
-        rdfs:Resource .
-
-<http://example.com/intersection/road4/lane/line4> a ex:line,
-        rdfs:Resource .
-
-<http://example.com/intersection/road4/side1> a ex:line,
-        ex:side,
-        rdfs:Resource ;
-    ex:affordance ex:perceivable .
-
-<http://example.com/intersection/road4/side2> a ex:line,
-        ex:side,
-        rdfs:Resource ;
-    ex:affordance ex:perceivable .
 
 <http://example.com/lane/interior> a ex:interior,
         rdfs:Resource .
 
-<http://example.com/lane/line1> a ex:line,
+<http://example.com/lane/line1> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/lane/line2> a ex:line,
+<http://example.com/lane/line2> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/lane/line3> a ex:line,
+<http://example.com/lane/line3> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/lane/line4> a ex:line,
+<http://example.com/lane/line4> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-ex:middle a ex:polygon,
+ex:middle a ex:geometry,
+        ex:polygon,
         rdfs:Resource ;
     ex:has_a <http://example.com/middle/interior>,
         <http://example.com/middle/line1>,
@@ -139,46 +88,58 @@ ex:middle a ex:polygon,
 <http://example.com/middle/interior> a ex:interior,
         rdfs:Resource .
 
-<http://example.com/middle/line1> a ex:line,
+<http://example.com/middle/line1> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/middle/line2> a ex:line,
+<http://example.com/middle/line2> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/middle/line3> a ex:line,
+<http://example.com/middle/line3> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/middle/line4> a ex:line,
+<http://example.com/middle/line4> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
 <http://example.com/polygon/interior> a ex:interior,
         rdfs:Resource .
 
-<http://example.com/polygon/line1> a ex:line,
+<http://example.com/polygon/line1> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/polygon/line2> a ex:line,
+<http://example.com/polygon/line2> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/polygon/line3> a ex:line,
+<http://example.com/polygon/line3> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/polygon/line4> a ex:line,
+<http://example.com/polygon/line4> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
 <http://example.com/road/lane/interior> a ex:interior,
         rdfs:Resource .
 
-<http://example.com/road/lane/line1> a ex:line,
+<http://example.com/road/lane/line1> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/road/lane/line2> a ex:line,
+<http://example.com/road/lane/line2> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/road/lane/line3> a ex:line,
+<http://example.com/road/lane/line3> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
-<http://example.com/road/lane/line4> a ex:line,
+<http://example.com/road/lane/line4> a ex:geometry,
+        ex:line,
         rdfs:Resource .
 
 rdf:type a rdf:Property,
@@ -197,21 +158,25 @@ rdfs:subPropertyOf a rdf:Property,
 
 "road" a rdfs:Resource .
 
-<http://example.com/intersection/middle/line1> a ex:line,
+<http://example.com/intersection/middle/line1> a ex:geometry,
+        ex:line,
         rdfs:Resource ;
-    ex:connects <http://example.com/intersection/road1/lane/line1> .
+    ex:equals <http://example.com/intersection/road1/lane/line1> .
 
-<http://example.com/intersection/middle/line2> a ex:line,
+<http://example.com/intersection/middle/line2> a ex:geometry,
+        ex:line,
         rdfs:Resource ;
-    ex:connects <http://example.com/intersection/road2/lane/line1> .
+    ex:equals <http://example.com/intersection/road2/lane/line1> .
 
-<http://example.com/intersection/middle/line3> a ex:line,
+<http://example.com/intersection/middle/line3> a ex:geometry,
+        ex:line,
         rdfs:Resource ;
-    ex:connects <http://example.com/intersection/road3/lane/line1> .
+    ex:equals <http://example.com/intersection/road3/lane/line1> .
 
-<http://example.com/intersection/middle/line4> a ex:line,
+<http://example.com/intersection/middle/line4> a ex:geometry,
+        ex:line,
         rdfs:Resource ;
-    ex:connects <http://example.com/intersection/road4/lane/line1> .
+    ex:equals <http://example.com/intersection/road4/lane/line1> .
 
 <http://example.com/intersection/road1> a ex:road,
         rdfs:Resource ;
@@ -220,7 +185,8 @@ rdfs:subPropertyOf a rdf:Property,
         <http://example.com/intersection/road1/side1>,
         <http://example.com/intersection/road1/side2> .
 
-<http://example.com/intersection/road1/lane> a ex:lane,
+<http://example.com/intersection/road1/lane> a ex:geometry,
+        ex:lane,
         ex:polygon,
         rdfs:Resource ;
     ex:affordance ex:driveable ;
@@ -231,9 +197,34 @@ rdfs:subPropertyOf a rdf:Property,
         <http://example.com/intersection/road1/lane/line3>,
         <http://example.com/intersection/road1/lane/line4> .
 
-<http://example.com/intersection/road1/lane/line1> a ex:line,
+<http://example.com/intersection/road1/lane/line1> a ex:geometry,
+        ex:line,
         rdfs:Resource ;
-    ex:connects <http://example.com/intersection/middle/line1> .
+    ex:equals <http://example.com/intersection/middle/line1> .
+
+<http://example.com/intersection/road1/lane/line2> a ex:geometry,
+        ex:line,
+        rdfs:Resource ;
+    ex:equals <http://example.com/intersection/road1/side1> .
+
+<http://example.com/intersection/road1/lane/line3> a ex:geometry,
+        ex:line,
+        rdfs:Resource ;
+    ex:equals <http://example.com/intersection/road1/side2> .
+
+<http://example.com/intersection/road1/side1> a ex:geometry,
+        ex:line,
+        ex:side,
+        rdfs:Resource ;
+    ex:affordance ex:perceivable ;
+    ex:equals <http://example.com/intersection/road1/lane/line2> .
+
+<http://example.com/intersection/road1/side2> a ex:geometry,
+        ex:line,
+        ex:side,
+        rdfs:Resource ;
+    ex:affordance ex:perceivable ;
+    ex:equals <http://example.com/intersection/road1/lane/line3> .
 
 <http://example.com/intersection/road2> a ex:road,
         rdfs:Resource ;
@@ -242,7 +233,8 @@ rdfs:subPropertyOf a rdf:Property,
         <http://example.com/intersection/road2/side1>,
         <http://example.com/intersection/road2/side2> .
 
-<http://example.com/intersection/road2/lane> a ex:lane,
+<http://example.com/intersection/road2/lane> a ex:geometry,
+        ex:lane,
         ex:polygon,
         rdfs:Resource ;
     ex:affordance ex:driveable ;
@@ -253,9 +245,34 @@ rdfs:subPropertyOf a rdf:Property,
         <http://example.com/intersection/road2/lane/line3>,
         <http://example.com/intersection/road2/lane/line4> .
 
-<http://example.com/intersection/road2/lane/line1> a ex:line,
+<http://example.com/intersection/road2/lane/line1> a ex:geometry,
+        ex:line,
         rdfs:Resource ;
-    ex:connects <http://example.com/intersection/middle/line2> .
+    ex:equals <http://example.com/intersection/middle/line2> .
+
+<http://example.com/intersection/road2/lane/line2> a ex:geometry,
+        ex:line,
+        rdfs:Resource ;
+    ex:equals <http://example.com/intersection/road2/side1> .
+
+<http://example.com/intersection/road2/lane/line3> a ex:geometry,
+        ex:line,
+        rdfs:Resource ;
+    ex:equals <http://example.com/intersection/road2/side2> .
+
+<http://example.com/intersection/road2/side1> a ex:geometry,
+        ex:line,
+        ex:side,
+        rdfs:Resource ;
+    ex:affordance ex:perceivable ;
+    ex:equals <http://example.com/intersection/road2/lane/line2> .
+
+<http://example.com/intersection/road2/side2> a ex:geometry,
+        ex:line,
+        ex:side,
+        rdfs:Resource ;
+    ex:affordance ex:perceivable ;
+    ex:equals <http://example.com/intersection/road2/lane/line3> .
 
 <http://example.com/intersection/road3> a ex:road,
         rdfs:Resource ;
@@ -264,7 +281,8 @@ rdfs:subPropertyOf a rdf:Property,
         <http://example.com/intersection/road3/side1>,
         <http://example.com/intersection/road3/side2> .
 
-<http://example.com/intersection/road3/lane> a ex:lane,
+<http://example.com/intersection/road3/lane> a ex:geometry,
+        ex:lane,
         ex:polygon,
         rdfs:Resource ;
     ex:affordance ex:driveable ;
@@ -275,9 +293,34 @@ rdfs:subPropertyOf a rdf:Property,
         <http://example.com/intersection/road3/lane/line3>,
         <http://example.com/intersection/road3/lane/line4> .
 
-<http://example.com/intersection/road3/lane/line1> a ex:line,
+<http://example.com/intersection/road3/lane/line1> a ex:geometry,
+        ex:line,
         rdfs:Resource ;
-    ex:connects <http://example.com/intersection/middle/line3> .
+    ex:equals <http://example.com/intersection/middle/line3> .
+
+<http://example.com/intersection/road3/lane/line2> a ex:geometry,
+        ex:line,
+        rdfs:Resource ;
+    ex:equals <http://example.com/intersection/road3/side1> .
+
+<http://example.com/intersection/road3/lane/line3> a ex:geometry,
+        ex:line,
+        rdfs:Resource ;
+    ex:equals <http://example.com/intersection/road3/side2> .
+
+<http://example.com/intersection/road3/side1> a ex:geometry,
+        ex:line,
+        ex:side,
+        rdfs:Resource ;
+    ex:affordance ex:perceivable ;
+    ex:equals <http://example.com/intersection/road3/lane/line2> .
+
+<http://example.com/intersection/road3/side2> a ex:geometry,
+        ex:line,
+        ex:side,
+        rdfs:Resource ;
+    ex:affordance ex:perceivable ;
+    ex:equals <http://example.com/intersection/road3/lane/line3> .
 
 <http://example.com/intersection/road4> a ex:road,
         rdfs:Resource ;
@@ -286,7 +329,8 @@ rdfs:subPropertyOf a rdf:Property,
         <http://example.com/intersection/road4/side1>,
         <http://example.com/intersection/road4/side2> .
 
-<http://example.com/intersection/road4/lane> a ex:lane,
+<http://example.com/intersection/road4/lane> a ex:geometry,
+        ex:lane,
         ex:polygon,
         rdfs:Resource ;
     ex:affordance ex:driveable ;
@@ -297,23 +341,51 @@ rdfs:subPropertyOf a rdf:Property,
         <http://example.com/intersection/road4/lane/line3>,
         <http://example.com/intersection/road4/lane/line4> .
 
-<http://example.com/intersection/road4/lane/line1> a ex:line,
+<http://example.com/intersection/road4/lane/line1> a ex:geometry,
+        ex:line,
         rdfs:Resource ;
-    ex:connects <http://example.com/intersection/middle/line4> .
+    ex:equals <http://example.com/intersection/middle/line4> .
 
-<http://example.com/road/side1> a ex:line,
+<http://example.com/intersection/road4/lane/line2> a ex:geometry,
+        ex:line,
+        rdfs:Resource ;
+    ex:equals <http://example.com/intersection/road4/side1> .
+
+<http://example.com/intersection/road4/lane/line3> a ex:geometry,
+        ex:line,
+        rdfs:Resource ;
+    ex:equals <http://example.com/intersection/road4/side2> .
+
+<http://example.com/intersection/road4/side1> a ex:geometry,
+        ex:line,
+        ex:side,
+        rdfs:Resource ;
+    ex:affordance ex:perceivable ;
+    ex:equals <http://example.com/intersection/road4/lane/line2> .
+
+<http://example.com/intersection/road4/side2> a ex:geometry,
+        ex:line,
+        ex:side,
+        rdfs:Resource ;
+    ex:affordance ex:perceivable ;
+    ex:equals <http://example.com/intersection/road4/lane/line3> .
+
+<http://example.com/road/side1> a ex:geometry,
+        ex:line,
         ex:side,
         rdfs:Resource ;
     ex:affordance ex:perceivable ;
     ex:connects <http://example.com/road/lane> .
 
-<http://example.com/road/side2> a ex:line,
+<http://example.com/road/side2> a ex:geometry,
+        ex:line,
         ex:side,
         rdfs:Resource ;
     ex:affordance ex:perceivable ;
     ex:connects <http://example.com/road/lane> .
 
-<http://example.com/road/lane> a ex:lane,
+<http://example.com/road/lane> a ex:geometry,
+        ex:lane,
         ex:polygon,
         rdfs:Resource ;
     ex:affordance ex:driveable ;
@@ -331,7 +403,8 @@ ex:road a rdfs:Resource ;
         <http://example.com/road/side1>,
         <http://example.com/road/side2> .
 
-ex:lane a ex:polygon,
+ex:lane a ex:geometry,
+        ex:polygon,
         rdfs:Resource ;
     ex:affordance ex:driveable ;
     ex:has_a <http://example.com/lane/interior>,
@@ -344,7 +417,8 @@ ex:driveable a rdfs:Resource .
 
 rdf:Property a rdfs:Resource .
 
-ex:polygon a rdfs:Resource ;
+ex:polygon a ex:geometry,
+        rdfs:Resource ;
     ex:has_a <http://example.com/polygon/interior>,
         <http://example.com/polygon/line1>,
         <http://example.com/polygon/line2>,
@@ -353,7 +427,8 @@ ex:polygon a rdfs:Resource ;
 
 ex:interior a rdfs:Resource .
 
-<http://example.com/intersection/middle> a ex:middle,
+<http://example.com/intersection/middle> a ex:geometry,
+        ex:middle,
         ex:polygon,
         rdfs:Resource ;
     ex:connects <http://example.com/intersection/road1>,
@@ -370,13 +445,17 @@ ex:interior a rdfs:Resource .
         <http://example.com/intersection/middle/line3>,
         <http://example.com/intersection/middle/line4> .
 
-ex:side a ex:line,
+ex:side a ex:geometry,
+        ex:line,
         rdfs:Resource ;
     ex:affordance ex:perceivable .
 
 ex:perceivable a rdfs:Resource .
 
-ex:line a rdfs:Resource .
+ex:line a ex:geometry,
+        rdfs:Resource .
+
+ex:geometry a rdfs:Resource .
 
 rdfs:Resource a rdfs:Resource .
 

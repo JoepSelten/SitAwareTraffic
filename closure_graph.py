@@ -179,8 +179,9 @@ class Semantics(Core):
         
 
 
-        if p == EX.connects:
-            self.store_triple((o, EX.connects, s))
+        if p == EX.connects or p == EX.equals:
+            self.store_triple((o, p, s))
+    
     
 
     #def unique_uri()
