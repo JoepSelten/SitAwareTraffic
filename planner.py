@@ -50,6 +50,7 @@ class Planner():
 
         
         #print(self.plan)
+        return self.plan[str(self.plan_number)][0]
 
     def skill(self, start, goal):        # plan is nu een dictionary, maar moet miss anders        
         # common whole query

@@ -164,16 +164,16 @@ def query_part_of(part):
     query = """
         PREFIX ex: <http://example.com/>
 
-        SELECT ?whole
+        SELECT DISTINCT ?whole
         WHERE {
             ?whole ex:has_a ?part .
         }"""
 
     whole = []
-    for r in g.query(query, initBindings={'subject': URIRef(part)}):
-        whole.append(r)
+    for r in g.query(query, initBindings={'part': URIRef(part)}):
+        whole.append(r[0])
 
-    return whole
+    return whole[0]
 
 def simple_check(subject, predicate, object):
     query = """

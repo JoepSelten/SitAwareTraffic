@@ -25,6 +25,10 @@ class Worldmodel():
 
         self.add_robot_pos(self.start)
 
+    def set_subgoal(self, line):
+        self.subgoal = line
+        plt.plot(*self.subgoal.xy, linewidth=5, color='green')
+
     def add_robot_pos(self, pos):
         self.robot_pos.append(pos)
 
@@ -41,9 +45,9 @@ class Worldmodel():
         ## ik zou hier later de kleuren nog kunnen veranderen
         for x in self.areas.values():
             if x.geom_type == 'Polygon':
-                plt.fill(*x.exterior.xy)
+                plt.fill(*x.exterior.xy, color='lightblue')
             elif x.geom_type == 'LineString':
-                plt.plot(*x.xy)
+                plt.plot(*x.xy, color='red', linewidth=2)
         
     def update_sit(self, sit):
         self.situation = sit

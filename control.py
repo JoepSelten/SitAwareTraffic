@@ -9,44 +9,48 @@ class Control():
     def __init__(self):
         pass
 
-    def move(self, robot, monitor):
-        self.predict(robot, monitor)
+    def move(self, robot, world, simulator):
+        goal = world.subgoal
+        self.predict(robot, goal)
         #self.check_constraints()
-        self.actuate(robot)
+        self.actuate(robot, simulator)
 
-    def predict(self, robot, monitor):
+    def predict(self, robot, goal):
+        goal_angle = math.atan2(goal.coords[0][1]-goal.coords[1][1], goal.coords[0][0]-goal.coords[1][0])
+
         self.x_pred = np.zeros(H)
         self.y_pred = np.zeros(H)
         self.yaw_pred = np.zeros(H)
-        self.x_pred[0] = robot.pos[0]
-        self.y_pred[0] = robot.pos[1]
-        self.yaw_pred[0] = robot.yaw
+        # self.x_pred[0] = robot.pos[0]
+        # self.y_pred[0] = robot.pos[1]
+        # self.yaw_pred[0] = robot.yaw
+        self.x_pred[0] = 0
+        self.y_pred[0] = 0
+        self.yaw_pred[0] = 0.5*math.pi
 
+        
         #if robot.resource == 'velocity control':    # on unicycle model
-        if monitor.subtask == 'Drive forward':
-            for i in range(1,H):
-                self.yaw_pred[i] = self.yaw_pred[i-1]+0.001
-                self.x_pred[i] = self.x_pred[i-1] + robot.velocity*math.cos(self.yaw_pred[i])*dt
-                self.y_pred[i] = self.y_pred[i-1] + robot.velocity*math.sin(self.yaw_pred[i])*dt
-                robot_pred = trans(np.array([self.x_pred[i], self.y_pred[i]]), self.yaw_pred[i-1], robot.length, robot.width)
-                #monitor.check_area(robot_pred, world)         # check invariants
-                #if monitor.subtask != 'Drive forward':
-                #    break
 
-        if monitor.subtask == 'Correct to the left':
-            pass
+        if goal_angle < 0.1:
+            self.omega = 0
+        else:
+            #self.omega = robot.omega_max
+            self.omega = 0
 
-        if monitor.subtask == 'Correct to the right':
-            pass
+        for i in range(1,H):
+            self.yaw_pred[i] = self.yaw_pred[i-1] + self.omega*dt
+            #self.yaw_pred[i] = self.yaw_pred[i-1]
+            self.x_pred[i] = self.x_pred[i-1] + robot.velocity*math.cos(self.yaw_pred[i])*dt
+            self.y_pred[i] = self.y_pred[i-1] + robot.velocity*math.sin(self.yaw_pred[i])*dt
+                        
 
-        pos = np.stack([self.x_pred, self.y_pred], axis=0)
-        rel_pos = coordinate_transform(robot, np.transpose(pos))
-        plt.plot(rel_pos[:, 0], rel_pos[:, 1], 'b--')
+        plt.plot(self.x_pred, self.y_pred, color='black', linestyle='dashed')
                 
-    def actuate(self, robot):
-        robot.yaw = self.yaw_pred[1]
-        robot.pos[0] = self.x_pred[1]
-        robot.pos[1] = self.y_pred[1]
+    def actuate(self, robot, simulator):
+        simulator.move_robot(robot, self.omega)
+        # robot.yaw += self.yaw_pred[1] - 0.5*math.pi
+        # robot.pos[0] += self.x_pred[1]
+        # robot.pos[1] += self.y_pred[1]
         
 
 

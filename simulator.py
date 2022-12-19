@@ -7,7 +7,7 @@ from matplotlib.pyplot import figure
 import json
 from traffic_areas import *
 from basic_functions import *
-from global_variables import b, l, w, c
+from global_variables import b, l, w, c, dt
 ## This script should be replaceble by real robots
 
 
@@ -20,8 +20,8 @@ class Simulator():
     def set_map(self, sit):
         self.map = Map(sit)
         
-    def add_robot(self, turtle_name, goal, l, w, vel, start='down'):
-        robot = Robot(turtle_name, goal, l, w, vel, start)
+    def add_robot(self, turtle_name, goal, l, w, vel, omega_max, start='down'):
+        robot = Robot(turtle_name, goal, l, w, vel, omega_max, start)
         self.robots.append(robot)
         self.num_robots += 1
 
@@ -66,9 +66,15 @@ class Simulator():
     def plot_input_features(self):
         for feature in self.input_features:
             if feature.geom_type=='Polygon':
-                plt.fill(*feature.exterior.xy)
+                plt.fill(*feature.exterior.xy, color='gray')
             elif feature.geom_type=='LineString':
-                plt.plot(*feature.xy)
+                plt.plot(*feature.xy, 'black')
+
+    def move_robot(self, robot, omega):
+        #robot = self.robots[0]
+        robot.yaw += omega*dt
+        robot.pos[0] += robot.velocity*math.cos(robot.yaw)*dt
+        robot.pos[1] += robot.velocity*math.sin(robot.yaw)*dt
         
 class Map():
     def __init__(self, Traffic_Situation = "intersection"):
@@ -162,7 +168,7 @@ class Map():
     
 
 class Robot():
-    def __init__(self, name, goal, length, width, vel, start, color='cyan'):
+    def __init__(self, name, goal, length, width, vel, omega_max, start, color='orange'):
         self.name = name
         self.goal = goal
         self.length = length
@@ -170,6 +176,7 @@ class Robot():
         self.velocity = vel
         self.start = start
         self.color = color
+        self.omega_max = omega_max
         
         if start == 'down':
             self.pos = np.array([l+0.5*w, self.length/2])
@@ -196,4 +203,4 @@ class Robot():
         plt.fill(*self.box.exterior.xy, color=self.color)
 
     def plot_rel_robot(self):
-        plt.fill(*self.rel_box.exterior.xy)
+        plt.fill(*self.rel_box.exterior.xy, color=self.color)
