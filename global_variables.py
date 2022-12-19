@@ -12,6 +12,7 @@ TURTLE_WIDTH = config['turtle_width']
 TURTLE_VELOCITY = config['turtle_velocity']
 ROAD_LENGTH = config['road_length']
 ROAD_WIDTH = config['road_width']
+PERCEPTION_RADIUS = config['perception_radius']
 dt = config['dt']
 prediction_horizon = config['prediction_horizon']
 H = round(prediction_horizon/dt)
@@ -19,6 +20,7 @@ b = config['boundary_thickness']
 l = config['road_length']
 w = config['road_width']
 c = config['stop_area_size']
+
 
 
 ## load property graph , later miss met externe server doen oid

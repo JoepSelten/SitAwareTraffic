@@ -12,14 +12,18 @@ class Planner():
         self.plan[str(self.plan_number)] = [world.start, world.goal]
         #self.plan_number += 1
 
+    def clear_plan(self):
+        self.plan = {}
+        self.plan_number = 0
+
     def iterative_planning(self, world):
+        self.clear_plan()
         ## keeps planning untill actionable by control
         if not self.plan:
-            print("Error plan not set")
+            self.set_plan(world)
 
         current_start = self.plan[str(self.plan_number)][0]
         current_goal = self.plan[str(self.plan_number)][1]
-
 
         self.plan_finished = False
         polygons = False
@@ -27,6 +31,8 @@ class Planner():
         polygon2 = query_if_polygon(current_goal)
         if polygon1 and polygon2:
             polygon = True
+            plan = query_line_connection(current_start, current_goal)
+            self.plan_finished = True
         
         new_start = current_start
         new_goal = current_goal
@@ -61,6 +67,7 @@ class Planner():
         #plan = query_topology(whole, start, goal)
         adjacency = False
         plan = query_connectivity(start, goal)
+
         if len(plan) == 2:
             adjacency = True
 
@@ -85,6 +92,7 @@ class Planner():
             if polygon_start and polygon_goal:
                 plan = query_line_connection(sub_start, sub_goal)
                 self.plan_finished = True
+                self.plan_number = 0
             else:
                 plan = query_connectivity(sub_start, sub_goal)
 

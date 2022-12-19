@@ -13,7 +13,10 @@ class Perception():
         self.spotted_sign = False
 
     def perceive(self, simulator, world, inputs):       # de skills moeten eigenlijk vragen wat nodig is
+        ## dit is de perceive road skill
+        world.clear_areas()
         road = world.robot_pos[1]
+        print(road)
         #robot_pos_polygon = query_if_polygon(robot_pos)
         road_parts = has_a(road)
         perceivable_road_parts = []
@@ -44,7 +47,7 @@ class Perception():
 
         lane_polygon = Polygon([sub_part_areas[0].coords[0], sub_part_areas[0].coords[1], sub_part_areas[1].coords[1], sub_part_areas[1].coords[0]])
         world.add_area(lane_polygon, not_perceivable_road_parts[0])
-        world.plot_areas()
+        #world.plot_areas()
 
         # link sides met linestrings, gebruik relaties tussen sides en lane om de lane te plotten, het is in dit geval simpel maar moet altijd werken (intersection)
 

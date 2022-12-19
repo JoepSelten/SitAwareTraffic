@@ -8,6 +8,9 @@ class Worldmodel():
         self.robot_pos = []
         self.situation = URIRef("http://example.com/intersection")
         self.add_robot_pos(self.situation)
+
+    def clear_areas(self):
+        self.areas = {}
         
     def set_goal(self, direction):
         # human grounding, miss ook met bepaalde intersection geven, of met de whole queryen

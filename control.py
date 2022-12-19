@@ -31,11 +31,12 @@ class Control():
         
         #if robot.resource == 'velocity control':    # on unicycle model
 
-        if goal_angle < 0.1:
+        #print(goal_angle)
+        if goal_angle < 0.03:
             self.omega = 0
         else:
-            #self.omega = robot.omega_max
-            self.omega = 0
+            self.omega = robot.omega_max
+            #self.omega = 0
 
         for i in range(1,H):
             self.yaw_pred[i] = self.yaw_pred[i-1] + self.omega*dt

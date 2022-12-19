@@ -10,5 +10,6 @@
     "road_width": 20,
     "road_length": 40,
     "stop_area_size": 10,
-    "intersection_monitor_size": 20
+    "intersection_monitor_size": 20,
+    "perception_radius": 30
 }

@@ -7,7 +7,7 @@ from matplotlib.pyplot import figure
 import json
 from traffic_areas import *
 from basic_functions import *
-from global_variables import b, l, w, c, dt
+from global_variables import *
 ## This script should be replaceble by real robots
 
 
@@ -15,7 +15,7 @@ class Simulator():
     def __init__(self, sit="intersection"):
         self.robots = []
         self.num_robots = 0
-        self.input_features = []
+        #self.input_features = []
 
     def set_map(self, sit):
         self.map = Map(sit)
@@ -51,9 +51,10 @@ class Simulator():
 
     def perceived_features(self):   # gives all features inside a certain radius, maybe later use a part of the circle
         robot = self.robots[0]
-        perception_radius = 50
+        perception_radius = PERCEPTION_RADIUS
         p = Point(robot.pos)
         perception_area = p.buffer(perception_radius)
+        self.input_features = []
         
         #map_features = MultiPolygon(self.map.polygon_list)
         for polygon in self.map.polygon_list:
@@ -180,7 +181,7 @@ class Robot():
         
         if start == 'down':
             self.pos = np.array([l+0.5*w, self.length/2])
-            self.yaw = 0.5*math.pi
+            self.yaw = 0.35*math.pi
             self.lane_id_start = '2'
         elif start == 'up':
             self.pos = np.array([l+0.5*w,2*l+w-self.length/2])

@@ -46,8 +46,9 @@ fig = figure(3)
 move_figure(fig, 1200, 400)
 
 planner.set_plan(world)
-control_task = planner.iterative_planning(world)
 
+
+t = 0
 waiting = True
 while True:
     plt.figure(1)   
@@ -78,14 +79,23 @@ while True:
     
     #end = time.time()
     #print(f'Time to run control/planning: {end-start}')
+    if round(t/dt) % 10 == 0:
+        control_task = planner.iterative_planning(world)
+
     
+    #if len(perception_inputs) == 2:
     perception.perceive(simulator, world, perception_inputs)
+    
+    #perception.perceive_intersection(simulator, world, perception_inputs)
+        
     
     whole = query_part_of(control_task)
     lines = world.areas[whole].boundary
+    #print(lines)
     control_line = LineString((lines.coords[1], lines.coords[2]))
     #print(control_line)
     world.set_subgoal(control_line)
+    world.plot_areas()
 
 
     simulator.robots[0].plot_rel_robot()
@@ -93,7 +103,10 @@ while True:
     control.move(simulator.robots[0], world, simulator)
 
     plt.pause(dt)
-    
+    #round(t/dt) % 10
+    t += dt
+
+
     if waiting:
         plt.waitforbuttonpress()
         waiting = False
