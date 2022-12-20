@@ -1,8 +1,58 @@
-
+from shapely.geometry import LineString
+from queries import *
 
 class Monitor():
     def __init__(self):
-        pass
+        self.previous_area = 0
+        self.control_task = 0
+
+    def run(self, simulator, world, planner, perception, control):
+        ## init conditions
+        self.diff_area = False
+        self.plan = False
+        self.perception = True
+
+        robot = simulator.robots[0]
+
+        self.current_area = world.check_current_area(robot)
+        if self.previous_area != self.current_area:
+            self.diff_area = True
+            self.previous_area = self.current_area    
+
+        self.plan_monitor(planner)
+        if self.plan:
+            self.control_task = planner.iterative_planning(world)
+
+        self.perception_monitor(perception)
+        if self.perception:
+            perception.perceive(simulator, world, perception.inputs)
+        
+        if self.control_task:
+            print(self.control_task)
+            ## hier gebeurd pas de associatie met geometrie
+            whole = query_part_of(self.control_task)
+            lines = world.relative_areas[whole].boundary
+            control_line = LineString((lines.coords[1], lines.coords[2]))
+        
+            world.set_subgoal(control_line)
+            world.plot_relative_areas()
+            simulator.robots[0].plot_rel_robot()
+            control.move(simulator.robots[0], world, simulator)
+
+    def plan_monitor(self, planner):
+        ## If not planned yet
+        if not planner.plan:
+            self.plan = True
+
+        if self.diff_area:
+            self.plan = True
+
+        ## Other conditions, eg when things change or when goal is reached, or when more information from perception is available
+
+    def perception_monitor(self, perception):
+        if self.diff_area:
+            self.perception = True
+
 
     def set_meta_plan(self, meta_plan):
         self.meta_plan = meta_plan

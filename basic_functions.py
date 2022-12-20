@@ -52,11 +52,18 @@ def coordinate_transform(robot, abs_pos):
         rel_pos_rot = rel_pos.dot(Rot1)
         return rel_pos_rot
 
-def coordinate_transform_polygon(robot, polygon):
+def coordinate_transform_abs_to_rel(robot, geom):
         yaw = robot.yaw-0.5*math.pi
         pos = robot.pos
-        rot = affinity.rotate(polygon, -yaw, (pos[0], pos[1]), use_radians=True)
+        rot = affinity.rotate(geom, -yaw, (pos[0], pos[1]), use_radians=True)
         trans = affinity.translate(rot, -pos[0], -pos[1])
+        return trans
+
+def coordinate_transform_rel_to_abs(robot, geom):
+        yaw = robot.yaw-0.5*math.pi
+        pos = robot.pos
+        trans = affinity.translate(geom, pos[0], pos[1])
+        rot = affinity.rotate(trans, yaw, (pos[0], pos[1]), use_radians=True)
         return trans
 
 def move_figure(f, x, y):

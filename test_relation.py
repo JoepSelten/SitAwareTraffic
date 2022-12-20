@@ -1,6 +1,6 @@
 from rdflib import Graph, URIRef, Literal, BNode, Namespace, RDF, RDFS
 from rdflib.namespace import GEO
-from perception import Perception
+from perception2 import Perception
 
 EX = Namespace("http://example.com/")
 GEO = Namespace("http://www.opengis.net/ont/geosparql#")

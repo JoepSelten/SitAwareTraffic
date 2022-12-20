@@ -395,3 +395,17 @@ def query_if_equal(subject, object):
         answer = r
 
     return answer
+
+def query_left_part(subjects):
+    answer = 0
+    for subject in subjects:
+        if subject[-1] == str(1):
+            answer = subject
+    return answer
+
+def query_right_part(subjects):
+    answer = 0
+    for subject in subjects:
+        if subject[-1] == str(2):
+            answer = subject
+    return answer

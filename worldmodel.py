@@ -1,16 +1,21 @@
 import numpy as np
 from traffic_areas import *
 from rdflib import URIRef
+from basic_functions import *
 
 class Worldmodel():
     def __init__(self):
-        self.areas = {}
+        self.absolute_areas = {}
+        self.relative_areas = {}
         self.robot_pos = []
         self.situation = URIRef("http://example.com/intersection")
         self.add_robot_pos(self.situation)
+        self.number_of_relative_areas = 0
+        self.number_of_absolute_areas = 0
 
-    def clear_areas(self):
-        self.areas = {}
+    def clear_relative_areas(self):
+        self.relative_areas = {}
+        self.number_of_relative_areas = 0
         
     def set_goal(self, direction):
         # human grounding, miss ook met bepaalde intersection geven, of met de whole queryen
@@ -35,28 +40,45 @@ class Worldmodel():
     def add_robot_pos(self, pos):
         self.robot_pos.append(pos)
 
-    def add_area(self, area, uri=0):
-        self.areas.update({uri: area})  # dit kan later iets van geopackage of sqlite/spatialite zijn
+    def add_area(self, robot, area, uri):
+        self.add_relative_area(area, uri)
+        abs_area = coordinate_transform_rel_to_abs(robot, area)
+        self.add_absolute_area(abs_area, uri)
+
+    def add_relative_area(self, area, uri=0):
+        self.relative_areas.update({uri: area})  # dit kan later iets van geopackage of sqlite/spatialite zijn
+        self.number_of_relative_areas += 1
+
+    def add_absolute_area(self, area, uri=0):
+        self.absolute_areas.update({uri: area})  # dit kan later iets van geopackage of sqlite/spatialite zijn
+        self.number_of_absolute_areas += 1
     
     def get_area(self, uri):
-        return self.areas[uri]
+        return self.relative_areas[uri]
 
-    def print_areas(self):
-        print(self.areas)
-
-    def plot_areas(self):
+    def plot_relative_areas(self):
         ## ik zou hier later de kleuren nog kunnen veranderen
-        for x in self.areas.values():
+        for x in self.relative_areas.values():
             if x.geom_type == 'Polygon':
                 plt.fill(*x.exterior.xy, color='lightblue')
             elif x.geom_type == 'LineString':
                 plt.plot(*x.xy, color='red', linewidth=2)
         
+    def plot_absolute_areas(self):
+        ## ik zou hier later de kleuren nog kunnen veranderen
+        for x in self.absolute_areas.values():
+            if x.geom_type == 'Polygon':
+                plt.fill(*x.exterior.xy, color='lightblue')
+            elif x.geom_type == 'LineString':
+                plt.plot(*x.xy, color='red', linewidth=2)
+
     def update_sit(self, sit):
         self.situation = sit
 
-    def current_area(self, robot):     
-        for uri, area in self.areas.items():
-            if robot.rel_box.intersection(area['polygon']).area > 0.7*robot.rel_box.area:
+    def check_current_area(self, robot):     
+        for uri, area in self.relative_areas.items():
+            if robot.rel_box.intersection(area).area > 0.7*robot.rel_box.area:
+                self.current_area = uri
+
                 return uri
             

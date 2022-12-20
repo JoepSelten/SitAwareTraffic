@@ -1,11 +1,13 @@
 from queries import *
-from basic_functions import abs_to_rel, coordinate_transform_polygon
+from basic_functions import *
 import matplotlib.pyplot as plt
 import numpy as np
 import geopandas
-from shapely.geometry import Polygon
+import math
+from shapely.geometry import Polygon, LineString
 from rdflib import URIRef
 from global_variables import EX
+
 
 
 class Perception():
@@ -13,10 +15,17 @@ class Perception():
         self.spotted_sign = False
 
     def perceive(self, simulator, world, inputs):       # de skills moeten eigenlijk vragen wat nodig is
-        ## dit is de perceive road skill
-        world.clear_areas()
+        #world.clear_areas()
         road = world.robot_pos[1]
-        print(road)
+        xaxis = LineString(([-30, 0],[30, 0]))
+        robot = simulator.robots[0]
+        
+                
+        
+        
+        ## dit is de perceive road skill
+        
+  
         #robot_pos_polygon = query_if_polygon(robot_pos)
         road_parts = has_a(road)
         perceivable_road_parts = []
@@ -24,16 +33,32 @@ class Perception():
         n = 0
         polygon_uri = URIRef("http://example.com/polygon")
         line_uri = URIRef("http://example.com/line")
+
+        ## seperating what can be perceived
         for part in road_parts:
             perceivable = query_if_perceivable(part)
+            
             if perceivable:
-                #print(part)
                 perceivable_road_parts.append(part)
-                transform_input = coordinate_transform_polygon(simulator.robots[0], inputs[n])
-                world.add_area(transform_input, part)
-                n += 1
+
             if not perceivable:
                 not_perceivable_road_parts.append(part)
+
+        ## road asociation skill, later seperate functions
+        # dit moet niet altijd gebeuren, maar gwn een keer, vervolgens alleen nog een vorm van checken (monitor)
+        for input in inputs:
+            intersection = input.intersection(xaxis)
+            #print(intersection)
+            if intersection:
+                if intersection.coords[0][0] <= 0:
+                    left_part = query_left_part(perceivable_road_parts)
+                    #print(f"input: {input}")
+                    world.add_area(robot, input, left_part)
+                elif intersection.coords[0][0] > 0:
+                    right_part = query_right_part(perceivable_road_parts)
+                    world.add_area(robot, input, right_part)
+
+        ## moet nog zorgen dat het geen error geeft als het een side niet meer ziet, miss data van de vorige run meenemen
         
         sub_part_areas = []
         for part in not_perceivable_road_parts:
@@ -46,7 +71,22 @@ class Perception():
                         sub_part_areas.append(world.get_area(perceivable_part))
 
         lane_polygon = Polygon([sub_part_areas[0].coords[0], sub_part_areas[0].coords[1], sub_part_areas[1].coords[1], sub_part_areas[1].coords[0]])
-        world.add_area(lane_polygon, not_perceivable_road_parts[0])
+        world.add_area(robot, lane_polygon, not_perceivable_road_parts[0])
+
+
+        if len(inputs) > 2:
+            intersection = query_part_of(road)
+            intersection_parts = has_a(intersection)
+            #for part in intersection_parts:
+                #print(part)
+            for i in range(len(inputs)):
+                for j in range(len(inputs)):
+                    line_intersect = inputs[i].intersection(inputs[j])
+
+                    if line_intersect.geom_type=='Point':
+                        print(f'corner found at {line_intersect}')
+                        print(inputs[i])
+
         #world.plot_areas()
 
         # link sides met linestrings, gebruik relaties tussen sides en lane om de lane te plotten, het is in dit geval simpel maar moet altijd werken (intersection)

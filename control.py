@@ -31,8 +31,8 @@ class Control():
         
         #if robot.resource == 'velocity control':    # on unicycle model
 
-        #print(goal_angle)
-        if goal_angle < 0.03:
+        #print(goal_angle % math.pi)
+        if goal_angle % math.pi < 0.03:
             self.omega = 0
         else:
             self.omega = robot.omega_max

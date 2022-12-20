@@ -61,7 +61,8 @@ class Simulator():
             if polygon.geom_type=='LineString':
                 overlap = polygon.intersection(perception_area)
                 if overlap:
-                    self.input_features.append(overlap)            
+                    overlap_rel = coordinate_transform_abs_to_rel(robot, overlap)
+                    self.input_features.append(overlap_rel)            
         return self.input_features
 
     def plot_input_features(self):
@@ -181,7 +182,7 @@ class Robot():
         
         if start == 'down':
             self.pos = np.array([l+0.5*w, self.length/2])
-            self.yaw = 0.35*math.pi
+            self.yaw = 0.5*math.pi
             self.lane_id_start = '2'
         elif start == 'up':
             self.pos = np.array([l+0.5*w,2*l+w-self.length/2])
