@@ -44,9 +44,10 @@ move_figure(fig, 700, 400)
 figure(num=3, figsize=(6, 6), dpi=80)
 fig = figure(3)
 move_figure(fig, 1200, 400)
-figure(num=4, figsize=(6, 6), dpi=80)
-fig = figure(4)
-move_figure(fig, 1700, 400)
+
+# figure(num=4, figsize=(6, 6), dpi=80)
+# fig = figure(4)
+# move_figure(fig, 1700, 400)
 
 
 planner.set_plan(world)
@@ -99,10 +100,10 @@ while True:
     # simulator.robots[0].plot_rel_robot()
     # control.move(simulator.robots[0], world, simulator)
 
-    plt.figure(4)
-    plt.cla()
-    plt.title('Absolute world model')
-    world.plot_absolute_areas()
+    #plt.figure(4)
+    #plt.cla()
+    #plt.title('Absolute world model')
+    #world.plot_absolute_areas()
 
     
 

@@ -1,5 +1,5 @@
 from global_variables import g
-from queries import query_connectivity, query_driveable_location, query_plan, query_mereology, query_line_connection, has_a, query_if_polygon, query_if_line, query_common_whole, query_driveable_part
+from queries import *
 ## hier moeten de resources van de robot, en de affordances gematched worden tot een plan
 from rdflib import URIRef
 

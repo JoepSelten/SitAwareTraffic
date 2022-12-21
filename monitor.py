@@ -5,32 +5,38 @@ class Monitor():
     def __init__(self):
         self.previous_area = 0
         self.control_task = 0
+        self.previous_inputs = 0
 
     def run(self, simulator, world, planner, perception, control):
         ## init conditions
         self.diff_area = False
         self.plan = False
-        self.perception = True
+        self.perception_query = False
+        self.perception_geom = False
 
         robot = simulator.robots[0]
 
         self.current_area = world.check_current_area(robot)
         if self.previous_area != self.current_area:
             self.diff_area = True
-            self.previous_area = self.current_area    
+            self.previous_area = self.current_area 
 
         self.plan_monitor(planner)
         if self.plan:
             self.control_task = planner.iterative_planning(world)
 
         self.perception_monitor(perception)
-        if self.perception:
-            perception.perceive(simulator, world, perception.inputs)
+        if self.perception_query:
+            perception.perceive_query(world, perception.inputs)
+        if self.perception_geom:
+            perception.perceive_geom(world, simulator, perception.inputs)
+        self.previous_inputs = len(perception.inputs)
         
         if self.control_task:
-            print(self.control_task)
+            #print(self.control_task)
             ## hier gebeurd pas de associatie met geometrie
             whole = query_part_of(self.control_task)
+            #print(f'whole: {whole}')
             lines = world.relative_areas[whole].boundary
             control_line = LineString((lines.coords[1], lines.coords[2]))
         
@@ -51,7 +57,10 @@ class Monitor():
 
     def perception_monitor(self, perception):
         if self.diff_area:
-            self.perception = True
+            self.perception_query = True
+        if len(perception.inputs) != self.previous_inputs:   ## later iets mooier doen, bijv daadwerkelijk inputs vergelijken
+            self.perception_query = True
+        self.perception_geom = True
 
 
     def set_meta_plan(self, meta_plan):

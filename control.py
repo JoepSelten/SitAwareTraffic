@@ -13,7 +13,7 @@ class Control():
         goal = world.subgoal
         self.predict(robot, goal)
         #self.check_constraints()
-        self.actuate(robot, simulator)
+        self.actuate(robot, simulator, world)
 
     def predict(self, robot, goal):
         goal_angle = math.atan2(goal.coords[0][1]-goal.coords[1][1], goal.coords[0][0]-goal.coords[1][0])
@@ -47,8 +47,9 @@ class Control():
 
         plt.plot(self.x_pred, self.y_pred, color='black', linestyle='dashed')
                 
-    def actuate(self, robot, simulator):
+    def actuate(self, robot, simulator, world):
         simulator.move_robot(robot, self.omega)
+        world.update_pos(robot)
         # robot.yaw += self.yaw_pred[1] - 0.5*math.pi
         # robot.pos[0] += self.x_pred[1]
         # robot.pos[1] += self.y_pred[1]

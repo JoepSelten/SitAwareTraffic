@@ -409,3 +409,43 @@ def query_right_part(subjects):
         if subject[-1] == str(2):
             answer = subject
     return answer
+
+def has_geometries(subject):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?part
+        WHERE {
+            ?subject ex:has_a* ?part .
+            ?part rdf:type ex:geometry
+        }"""
+
+    parts = []
+    for r in g.query(query, initBindings={'subject': URIRef(subject)}):
+        parts.append(r[0])
+
+    return parts
+
+def query_if_first_layer_geometry(subject):    # zou met zowel uris als labels moeten werken
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        ASK {
+            ?whole ex:has_a ?subject .
+            ?whole rdf:type ex:geometry
+            }
+        """
+    answer = True
+    for r in g.query(query, initBindings={'subject': subject}):
+        if r:
+            answer = False
+
+    return answer
+
+def has_first_layer_geometries(subject):
+    geometries = has_geometries(subject)
+    parts = []
+    for geometry in geometries:
+        if query_if_first_layer_geometry(geometry):
+            parts.append(geometry)
+    return parts

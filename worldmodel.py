@@ -81,4 +81,11 @@ class Worldmodel():
                 self.current_area = uri
 
                 return uri
+
+    def update_pos(self, robot):
+        self.clear_relative_areas()
+        for uri, area in self.absolute_areas.items():
+            new_area = coordinate_transform_abs_to_rel(robot, area)
+            self.add_relative_area(new_area, uri)
+
             
