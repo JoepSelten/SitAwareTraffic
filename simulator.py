@@ -20,8 +20,8 @@ class Simulator():
     def set_map(self, sit):
         self.map = Map(sit)
         
-    def add_robot(self, turtle_name, goal, l, w, vel, omega_max, start='down'):
-        robot = Robot(turtle_name, goal, l, w, vel, omega_max, start)
+    def add_robot(self, turtle_name, l, w, vel, omega_max, start='down'):
+        robot = Robot(turtle_name, l, w, vel, omega_max, start)
         self.robots.append(robot)
         self.num_robots += 1
 
@@ -170,9 +170,8 @@ class Map():
     
 
 class Robot():
-    def __init__(self, name, goal, length, width, vel, omega_max, start, color='orange'):
+    def __init__(self, name, length, width, vel, omega_max, start, color='orange'):
         self.name = name
-        self.goal = goal
         self.length = length
         self.width = width
         self.velocity = vel

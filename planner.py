@@ -2,11 +2,19 @@ from global_variables import g
 from queries import *
 ## hier moeten de resources van de robot, en de affordances gematched worden tot een plan
 from rdflib import URIRef
+from shapely.geometry import LineString
 
 class Planner():
     def __init__(self):
         self.plan = {}
         self.plan_number = 0
+
+    def planning(self, world):
+        task = self.iterative_planning(world)
+        whole = query_part_of(task)
+        lines = world.relative_areas[whole].boundary
+        control_line = LineString((lines.coords[1], lines.coords[2]))
+        world.set_relative_subgoal(control_line)
 
     def set_plan(self, world):  # most abstract plan
         self.plan[str(self.plan_number)] = [world.start, world.goal]
@@ -49,7 +57,7 @@ class Planner():
             # if polygon1 and polygon2:
             #     polygons = True
 
-            world.add_robot_pos(new_plan[0])
+            #world.add_robot_pos(new_plan[0])
             
             self.plan_number += 1
             self.plan[str(self.plan_number)] = new_plan
@@ -99,28 +107,28 @@ class Planner():
         #print(plan)
         return plan
 
-    def meta_plan(self, monitor, world, robot, goal): # dit voelt zo niet composable, ik neem iig aan dat de goal is naar een bepaalde plek te gaan, maar hier zou nog een abstractie laag op kunnen
-        #self.goal_area = query_driveable_location(goal)
-        self.goal = goal
-        self.current_area = world.current_area(robot) # too concrete
-        ## robot first needs to understand where am I, and where is the goal
-        self.current_pos = query_mereology(self.goal, self.current_area)
-        monitor.set_meta_plan([self.current_pos, self.goal])
-        #print([self.current_pos, self.goal])
+    # def meta_plan(self, monitor, world, robot, goal): # dit voelt zo niet composable, ik neem iig aan dat de goal is naar een bepaalde plek te gaan, maar hier zou nog een abstractie laag op kunnen
+    #     #self.goal_area = query_driveable_location(goal)
+    #     self.goal = goal
+    #     self.current_area = world.current_area(robot) # too concrete
+    #     ## robot first needs to understand where am I, and where is the goal
+    #     self.current_pos = query_mereology(self.goal, self.current_area)
+    #     monitor.set_meta_plan([self.current_pos, self.goal])
+    #     #print([self.current_pos, self.goal])
         
-    def plan1(self, monitor, world, robot):
-        self.connectivity = query_connectivity(self.current_pos, self.goal)
-        monitor.set_plan(self.connectivity)
-        #print(self.connectivity)
-        # how do you go from one part to the next
-        #self.meta_plan = query_plan(connectivity)
+    # def plan1(self, monitor, world, robot):
+    #     self.connectivity = query_connectivity(self.current_pos, self.goal)
+    #     monitor.set_plan(self.connectivity)
+    #     #print(self.connectivity)
+    #     # how do you go from one part to the next
+    #     #self.meta_plan = query_plan(connectivity)
 
-    def sub_plan1(self, monitor):
-        sub_start = self.connectivity[0]
-        sub_goal = self.connectivity[1]
-        self.line_connection = query_line_connection(sub_start, sub_goal)
-        monitor.set_direction(self.line_connection)
-        #print(self.line_connection)
+    # def sub_plan1(self, monitor):
+    #     sub_start = self.connectivity[0]
+    #     sub_goal = self.connectivity[1]
+    #     self.line_connection = query_line_connection(sub_start, sub_goal)
+    #     monitor.set_direction(self.line_connection)
+    #     #print(self.line_connection)
 
 
         

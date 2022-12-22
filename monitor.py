@@ -7,6 +7,28 @@ class Monitor():
         self.control_task = 0
         self.previous_inputs = 0
 
+    def monitor(self, world):
+        ## sets booleans in world model, discrete decision making
+        self.check_area(world)
+        self.check_inputs(world)
+        self.check_config(world)
+        
+    def check_area(self, world):
+        world.different_area = False
+        previous_area = world.area
+        current_area = world.check_area()
+        if previous_area != current_area:
+            world.different_area = True
+
+    def check_inputs(self, world):
+        pass
+
+    def check_config(self, world):
+        world.map_configured = False
+        parts = has_first_layer_geometries(world.situation)
+        if len(parts) == world.number_of_absolute_areas:
+            world.map_configured = True
+
     def run(self, simulator, world, planner, perception, control):
         ## init conditions
         self.diff_area = False
@@ -16,7 +38,7 @@ class Monitor():
 
         robot = simulator.robots[0]
 
-        self.current_area = world.check_current_area(robot)
+        self.current_area = world.check_area()
         if self.previous_area != self.current_area:
             self.diff_area = True
             self.previous_area = self.current_area 
@@ -79,7 +101,7 @@ class Monitor():
     def meta_monitor(self, world): # check if mereology changes or if goal succesful
         pass
 
-    def monitor(self, world, robot): # check if topology changes or if next step in connectivity plan
+    def monitor2(self, world, robot): # check if topology changes or if next step in connectivity plan
         current_area = world.current_area(robot)
         if current_area == self.subtask:
             print("Still going good, keep going!")

@@ -20,14 +20,14 @@ import time
 sit = 'intersection'
 
 ## initialize objects
-world = Worldmodel()
-world.set_goal('left')
 simulator = Simulator(sit)       # configure global map
 simulator.set_map(sit)
 
-goal = URIRef("http://example.com/intersection/road4") # "At the intersection go left"
-simulator.add_robot('turtle1', goal, TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 0.3, 'down')
-add_robot('turtle1', 'laser_range_finder', 'velocity_control', 'encoders')
+simulator.add_robot('turtle1', TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 0.3, 'down')
+add_robot('turtle1', 'laser_range_finder', 'velocity_control', 'encoders')  # prior knowledge for kg
+
+world = Worldmodel(simulator.robots[0])
+world.set_goal('left')
 
 perception = Perception()
 planner = Planner()
@@ -64,7 +64,7 @@ while True:
     plt.figure(2)
     plt.cla()
     plt.title('Perception inputs')
-    perception.inputs = simulator.perceived_features()
+    inputs = simulator.perceived_features()
     simulator.plot_input_features()
 
 
@@ -81,9 +81,15 @@ while True:
     
     #end = time.time()
     #print(f'Time to run control/planning: {end-start}')
+    perception.perceive(world, inputs)
+    monitor.monitor(world)
+    planner.planning(world)
+    world.plot_relative_areas()
+    world.robot.plot_rel_robot()
+    control.move(world, simulator)
 
-    
-    monitor.run(simulator, world, planner, perception, control)
+    #perception.check_worldmodel(world, perception.inputs)
+    #monitor.run(simulator, world, planner, perception, control)
 
     # if round(t/dt) % 10 == 0:
     #     control_task = planner.iterative_planning(world)
