@@ -38,6 +38,7 @@ class Perception():
                     world.absolute_areas.update({uri: abs_input})   # should be union?
                     world.relative_areas.update({uri: input})       # is de relatieve nodig?
                     print(query_part_of(uri))
+                    world.changed_geometry = True
                     ## updating lane that depends on this?
 
     def update_subgoal(self, world):
@@ -82,7 +83,8 @@ class Perception():
 
     def road_association(self, world, inputs):
         self.query_parts(world)
-        xaxis = LineString(([-30, 0],[30, 0]))    
+        xaxis = LineString(([-30, 0],[30, 0]))
+        association = {}    
 
         for input in inputs:
             intersect = input.intersection(xaxis)
@@ -90,14 +92,15 @@ class Perception():
             if intersect:
                 if intersect.coords[0][0] <= 0:
                     left_part = query_left_part(self.perceivable_road_parts)
-                    #print(f"input: {input}")
                     world.add_area(input, left_part)
                 elif intersect.coords[0][0] > 0:
                     right_part = query_right_part(self.perceivable_road_parts)
                     world.add_area(input, right_part)
 
         ## moet nog zorgen dat het geen error geeft als het een side niet meer ziet, miss data van de vorige run meenemen
-        
+        self.config_lane(world)
+
+    def config_lane(self, world):
         sub_part_areas = []
         for part in self.not_perceivable_road_parts:
             sub_parts = has_a(part)
@@ -108,8 +111,10 @@ class Perception():
                     is_equal = query_if_equal(sub_part, perceivable_part)
                     if is_equal:
                         #print('hello')
-                        sub_part_areas.append(world.get_area(perceivable_part))
-
+                        #association.update(perceivable_part)
+                        sub_part_areas.append(world.get_relative_area(perceivable_part))
+                    
+        #lane_polygon = self.create_polygon_from_lines(line1, line2)
         lane_polygon = Polygon([sub_part_areas[0].coords[0], sub_part_areas[0].coords[1], sub_part_areas[1].coords[1], sub_part_areas[1].coords[0]])
         world.add_area(lane_polygon, self.not_perceivable_road_parts[0])
 

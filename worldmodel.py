@@ -3,7 +3,7 @@ from traffic_areas import *
 from rdflib import URIRef
 from basic_functions import *
 
-class Worldmodel():
+class Worldmodel(): # moet uiteindelijk n keus maken tussen relatief of absoluut
     def __init__(self, robot):
         self.absolute_areas = {}
         self.relative_areas = {}
@@ -23,6 +23,7 @@ class Worldmodel():
 
         self.changed_geometry = False
 
+        self.relative_subgoal = 0
 
     def clear_relative_areas(self):
         self.relative_areas = {}
@@ -58,6 +59,9 @@ class Worldmodel():
     def set_relative_subgoal(self, line):
         self.relative_subgoal = line
 
+    def get_relative_subgoal(self):
+        return self.relative_subgoal
+
     def set_absolute_subgoal(self, line):
         self.absolute_subgoal = coordinate_transform_rel_to_abs(self.robot, line)
         
@@ -83,8 +87,17 @@ class Worldmodel():
         self.absolute_areas.update({uri: area})  # dit kan later iets van geopackage of sqlite/spatialite zijn
         self.number_of_absolute_areas += 1
     
-    def get_area(self, uri):
-        return self.relative_areas[uri]
+    def get_relative_area(self, uri):
+        if uri in self.relative_areas:
+            return self.relative_areas[uri]
+        else:
+            return 0
+
+    def get_absolute_area(self, uri):
+        if uri in self.absolute_areas:
+            return self.absolute_areas[uri]
+        else:
+            return 0
 
     def plot_relative_areas(self):
         ## ik zou hier later de kleuren nog kunnen veranderen

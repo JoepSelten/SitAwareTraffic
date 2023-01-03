@@ -8,12 +8,27 @@ class Planner():
     def __init__(self):
         self.plan = {}
         self.plan_number = 0
+        self.task = 0
 
     def planning(self, world):
-        task = self.iterative_planning(world)
-        whole = query_part_of(task)
-        lines = world.relative_areas[whole].boundary
+        ## if next area, move step in plan?
+        print(world.map_configured)
+        if not world.map_configured or not self.task:
+            self.task = self.iterative_planning(world)
+        if not world.map_configured or world.changed_geometry:
+            print('hallo')
+            self.config_subgoal(world)
+
+    def config_subgoal(self, world):
+        whole = query_part_of(self.task)
+        lines = []
+        if world.get_relative_area(whole):
+            lines = world.get_relative_area(whole).boundary
+        else:
+
+            print('We need to configure the lane!')
         control_line = LineString((lines.coords[1], lines.coords[2]))
+        print(f'control line: {control_line}')
         world.set_relative_subgoal(control_line)
 
     def set_plan(self, world):  # most abstract plan

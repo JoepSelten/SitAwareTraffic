@@ -10,7 +10,8 @@ class Control():
         pass
 
     def move(self, world, simulator):
-        goal = world.relative_subgoal # or should i use absolute control
+        goal = world.get_relative_subgoal() # or should i use absolute control
+        print(f'goal: {goal}')
         self.predict(world, goal)
         #self.check_constraints()
         self.actuate(simulator, world)

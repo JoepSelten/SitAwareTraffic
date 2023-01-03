@@ -26,6 +26,8 @@ class Monitor():
     def check_config(self, world):
         world.map_configured = False
         parts = has_first_layer_geometries(world.situation)
+        print(f'parts: {parts}')
+        print(world.number_of_absolute_areas)
         if len(parts) == world.number_of_absolute_areas:
             world.map_configured = True
 
