@@ -9,6 +9,9 @@ class Control():
     def __init__(self):
         pass
 
+    def turn_and_drive(self, phi_des):
+        pass
+
     def move(self, world, simulator):
         goal = world.get_relative_subgoal() # or should i use absolute control
         print(f'goal: {goal}')

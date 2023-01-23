@@ -13,8 +13,18 @@ class Perception():
     def __init__(self):
         self.spotted_sign = False
         self.pos = 0
-        
+
     def perceive(self, world, inputs):
+        self.check_worldmodel(world, inputs)
+        #print(world.map_configured)
+        if world.changed_geometry:
+            self.update_subgoal(world)
+        self.update_geometries(world)
+        if not world.map_configured:
+            self.config_map(world, inputs)
+        
+        
+    def perceive2(self, world, inputs):
         self.check_worldmodel(world, inputs)
         #print(world.map_configured)
         if world.changed_geometry:
@@ -33,11 +43,11 @@ class Perception():
                 
                 if intersect.geom_type == abs_input.geom_type and area.geom_type == abs_input.geom_type and not intersect.is_empty:
                     #print(abs_input.difference(area))
-                    print(abs_input)
-                    print(LineString(abs_input.union(area).boundary))   # deze zijn nu nog hetzelfde, maar mocht je n deel niet meer zien dan houd deze t oude ook nog
+                    #print(abs_input)
+                    #print(LineString(abs_input.union(area).boundary))   # deze zijn nu nog hetzelfde, maar mocht je n deel niet meer zien dan houd deze t oude ook nog
                     world.absolute_areas.update({uri: abs_input})   # should be union?
                     world.relative_areas.update({uri: input})       # is de relatieve nodig?
-                    print(query_part_of(uri))
+                    #print(query_part_of(uri))
                     world.changed_geometry = True
                     ## updating lane that depends on this?
 
@@ -48,8 +58,8 @@ class Perception():
         pass
 
     def config_map(self, world, inputs):
-        self.situation_from_inputs(world, inputs)
-        self.association(world, inputs)
+        #self.situation_from_inputs(world, inputs)
+        #self.association(world, inputs)
 
 
     def odometry(self, world):

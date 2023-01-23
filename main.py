@@ -8,13 +8,14 @@ from shapely.geometry import Polygon, Point, LineString, CAP_STYLE, box
 from basic_functions import *
 from perception import Perception
 from worldmodel import Worldmodel
-from planner import Planner
+from reasoner import Reasoner
 from simulator import Simulator
 from monitor import Monitor
 from control import Control
 from global_variables import g, dt, TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, EX     
 from queries import *      
 import time
+from skills import *
 
 ## Situation to test
 sit = 'intersection'
@@ -30,7 +31,7 @@ world = Worldmodel(simulator.robots[0])
 world.set_goal('left')
 
 perception = Perception()
-planner = Planner()
+reasoner = Reasoner()
 monitor = Monitor()
 control = Control()
 
@@ -38,19 +39,19 @@ control = Control()
 figure(num=1, figsize=(6, 6), dpi=80)
 fig = figure(1)
 move_figure(fig, 200, 400)
-figure(num=2, figsize=(6, 6), dpi=80)
-fig = figure(2)
-move_figure(fig, 700, 400)
-figure(num=3, figsize=(6, 6), dpi=80)
-fig = figure(3)
-move_figure(fig, 1200, 400)
+# figure(num=2, figsize=(6, 6), dpi=80)
+# fig = figure(2)
+# move_figure(fig, 700, 400)
+# figure(num=3, figsize=(6, 6), dpi=80)
+# fig = figure(3)
+# move_figure(fig, 1200, 400)
 
 # figure(num=4, figsize=(6, 6), dpi=80)
 # fig = figure(4)
 # move_figure(fig, 1700, 400)
 
 
-planner.set_plan(world)
+#planner.set_plan(world)
 
 
 t = 0
@@ -61,32 +62,33 @@ while True:
     plt.title('Simulator')
     simulator.simulate()
 
-    plt.figure(2)
-    plt.cla()
-    plt.title('Perception inputs')
+    #plt.figure(2)
+    #plt.cla()
+    #plt.title('Perception inputs')
     inputs = simulator.perceived_features()
     simulator.plot_input_features()
 
 
     ## From here starts the robot software:
     
-    plt.figure(3)
-    plt.cla()
-    plt.title('Relative world model')
-    plt.xlim(-15,15)
-    plt.ylim(-10,40)
+    #plt.figure(3)
+    #plt.cla()
+    #plt.title('Relative world model')
+    #plt.xlim(-15,15)
+    #plt.ylim(-10,40)
 
     #start = time.time()
     
     
     #end = time.time()
     #print(f'Time to run control/planning: {end-start}')
-    perception.perceive(world, inputs)
-    monitor.monitor(world)
-    planner.planning(world)
-    world.plot_relative_areas()
-    world.robot.plot_rel_robot()
-    control.move(world, simulator)
+    #perception.perceive(world, inputs)
+
+    #monitor.monitor(world)
+    reasoner.reason(world)
+    #world.plot_relative_areas()
+    #world.robot.plot_rel_robot()
+    #control.move(world, simulator)
 
     #perception.check_worldmodel(world, perception.inputs)
     #monitor.run(simulator, world, planner, perception, control)

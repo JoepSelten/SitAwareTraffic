@@ -58,11 +58,11 @@ class Simulator():
         
         #map_features = MultiPolygon(self.map.polygon_list)
         for polygon in self.map.polygon_list:
-            if polygon.geom_type=='LineString':
-                overlap = polygon.intersection(perception_area)
-                if overlap:
-                    overlap_rel = coordinate_transform_abs_to_rel(robot, overlap)
-                    self.input_features.append(overlap_rel)            
+            #if polygon.geom_type=='LineString':
+            overlap = polygon.intersection(perception_area)
+            if overlap:
+                overlap_rel = coordinate_transform_abs_to_rel(robot, overlap)
+                self.input_features.append(overlap_rel)            
         return self.input_features
 
     def plot_input_features(self):

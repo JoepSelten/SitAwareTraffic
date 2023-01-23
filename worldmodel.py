@@ -33,7 +33,7 @@ class Worldmodel(): # moet uiteindelijk n keus maken tussen relatief of absoluut
         # human grounding, miss ook met bepaalde intersection geven, of met de whole queryen
         ## moet deze relatie niet in de graph staan
         self.goal_finished = False
-        self.start = URIRef("http://example.com/intersection/road1")
+        self.start = URIRef("http://example.com/intersection/road_current")
 
         if direction == 'right':
             self.goal = URIRef("http://example.com/intersection/road2")
@@ -42,7 +42,7 @@ class Worldmodel(): # moet uiteindelijk n keus maken tussen relatief of absoluut
             self.goal = URIRef("http://example.com/intersection/road3")
         
         if direction == 'left':
-            self.goal = URIRef("http://example.com/intersection/road4")
+            self.goal = URIRef("http://example.com/intersection/road_left")
 
 
     def set_situation(self, sit):

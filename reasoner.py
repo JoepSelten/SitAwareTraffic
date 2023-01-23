@@ -3,12 +3,30 @@ from queries import *
 ## hier moeten de resources van de robot, en de affordances gematched worden tot een plan
 from rdflib import URIRef
 from shapely.geometry import LineString
+from skills import *
 
-class Planner():
+class Reasoner():
     def __init__(self):
         self.plan = {}
         self.plan_number = 0
         self.task = 0
+        self.guard_violated = False
+        self.skill = 0
+
+    def reason(self, world):
+        if not self.skill or self.guard_violated:
+            self.skill = self.query_skill(world)
+
+
+    def query_skill(self, world):
+        abstract_skill = go_left()
+        traverse_road = abstract_skill[0]
+        print(traverse_road)
+        ## if not actionable:
+        concrete_skill = move_in_lane()
+        print(concrete_skill)
+        
+
 
     def planning(self, world):
         ## if next area, move step in plan?
@@ -42,20 +60,21 @@ class Planner():
     def iterative_planning(self, world):
         self.clear_plan()
         ## keeps planning untill actionable by control
-        if not self.plan:
-            self.set_plan(world)
+        #if not self.plan:
+        self.set_plan(world)
 
         current_start = self.plan[str(self.plan_number)][0]
         current_goal = self.plan[str(self.plan_number)][1]
 
         self.plan_finished = False
-        polygons = False
-        polygon1 = query_if_polygon(current_start)
-        polygon2 = query_if_polygon(current_goal)
-        if polygon1 and polygon2:
-            polygon = True
-            plan = query_line_connection(current_start, current_goal)
-            self.plan_finished = True
+       
+       # polygons = False
+       # polygon1 = query_if_polygon(current_start)
+       # polygon2 = query_if_polygon(current_goal)
+       # if polygon1 and polygon2:
+       #     polygon = True
+       #     plan = query_line_connection(current_start, current_goal)
+       #     self.plan_finished = True
         
         new_start = current_start
         new_goal = current_goal
