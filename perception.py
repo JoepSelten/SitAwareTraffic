@@ -60,7 +60,7 @@ class Perception():
     def config_map(self, world, inputs):
         #self.situation_from_inputs(world, inputs)
         #self.association(world, inputs)
-
+        pass
 
     def odometry(self, world):
         # dit doe ik nu in control.actuate

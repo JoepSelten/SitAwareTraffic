@@ -7,7 +7,8 @@ from rdflib import URIRef
 from shapely.geometry import Polygon, Point, LineString, CAP_STYLE, box
 from basic_functions import *
 from perception import Perception
-from worldmodel import Worldmodel
+from worldmodel import WorldModel
+from skill_model import SkillModel
 from reasoner import Reasoner
 from simulator import Simulator
 from monitor import Monitor
@@ -18,41 +19,32 @@ import time
 from skills import *
 
 ## Situation to test
-sit = 'intersection'
+map = 'two-lane_intersection'
 
 ## initialize objects
-simulator = Simulator(sit)       # configure global map
-simulator.set_map(sit)
+simulator = Simulator()       # configure global map
+simulator.set_map(map)
 
-simulator.add_robot('turtle1', TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 0.3, 'down')
-add_robot('turtle1', 'laser_range_finder', 'velocity_control', 'encoders')  # prior knowledge for kg
+simulator.add_robot('AV', TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 0.3, start='down', task='left')
 
-world = Worldmodel(simulator.robots[0])
-world.set_goal('left')
+#world = Worldmodel(simulator.robots[0])
+world = WorldModel(simulator.robots[0])
+world.init_geometric_map(simulator.map)
+world.init_kg(g)
 
-perception = Perception()
-reasoner = Reasoner()
-monitor = Monitor()
+skill_model = SkillModel()
 control = Control()
 
+#world.set_goal('left')
+#world.update()
 
-figure(num=1, figsize=(6, 6), dpi=80)
+
+figure(num=1, figsize=(8, 8), dpi=80)
 fig = figure(1)
-move_figure(fig, 200, 400)
+move_figure(fig, 1100, 150)
 # figure(num=2, figsize=(6, 6), dpi=80)
 # fig = figure(2)
 # move_figure(fig, 700, 400)
-# figure(num=3, figsize=(6, 6), dpi=80)
-# fig = figure(3)
-# move_figure(fig, 1200, 400)
-
-# figure(num=4, figsize=(6, 6), dpi=80)
-# fig = figure(4)
-# move_figure(fig, 1700, 400)
-
-
-#planner.set_plan(world)
-
 
 t = 0
 waiting = True
@@ -61,59 +53,17 @@ while True:
     plt.cla()
     plt.title('Simulator')
     simulator.simulate()
-
-    #plt.figure(2)
-    #plt.cla()
-    #plt.title('Perception inputs')
-    inputs = simulator.perceived_features()
-    simulator.plot_input_features()
-
-
-    ## From here starts the robot software:
     
-    #plt.figure(3)
-    #plt.cla()
-    #plt.title('Relative world model')
-    #plt.xlim(-15,15)
-    #plt.ylim(-10,40)
+    world.update(simulator)
 
-    #start = time.time()
+    #print(query_current_pos(world.kg, world.AV_uri))
     
     
-    #end = time.time()
-    #print(f'Time to run control/planning: {end-start}')
-    #perception.perceive(world, inputs)
-
-    #monitor.monitor(world)
-    reasoner.reason(world)
-    #world.plot_relative_areas()
-    #world.robot.plot_rel_robot()
-    #control.move(world, simulator)
-
-    #perception.check_worldmodel(world, perception.inputs)
-    #monitor.run(simulator, world, planner, perception, control)
-
-    # if round(t/dt) % 10 == 0:
-    #     control_task = planner.iterative_planning(world)
-    # perception.perceive(simulator, world, perception.inputs)
-        
-    # ## hier gebeurd pas de associatie met geometrie
-    # whole = query_part_of(control_task)
-    # lines = world.relative_areas[whole].boundary
-    # control_line = LineString((lines.coords[1], lines.coords[2]))
+    skill_model.select_skill(world)
+    skill_model.config_skill(world)
     
-    
-    # world.set_subgoal(control_line)
-    # world.plot_relative_areas()
-    # simulator.robots[0].plot_rel_robot()
-    # control.move(simulator.robots[0], world, simulator)
-
-    #plt.figure(4)
-    #plt.cla()
-    #plt.title('Absolute world model')
-    #world.plot_absolute_areas()
-
-    
+    control.execute_skill(world)
+    control.actuate(simulator)
 
     plt.pause(dt)
     #round(t/dt) % 10

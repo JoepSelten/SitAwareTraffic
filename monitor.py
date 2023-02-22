@@ -10,7 +10,7 @@ class Monitor():
     def monitor(self, world):
         ## sets booleans in world model, discrete decision making
         self.check_area(world)
-        self.check_inputs(world)
+        #self.check_inputs(world)
         self.check_config(world)
         
     def check_area(self, world):

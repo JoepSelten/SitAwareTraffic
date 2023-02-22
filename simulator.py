@@ -12,7 +12,7 @@ from global_variables import *
 
 
 class Simulator():
-    def __init__(self, sit="intersection"):
+    def __init__(self):
         self.robots = []
         self.num_robots = 0
         #self.input_features = []
@@ -20,8 +20,8 @@ class Simulator():
     def set_map(self, sit):
         self.map = Map(sit)
         
-    def add_robot(self, turtle_name, l, w, vel, omega_max, start='down'):
-        robot = Robot(turtle_name, l, w, vel, omega_max, start)
+    def add_robot(self, name, l, w, vel, omega_max, start='down', task='left'):
+        robot = Robot(name, l, w, vel, omega_max, start, task)
         self.robots.append(robot)
         self.num_robots += 1
 
@@ -32,22 +32,6 @@ class Simulator():
     def plot_robots(self):
         for robot in self.robots:
             robot.plot_robot()
-
-    def simulate_relative_obj(self, obj_pos, l, b):     
-        rel_pos = obj_pos - self.robot.pos
-        yaw = -0.5*math.pi
-        Rot1 = np.array([[math.cos(yaw), math.sin(yaw)],
-                        [-math.sin(yaw), math.cos(yaw)]])
-
-        rel_pos_rot = rel_pos.dot(Rot1)
-        rel_yaw = 0.5*math.pi-self.robot.yaw
-        
-        rel_object = trans(np.array([0,0]), 0.5*math.pi+rel_yaw, l, b, rel_pos_rot)
-        plt.xlim([-20, 20])
-        plt.ylim([-20, 20])
-        plt.fill(*rel_object.exterior.xy)
-
-        return rel_object
 
     def perceived_features(self):   # gives all features inside a certain radius, maybe later use a part of the circle
         robot = self.robots[0]
@@ -72,15 +56,16 @@ class Simulator():
             elif feature.geom_type=='LineString':
                 plt.plot(*feature.xy, 'black')
 
-    def move_robot(self, robot, omega):
+    def move_robot(self, robot, velocity, omega):
         #robot = self.robots[0]
         robot.yaw += omega*dt
-        robot.pos[0] += robot.velocity*math.cos(robot.yaw)*dt
-        robot.pos[1] += robot.velocity*math.sin(robot.yaw)*dt
+        robot.pos[0] += velocity*math.cos(robot.yaw)*dt
+        robot.pos[1] += velocity*math.sin(robot.yaw)*dt
         
 class Map():
-    def __init__(self, Traffic_Situation = "intersection"):
-        if Traffic_Situation == "intersection" :
+    def __init__(self, traffic_situation = "two_lane-intersection"):
+        self.traffic_situation = traffic_situation
+        if traffic_situation == "one-lane_intersection" :
             self.map_dict =  {'0': {'type': 'on intersection',
                             'poly': Polygon([(l, l), (l+w, l), (l+w, l+w), (l, l+w)]), 'color': 'lightblue', 'transparency': 1},
                         '1': {'type': 'lane', 'location': 'down', 'poly': Polygon([(l, 0), (l+w, 0), (l+w, l), (l, l)]), 'color': 'lightblue', 'transparency': 1},
@@ -105,32 +90,46 @@ class Map():
                             'poly': LineString([(l+w, l+w), (2*l+w, l+w)]), 'color': 'red', 'transparency': 1},
             }
 
-        if Traffic_Situation == "intersection2" :
-            self.map_dict =  {'0': {'type': 'on intersection',
-                            'geometry': np.array([l, l+w, l+w, l, l, l, l+w, l+w]), 'color': 'lightblue', 'transparency': 1},
-                        '1': {'type': 'lane', 'location': 'down', 'geometry': np.array([l, l+w, l+w, l, 0, 0, l, l]), 'color': 'lightblue', 'transparency': 1},
-                        '2': {'type': 'lane', 'location': 'up', 'geometry': np.array([l, l+w, l+w, l, l+w, l+w, 2*l+w, 2*l+w]), 'color': 'lightblue', 'transparency': 1},
-                        '3': {'type': 'lane', 'location': 'left', 'geometry': np.array([0, l, l, 0, l, l, l+w, l+w]), 'color': 'lightblue', 'transparency': 1},
-                        '4': {'type': 'lane', 'location': 'right', 'geometry': np.array([l+w, 2*l+w, 2*l+w, l+w, l, l, l+w, l+w]), 'color': 'lightblue', 'transparency': 1},
-                        '5': {'type': 'boundary', 'location': 'down', 
-                            'geometry': np.array([l-0.5*b, l+0.5*b, l+0.5*b, l-0.5*b, 0, 0, l, l]), 'color': 'red', 'transparency': 1},
-                        '6': {'type': 'boundary', 'location': 'down', 
-                            'geometry': np.array([l+w-0.5*b, l+w+0.5*b, l+w+0.5*b, l+w-0.5*b, 0, 0, l, l]), 'color': 'red', 'transparency': 1},
-                        '7': {'type': 'boundary', 'location': 'up', 
-                            'geometry': np.array([l-0.5*b, l+0.5*b, l+0.5*b, l-0.5*b, l+w, l+w, 2*l+w, 2*l+w]), 'color': 'red', 'transparency': 1},
-                        '8': {'type': 'boundary', 'location': 'up', 
-                            'geometry': np.array([l+w-0.5*b, l+w+0.5*b, l+w+0.5*b, l+w-0.5*b, l+w, l+w, 2*l+w, 2*l+w]), 'color': 'red', 'transparency': 1},
-                        '9': {'type': 'boundary', 'location': 'left', 
-                            'geometry': np.array([0, l, l, 0, l-0.5*b, l-0.5*b, l+0.5*b, l+0.5*b]), 'color': 'red', 'transparency': 1},
-                        '10': {'type': 'boundary', 'location': 'left', 
-                            'geometry': np.array([0, l, l, 0, l+w-0.5*b, l+w-0.5*b, l+w+0.5*b, l+w+0.5*b]), 'color': 'red', 'transparency': 1},
+        if traffic_situation == "two-lane_intersection" :
+            self.map_dict =  {'0': {'type': 'middle',
+                            'poly': Polygon([(l, l), (l+w, l), (l+w, l+w), (l, l+w)]), 'color': 'darkgray', 'transparency': 1},
+                        '1': {'type': 'lane', 'location': 'down', 'poly': Polygon([(l+0.5*w, 0), (l+w, 0), (l+w, l), (l+0.5*w, l)]), 'color': 'lightblue', 'transparency': 1},
+                        '2': {'type': 'lane', 'location': 'down', 'poly': Polygon([(l, 0), (l+0.5*w, 0), (l+0.5*w, l), (l, l)]), 'color': 'orange', 'transparency': 1},
+                        '3': {'type': 'lane', 'location': 'right', 'poly': Polygon([(l+w, l+0.5*w), (2*l+w, l+0.5*w), (2*l+w, l+w), (l+w, l+w)]), 'color': 'lightblue', 'transparency': 1},
+                        '4': {'type': 'lane', 'location': 'right', 'poly': Polygon([(l+w, l), (2*l+w, l), (2*l+w, l+0.5*w), (l+w, l+0.5*w)]), 'color': 'orange', 'transparency': 1},
+                        '5': {'type': 'lane', 'location': 'up', 'poly': Polygon([(l, l+w), (l+0.5*w, l+w), (l+0.5*w, 2*l+w), (l, 2*l+w)]), 'color': 'lightblue', 'transparency': 1},
+                        '6': {'type': 'lane', 'location': 'up', 'poly': Polygon([(l+0.5*w, l+w), (l+w, l+w), (l+w, 2*l+w), (l+0.5*w, 2*l+w)]), 'color': 'orange', 'transparency': 1},
+                        '7': {'type': 'lane', 'location': 'left', 'poly': Polygon([(0, l), (l, l), (l, l+0.5*w), (0, l+0.5*w)]), 'color': 'lightblue', 'transparency': 1},
+                        '8': {'type': 'lane', 'location': 'left', 'poly': Polygon([(0, l+0.5*w), (l, l+0.5*w), (l, l+w), (0, l+w)]), 'color': 'orange', 'transparency': 1},
+                        
+                        '9': {'type': 'boundary', 'location': 'down', 
+                            'poly': LineString([(l+w, 0), (l+w, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '10': {'type': 'boundary', 'location': 'down', 
+                            'poly': LineString([(l, 0), (l, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
                         '11': {'type': 'boundary', 'location': 'right', 
-                            'geometry': np.array([l+w, 2*l+w, 2*l+w, l+w, l-0.5*b, l-0.5*b, l+0.5*b, l+0.5*b]), 'color': 'red', 'transparency': 1},
+                            'poly': LineString([(l+w, l+w), (2*l+w, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
                         '12': {'type': 'boundary', 'location': 'right', 
-                            'geometry': np.array([l+w, 2*l+w, 2*l+w, l+w, l+w-0.5*b, l+w-0.5*b, l+w+0.5*b, l+w+0.5*b]), 'color': 'red', 'transparency': 1},
+                            'poly': LineString([(l+w, l), (2*l+w, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '13': {'type': 'boundary', 'location': 'up', 
+                            'poly': LineString([(l, l+w), (l, 2*l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '14': {'type': 'boundary', 'location': 'up', 
+                            'poly': LineString([(l+w, l+w), (l+w, 2*l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '15': {'type': 'boundary', 'location': 'left', 
+                            'poly': LineString([(0, l), (l, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '16': {'type': 'boundary', 'location': 'left', 
+                            'poly': LineString([(0, l+w), (l, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+
+                        '17': {'type': 'centerline', 'location': 'down', 
+                            'poly': LineString([(l+0.5*w, 0), (l+0.5*w, l)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1},
+                        '18': {'type': 'centerline', 'location': 'right', 
+                            'poly': LineString([(l+w, l+0.5*w), (2*l+w, l+0.5*w)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1},
+                        '19': {'type': 'centerline', 'location': 'up', 
+                            'poly': LineString([(l+0.5*w, l+w), (l+0.5*w, 2*l+w)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1},
+                        '20': {'type': 'centerline', 'location': 'left', 
+                            'poly': LineString([(0, l+0.5*w), (l, l+0.5*w)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1}
             }
 
-        elif Traffic_Situation == "road":
+        elif traffic_situation == "road":
 
             self.map_dict =  {'0': {'type': 'lane', 'location': 'down', 'direction': [0, -1],
                             'geometry': np.array([l, l+w, l+w, l, 0, 0, 2*l, 2*l]), 'color': 'lightblue', 'transparency': 1},
@@ -147,7 +146,7 @@ class Map():
             #print(self.map_dict[key]['geometry'])
             #print(self.map_dict[key]['poly'])
             self.polygon_list.append(self.map_dict[key]['poly'])
-
+        #print(self.polygon_list)
         self.turtles = []
         self.number_of_turtles = 0
 
@@ -156,7 +155,7 @@ class Map():
             if self.map_dict[key]['poly'].geom_type=='Polygon':
                 plt.fill(*self.map_dict[key]['poly'].exterior.xy, color=self.map_dict[key]['color'], alpha=self.map_dict[key]['transparency'])
             elif self.map_dict[key]['poly'].geom_type=='LineString':
-                plt.plot(*self.map_dict[key]['poly'].xy, color=self.map_dict[key]['color'], alpha=self.map_dict[key]['transparency'])
+                plt.plot(*self.map_dict[key]['poly'].xy, color=self.map_dict[key]['color'], linestyle=self.map_dict[key]['linestyle'] , alpha=self.map_dict[key]['transparency'])
 
     def add_robot(self, turtle):
         self.turtles.append(turtle)
@@ -170,7 +169,7 @@ class Map():
     
 
 class Robot():
-    def __init__(self, name, length, width, vel, omega_max, start, color='orange'):
+    def __init__(self, name, length, width, vel, omega_max, start, task, color='blue'):
         self.name = name
         self.length = length
         self.width = width
@@ -178,21 +177,22 @@ class Robot():
         self.start = start
         self.color = color
         self.omega_max = omega_max
+        self.task = task
         
         if start == 'down':
-            self.pos = np.array([l+0.5*w, self.length/2])
+            self.pos = np.array([l+0.75*w, self.length/2])
             self.yaw = 0.5*math.pi
             self.lane_id_start = '2'
         elif start == 'up':
-            self.pos = np.array([l+0.5*w,2*l+w-self.length/2])
+            self.pos = np.array([l+0.25*w,2*l+w-self.length/2])
             self.yaw = -0.5*math.pi
             self.lane_id_start = '3'
         elif start == 'left':
-            self.pos = np.array([self.length/2,l+0.5*w])
+            self.pos = np.array([self.length/2,l+0.25*w])
             self.yaw = 0
             self.lane_id_start = '5'
         elif start == 'right':
-            self.pos = np.array([2*l+w-self.length/2,l+0.5*w])
+            self.pos = np.array([2*l+w-self.length/2,l+0.75*w])
             self.yaw = math.pi
             self.lane_id_start = '8'
         self.box = trans(self.pos, self.yaw, self.length, self.width)

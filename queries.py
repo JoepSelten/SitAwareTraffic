@@ -3,6 +3,39 @@ from global_variables import g, EX, GEO
 from closure_graph import Semantics
 from owlrl import DeductiveClosure
 
+def query_current_pos(g, robot):
+    query = """
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?pos
+        WHERE {
+            ?robot ex:is_on ?pos
+        }
+        """
+    answer = 0
+    for r in g.query(query, initBindings={'robot': robot}):
+        answer = r[0]
+    
+    return answer
+
+def query_type(g, subject):
+    query = """
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?object
+        WHERE {
+            ?subject rdf:type ?object
+        }
+        """
+    answer = 0
+    for r in g.query(query, initBindings={'subject': subject}):
+        answer = r[0]
+    
+    return answer
+
 def uri_from_label(label):
     query = """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -14,7 +47,7 @@ def uri_from_label(label):
         """
     answer = 0
     for r in g.query(query, initBindings={'label': Literal(label)}):
-        answer = r
+        answer = r[0]
     
     return answer
 
@@ -202,19 +235,19 @@ def query_check_geometrical(subject):
 def query_check_driveable(subject):
     return query_check_affordance(subject, EX.driveable)
 
-def query_type(subject):
-    query = """
-        PREFIX ex: <http://example.com/>
+# def query_type(subject):
+#     query = """
+#         PREFIX ex: <http://example.com/>
 
-        SELECT ?object
-        WHERE {
-            ?subject rdf:type ?object .
-        }"""
-    answer = []
-    for r in g.query(query, initBindings={'subject': URIRef(subject)}):
-        answer.append(r[0])
-    # if empty, go abstraction level higher and try again
-    return answer
+#         SELECT ?object
+#         WHERE {
+#             ?subject rdf:type ?object .
+#         }"""
+#     answer = []
+#     for r in g.query(query, initBindings={'subject': URIRef(subject)}):
+#         answer.append(r[0])
+#     # if empty, go abstraction level higher and try again
+#     return answer
 
 def query_driveable_part(parts):
     for part in parts:
