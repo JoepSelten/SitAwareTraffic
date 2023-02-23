@@ -1,6 +1,6 @@
 {
-    "dt": 0.1,
-    "turtle_velocity": 8,
+    "dt": 0.05,
+    "turtle_velocity": 12,
     "turtle_length": 6,
     "turtle_width": 4,
     "prediction_horizon": 3,

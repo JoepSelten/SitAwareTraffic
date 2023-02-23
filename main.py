@@ -25,7 +25,8 @@ map = 'two-lane_intersection'
 simulator = Simulator()       # configure global map
 simulator.set_map(map)
 
-simulator.add_robot('AV', TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 0.3, start='down', task='left')
+simulator.add_robot('AV', TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 1, start='down', task='left')
+#simulator.robots[0].yaw += 0.1
 
 #world = Worldmodel(simulator.robots[0])
 world = WorldModel(simulator.robots[0])
@@ -58,11 +59,9 @@ while True:
 
     #print(query_current_pos(world.kg, world.AV_uri))
     
+    skill_model.monitor_skills(world, control)
     
-    skill_model.select_skill(world)
-    skill_model.config_skill(world)
-    
-    control.execute_skill(world)
+    #control.execute_skill(world)
     control.actuate(simulator)
 
     plt.pause(dt)
