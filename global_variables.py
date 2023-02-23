@@ -7,9 +7,10 @@ with open('conf.json') as f:
     config = json.load(f)
     f.close
 
-TURTLE_LENGTH = config['turtle_length']
-TURTLE_WIDTH = config['turtle_width']
-TURTLE_VELOCITY = config['turtle_velocity']
+AV_LENGTH = config['av_length']
+AV_WIDTH = config['av_width']
+AV_VELOCITY = config['av_velocity']
+AV_OMEGA = config['av_omega']
 ROAD_LENGTH = config['road_length']
 ROAD_WIDTH = config['road_width']
 PERCEPTION_RADIUS = config['perception_radius']

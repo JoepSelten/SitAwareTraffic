@@ -26,21 +26,27 @@ class Control():
         self.omega = -yaw_error
         world.skill_finished = True
 
-    def turn(self, world, phi_des, lane):
+    def turn(self, world, phi_des, centerline):
         self.velocity = world.robot.velocity
+        reduced_velocity = False
         yaw_error = world.robot.yaw - phi_des
         T_omega = phi_des/world.robot.omega_max
         turn_dist = self.velocity/world.robot.omega_max
     
         if turn_dist > 5:
             turn_dist = 5
-            self.velocity = world.robot.omega_max*5
+            reduced_velocity = True
         ## kan later nog n bepaalde skill hebben die altijd afremt voor n intersection
-        turn_pos = lane-turn_dist
+        print(world.robot.point.distance(centerline))
+        turn_pos = 55-turn_dist
+        
         if world.robot.pos[1] < turn_pos:
             self.omega = 0
         elif world.robot.pos[1] >= turn_pos and abs(yaw_error) > 0.05:
             self.omega = -1*np.sign(yaw_error)*world.robot.omega_max
+            if reduced_velocity:
+                self.velocity = world.robot.omega_max*5
+
         #elif world.robot.pos[1] >= turn_pos and yaw_error > 0.05:
          #   self.omega = -world.robot.omega_max
         else:

@@ -8,6 +8,7 @@ import json
 from traffic_areas import *
 from basic_functions import *
 from global_variables import *
+import random
 ## This script should be replaceble by real robots
 
 
@@ -57,10 +58,10 @@ class Simulator():
                 plt.plot(*feature.xy, 'black')
 
     def move_robot(self, robot, velocity, omega):
-        #robot = self.robots[0]
         robot.yaw += omega*dt
         robot.pos[0] += velocity*math.cos(robot.yaw)*dt
         robot.pos[1] += velocity*math.sin(robot.yaw)*dt
+        robot.point = Point(robot.pos[0], robot.pos[1])
         
 class Map():
     def __init__(self, traffic_situation = "two_lane-intersection"):
@@ -169,39 +170,39 @@ class Map():
     
 
 class Robot():
-    def __init__(self, name, length, width, vel, omega_max, start, task, color='blue'):
+    def __init__(self, name, length, width, velocity, omega_max, start, task, color='blue'):
         self.name = name
         self.length = length
         self.width = width
-        self.velocity = vel
+        self.velocity = velocity
         self.start = start
         self.color = color
         self.omega_max = omega_max
-        self.task = task
+        self.reset(start, task)
+        self.point = Point(self.pos[0], self.pos[1])
         
+
+    def plot_robot(self):
+        self.poly = trans(self.pos, self.yaw, self.length, self.width)
+        plt.fill(*self.poly.exterior.xy, color=self.color)
+
+    def random_reset(self):
+        start_task_list = ['down', 'right', 'up', 'left']
+        start, task = random.sample(start_task_list, 2)
+        self.reset(start, task)
+
+    def reset(self, start, task):
+        self.task = task
         if start == 'down':
             self.pos = np.array([l+0.75*w, self.length/2])
             self.yaw = 0.5*math.pi
-            self.lane_id_start = '2'
         elif start == 'up':
             self.pos = np.array([l+0.25*w,2*l+w-self.length/2])
             self.yaw = -0.5*math.pi
-            self.lane_id_start = '3'
         elif start == 'left':
             self.pos = np.array([self.length/2,l+0.25*w])
             self.yaw = 0
-            self.lane_id_start = '5'
         elif start == 'right':
             self.pos = np.array([2*l+w-self.length/2,l+0.75*w])
             self.yaw = math.pi
-            self.lane_id_start = '8'
-        self.box = trans(self.pos, self.yaw, self.length, self.width)
-        self.rel_box = trans(np.array([0,0]), 0.5*math.pi, self.length, self.width)
-        #print(self.yaw)
-
-    def plot_robot(self):
-        self.box = trans(self.pos, self.yaw, self.length, self.width)
-        plt.fill(*self.box.exterior.xy, color=self.color)
-
-    def plot_rel_robot(self):
-        plt.fill(*self.rel_box.exterior.xy, color=self.color)
+        self.poly = trans(self.pos, self.yaw, self.length, self.width)

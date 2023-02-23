@@ -77,3 +77,17 @@ def move_figure(f, x, y):
         # This works for QT and GTK
         # You can also use window.setGeometry
         f.canvas.manager.window.move(x, y)
+
+def shift_line(coords, d):
+        x1 = coords[0][0]
+        x2 = coords[1][0]
+        y1 = coords[0][1]
+        y2 = coords[1][1]
+        r = math.hypot(x2-x1, y2-y1)
+        dx = d/r*(y1-y2)
+        dy = d/r*(x2-x1)
+        x3 = x1 + dx
+        x4 = x2 + dx
+        y3 = y1 + dy
+        y4 = y2 + dy
+        return LineString([(x3, y3),(x4, y4)])

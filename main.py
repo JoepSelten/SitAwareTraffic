@@ -13,7 +13,7 @@ from reasoner import Reasoner
 from simulator import Simulator
 from monitor import Monitor
 from control import Control
-from global_variables import g, dt, TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, EX     
+from global_variables import g, dt, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, EX     
 from queries import *      
 import time
 from skills import *
@@ -25,7 +25,7 @@ map = 'two-lane_intersection'
 simulator = Simulator()       # configure global map
 simulator.set_map(map)
 
-simulator.add_robot('AV', TURTLE_LENGTH, TURTLE_WIDTH, TURTLE_VELOCITY, 1, start='down', task='left')
+simulator.add_robot('AV', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='left')
 #simulator.robots[0].yaw += 0.1
 
 #world = Worldmodel(simulator.robots[0])
@@ -64,7 +64,7 @@ while True:
     #control.execute_skill(world)
     control.actuate(simulator)
 
-    plt.pause(dt)
+    plt.pause(dt/5)
     #round(t/dt) % 10
     t += dt
 

@@ -3,7 +3,7 @@ from global_variables import g, EX, GEO
 from closure_graph import Semantics
 from owlrl import DeductiveClosure
 
-def query_current_pos(g, robot):
+def query_is_on(g, robot):
     query = """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX ex: <http://example.com/>
@@ -27,7 +27,9 @@ def query_type(g, subject):
 
         SELECT ?object
         WHERE {
-            ?subject rdf:type ?object
+            ?subject rdf:type ?object .
+            ?object rdf:type ex:geometry .
+            ?object rdf:type ex:polygon .
         }
         """
     answer = 0
