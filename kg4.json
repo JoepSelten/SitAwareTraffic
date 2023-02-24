@@ -1,116 +1,41 @@
 [
   {
-    "@id": "http://example.com/intersection/road_right/lane_right/interior",
+    "@id": "http://example.com/intersection/road_left/lane_left/line3",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/middle/interior",
     "@type": [
       "http://example.com/interior",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_right/lane_right/line4",
+    "@id": "http://example.com/road/lane_right/line1",
     "@type": [
       "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/has_a",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://example.com/has_a"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right/lane_right/line1",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/road/lane_right/line2",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/centerline",
-    "@type": [
-      "http://example.com/centerline",
       "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/line"
+      "http://example.com/geometry"
     ]
   },
   {
-    "@id": "http://example.com/lane/line2",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/side_right",
+    "@id": "http://example.com/intersection/road_left/side_left",
     "@type": [
       "http://example.com/side",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
       "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
       "http://example.com/line"
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_down/centerline",
-    "@type": [
-      "http://example.com/centerline",
-      "http://example.com/geometry",
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane_left/line2",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane_right/line3",
+    "@id": "http://example.com/intersection/road_up/lane_right/line3",
     "@type": [
       "http://example.com/line",
       "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/middle/line2",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/lane_left/interior",
-    "@type": [
-      "http://example.com/interior",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/road/lane_right/interior",
-    "@type": [
-      "http://example.com/interior",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
@@ -118,49 +43,38 @@
     "@id": "http://example.com/intersection/road_up/lane_left/line3",
     "@type": [
       "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left",
-    "@type": [
-      "http://example.com/road",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/middle"
-      }
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_left/centerline"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/side_left"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_right"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/side_right"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_left"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/lane/line1",
-    "@type": [
-      "http://example.com/line",
       "http://example.com/geometry",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_left/lane_right/line4",
+    "@id": "http://example.com/intersection/road_down/lane_left",
+    "@type": [
+      "http://example.com/lane",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/polygon",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_down/lane_left/line2"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane_left/interior"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane_left/line1"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane_left/line3"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane_left/line4"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/middle/line4",
     "@type": [
       "http://example.com/line",
       "http://example.com/geometry",
@@ -171,275 +85,22 @@
     "@id": "http://example.com/road/lane_left/line3",
     "@type": [
       "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/middle/line4",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/polygon",
-    "@type": [
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/polygon/interior"
-      },
-      {
-        "@id": "http://example.com/polygon/line1"
-      },
-      {
-        "@id": "http://example.com/polygon/line2"
-      },
-      {
-        "@id": "http://example.com/polygon/line3"
-      },
-      {
-        "@id": "http://example.com/polygon/line4"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane_left/interior",
-    "@type": [
-      "http://example.com/interior",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/middle/line3",
-    "@type": [
-      "http://example.com/line",
       "http://example.com/geometry",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_right/lane_left/interior",
+    "@id": "http://example.com/geometry",
     "@type": [
-      "http://example.com/interior",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_down/lane_right/line2",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane_left/line1",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/lane_right/line2",
+    "@id": "http://example.com/intersection/road_left/lane_right/line1",
     "@type": [
       "http://example.com/line",
       "http://example.com/geometry",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/connects",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://example.com/connects"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/polygon/line1",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right/lane_right/line3",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/middle/line3",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right/lane_left/line1",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right/lane_right/line2",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/polygon/line4",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right/side_left",
-    "@type": [
-      "http://example.com/side",
-      "http://example.com/geometry",
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/line",
-    "@type": [
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/lane_left",
-    "@type": [
-      "http://example.com/lane",
-      "http://example.com/geometry",
-      "http://example.com/polygon",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_left/lane_left/line3"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_left/line4"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_left/interior"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_left/line1"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_left/line2"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane_right",
-    "@type": [
-      "http://example.com/lane",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/polygon"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_down/lane_right/line3"
-      },
-      {
-        "@id": "http://example.com/intersection/road_down/lane_right/interior"
-      },
-      {
-        "@id": "http://example.com/intersection/road_down/lane_right/line2"
-      },
-      {
-        "@id": "http://example.com/intersection/road_down/lane_right/line4"
-      },
-      {
-        "@id": "http://example.com/intersection/road_down/lane_right/line1"
-      }
-    ]
-  },
-  {
-    "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/middle",
-    "@type": [
-      "http://example.com/middle",
-      "http://example.com/polygon",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/road_down"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right"
-      },
-      {
-        "@id": "http://example.com/intersection/road_up"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left"
-      }
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/middle/line3"
-      },
-      {
-        "@id": "http://example.com/intersection/middle/interior"
-      },
-      {
-        "@id": "http://example.com/intersection/middle/line2"
-      },
-      {
-        "@id": "http://example.com/intersection/middle/line4"
-      },
-      {
-        "@id": "http://example.com/intersection/middle/line1"
-      }
     ]
   },
   {
@@ -460,7 +121,148 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_right/lane_left/line3",
+    "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_up/side_right",
+    "@type": [
+      "http://example.com/side",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/line"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane_left/line1",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/side_left",
+    "@type": [
+      "http://example.com/side",
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/side_left",
+    "@type": [
+      "http://example.com/side",
+      "http://example.com/geometry",
+      "http://example.com/line",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/lane_right/line4",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/lane_right/line3",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/centerline",
+    "@type": [
+      "http://example.com/centerline",
+      "http://example.com/line",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
+    ]
+  },
+  {
+    "@id": "http://example.com/road/lane_left/line4",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/lane_right",
+    "@type": [
+      "http://example.com/lane",
+      "http://example.com/polygon",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_left/lane_right/line1"
+      },
+      {
+        "@id": "http://example.com/intersection/road_left/lane_right/line2"
+      },
+      {
+        "@id": "http://example.com/intersection/road_left/lane_right/line3"
+      },
+      {
+        "@id": "http://example.com/intersection/road_left/lane_right/line4"
+      },
+      {
+        "@id": "http://example.com/intersection/road_left/lane_right/interior"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/polygon/interior",
+    "@type": [
+      "http://example.com/interior",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/lane/line3",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/road/side_left",
+    "@type": [
+      "http://example.com/side",
+      "http://example.com/line",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/road/lane_left"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane_left/interior",
+    "@type": [
+      "http://example.com/interior",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/lane_left/line1",
     "@type": [
       "http://example.com/line",
       "http://www.w3.org/2000/01/rdf-schema#Resource",
@@ -468,11 +270,55 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_left/lane_right/line3",
+    "@id": "http://example.com/road/lane_right/interior",
+    "@type": [
+      "http://example.com/interior",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane_right/line2",
     "@type": [
       "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/centerline",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/middle"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_right/centerline"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/side_right"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_right"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_left"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/side_left"
+      }
     ]
   },
   {
@@ -483,14 +329,7 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_down/lane_right/interior",
-    "@type": [
-      "http://example.com/interior",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/road/lane_right/line3",
+    "@id": "http://example.com/polygon/line4",
     "@type": [
       "http://example.com/line",
       "http://www.w3.org/2000/01/rdf-schema#Resource",
@@ -498,7 +337,159 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_up/side_right",
+    "@id": "http://example.com/middle/interior",
+    "@type": [
+      "http://example.com/interior",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/middle/line2",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane_left/line2",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/centerline",
+    "@type": [
+      "http://example.com/centerline",
+      "http://example.com/line",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
+    ]
+  },
+  {
+    "@id": "http://example.com/road/lane_left",
+    "@type": [
+      "http://example.com/lane",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/polygon",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/road/side_left"
+      },
+      {
+        "@id": "http://example.com/road/centerline"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/road/lane_left/line4"
+      },
+      {
+        "@id": "http://example.com/road/lane_left/line1"
+      },
+      {
+        "@id": "http://example.com/road/lane_left/line2"
+      },
+      {
+        "@id": "http://example.com/road/lane_left/line3"
+      },
+      {
+        "@id": "http://example.com/road/lane_left/interior"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/middle/line3",
+    "@type": [
+      "http://example.com/line",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_up/lane_left/line2",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/polygon/line1",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane_left/line4",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/middle"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_down/lane_right"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane_left"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/side_left"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/side_right"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/centerline"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/lane",
+    "@type": [
+      "http://example.com/polygon",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/lane/line3"
+      },
+      {
+        "@id": "http://example.com/lane/line1"
+      },
+      {
+        "@id": "http://example.com/lane/line2"
+      },
+      {
+        "@id": "http://example.com/lane/interior"
+      },
+      {
+        "@id": "http://example.com/lane/line4"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/side_right",
     "@type": [
       "http://example.com/side",
       "http://example.com/geometry",
@@ -515,146 +506,33 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_down/lane_left/line4",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/side_left",
-    "@type": [
-      "http://example.com/side",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/line"
-    ]
-  },
-  {
-    "@id": "http://example.com/road/lane_left/interior",
-    "@type": [
-      "http://example.com/interior",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/lane/interior",
-    "@type": [
-      "http://example.com/interior",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/lane_left/line2",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/lane_right",
-    "@type": [
-      "http://example.com/lane",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/polygon"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_left/lane_right/line4"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_right/line3"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_right/line2"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_right/line1"
-      },
-      {
-        "@id": "http://example.com/intersection/road_left/lane_right/interior"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/interior",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/lane_left/line4",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/road/lane_right/line1",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/lane_right/line1",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
     "@id": "http://example.com/intersection/road_up/lane_left",
     "@type": [
       "http://example.com/lane",
       "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/polygon"
+      "http://example.com/polygon",
+      "http://example.com/geometry"
     ],
     "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_up/lane_left/line2"
-      },
-      {
-        "@id": "http://example.com/intersection/road_up/lane_left/line4"
-      },
-      {
-        "@id": "http://example.com/intersection/road_up/lane_left/interior"
-      },
       {
         "@id": "http://example.com/intersection/road_up/lane_left/line3"
       },
       {
         "@id": "http://example.com/intersection/road_up/lane_left/line1"
+      },
+      {
+        "@id": "http://example.com/intersection/road_up/lane_left/interior"
+      },
+      {
+        "@id": "http://example.com/intersection/road_up/lane_left/line4"
+      },
+      {
+        "@id": "http://example.com/intersection/road_up/lane_left/line2"
       }
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_right/side_right",
-    "@type": [
-      "http://example.com/side",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/line"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/side_left",
-    "@type": [
-      "http://example.com/side",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/line",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/lane_left/line2",
+    "@id": "http://example.com/intersection/road_right/lane_right/line1",
     "@type": [
       "http://example.com/line",
       "http://www.w3.org/2000/01/rdf-schema#Resource",
@@ -662,112 +540,43 @@
     ]
   },
   {
-    "@id": "http://example.com/road/side_right",
+    "@id": "http://example.com/intersection/road_left",
     "@type": [
-      "http://example.com/side",
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
     ],
     "http://example.com/connects": [
       {
-        "@id": "http://example.com/road/lane_right"
+        "@id": "http://example.com/intersection/middle"
       }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/lane_left/line3",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/middle/line1",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane_right/line4",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane_left",
-    "@type": [
-      "http://example.com/lane",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/polygon",
-      "http://example.com/geometry"
     ],
     "http://example.com/has_a": [
       {
-        "@id": "http://example.com/intersection/road_down/lane_left/interior"
+        "@id": "http://example.com/intersection/road_left/side_left"
       },
       {
-        "@id": "http://example.com/intersection/road_down/lane_left/line1"
+        "@id": "http://example.com/intersection/road_left/side_right"
       },
       {
-        "@id": "http://example.com/intersection/road_down/lane_left/line2"
+        "@id": "http://example.com/intersection/road_left/lane_right"
       },
       {
-        "@id": "http://example.com/intersection/road_down/lane_left/line3"
+        "@id": "http://example.com/intersection/road_left/lane_left"
       },
       {
-        "@id": "http://example.com/intersection/road_down/lane_left/line4"
+        "@id": "http://example.com/intersection/road_left/centerline"
       }
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_left/lane_left/interior",
+    "@id": "http://example.com/intersection/road_down/lane_right/interior",
     "@type": [
       "http://example.com/interior",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
-    "@id": "http://example.com/road/lane_right",
-    "@type": [
-      "http://example.com/lane",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/polygon",
-      "http://example.com/geometry"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/road/side_right"
-      },
-      {
-        "@id": "http://example.com/road/centerline"
-      }
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/road/lane_right/line2"
-      },
-      {
-        "@id": "http://example.com/road/lane_right/interior"
-      },
-      {
-        "@id": "http://example.com/road/lane_right/line3"
-      },
-      {
-        "@id": "http://example.com/road/lane_right/line1"
-      },
-      {
-        "@id": "http://example.com/road/lane_right/line4"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/road/lane_left/line4",
+    "@id": "http://example.com/intersection/road_right/lane_left/line2",
     "@type": [
       "http://example.com/line",
       "http://example.com/geometry",
@@ -775,11 +584,22 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_up/lane_right/line2",
+    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane_left/line3",
     "@type": [
       "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
@@ -811,37 +631,7 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_left/lane_right/interior",
-    "@type": [
-      "http://example.com/interior",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right/lane_left/line2",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/centerline",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/middle/interior",
-    "@type": [
-      "http://example.com/interior",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane_right/line1",
+    "@id": "http://example.com/intersection/road_left/lane_right/line3",
     "@type": [
       "http://example.com/line",
       "http://example.com/geometry",
@@ -849,18 +639,44 @@
     ]
   },
   {
-    "@id": "http://example.com/polygon/interior",
-    "@type": [
-      "http://example.com/interior",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/lane_left/line1",
+    "@id": "http://example.com/intersection/road_right/lane_left/line4",
     "@type": [
       "http://example.com/line",
       "http://example.com/geometry",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/lane_right/line2",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/middle",
+    "@type": [
+      "http://example.com/polygon",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/middle/line2"
+      },
+      {
+        "@id": "http://example.com/middle/line4"
+      },
+      {
+        "@id": "http://example.com/middle/line3"
+      },
+      {
+        "@id": "http://example.com/middle/line1"
+      },
+      {
+        "@id": "http://example.com/middle/interior"
+      }
     ]
   },
   {
@@ -872,57 +688,157 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_down",
+    "@id": "http://example.com/road/lane_left/interior",
     "@type": [
-      "http://example.com/road",
+      "http://example.com/interior",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/connects",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/connects"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/road/side_right",
+    "@type": [
+      "http://example.com/side",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/line",
+      "http://example.com/geometry"
     ],
     "http://example.com/connects": [
       {
-        "@id": "http://example.com/intersection/middle"
+        "@id": "http://example.com/road/lane_right"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/lane_left/line4",
+    "@type": [
+      "http://example.com/line",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/middle/line4",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/road/lane_left/line1",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/lane/line1",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane_right/line4",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/middle",
+    "@type": [
+      "http://example.com/middle",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/polygon",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/road_down"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right"
+      },
+      {
+        "@id": "http://example.com/intersection/road_up"
+      },
+      {
+        "@id": "http://example.com/intersection/road_left"
       }
     ],
     "http://example.com/has_a": [
       {
-        "@id": "http://example.com/intersection/road_down/side_right"
+        "@id": "http://example.com/intersection/middle/interior"
       },
       {
-        "@id": "http://example.com/intersection/road_down/lane_right"
+        "@id": "http://example.com/intersection/middle/line4"
       },
       {
-        "@id": "http://example.com/intersection/road_down/centerline"
+        "@id": "http://example.com/intersection/middle/line3"
       },
       {
-        "@id": "http://example.com/intersection/road_down/side_left"
+        "@id": "http://example.com/intersection/middle/line1"
       },
       {
-        "@id": "http://example.com/intersection/road_down/lane_left"
+        "@id": "http://example.com/intersection/middle/line2"
       }
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_up/lane_right/line3",
+    "@id": "http://example.com/intersection/road_up/lane_right/line1",
     "@type": [
       "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/polygon/line2",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/centerline",
-    "@type": [
-      "http://example.com/centerline",
       "http://example.com/geometry",
-      "http://example.com/line",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/road/lane_right",
+    "@type": [
+      "http://example.com/lane",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/polygon",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/road/side_right"
+      },
+      {
+        "@id": "http://example.com/road/centerline"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/road/lane_right/line1"
+      },
+      {
+        "@id": "http://example.com/road/lane_right/line2"
+      },
+      {
+        "@id": "http://example.com/road/lane_right/line4"
+      },
+      {
+        "@id": "http://example.com/road/lane_right/interior"
+      },
+      {
+        "@id": "http://example.com/road/lane_right/line3"
+      }
     ]
   },
   {
@@ -937,7 +853,55 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_right/lane_left/line4",
+    "@id": "http://example.com/lane/interior",
+    "@type": [
+      "http://example.com/interior",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/lane_right",
+    "@type": [
+      "http://example.com/lane",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/polygon"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_right/lane_right/line1"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_right/interior"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_right/line2"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_right/line3"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_right/line4"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/lane_right/interior",
+    "@type": [
+      "http://example.com/interior",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/road/lane_left/line2",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/polygon/line3",
     "@type": [
       "http://example.com/line",
       "http://www.w3.org/2000/01/rdf-schema#Resource",
@@ -945,80 +909,11 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_right/lane_left",
+    "@id": "http://example.com/intersection/road_up/lane_right/line2",
     "@type": [
-      "http://example.com/lane",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/polygon"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_right/lane_left/line1"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_left/line3"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_left/line4"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_left/line2"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_left/interior"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/lane_right",
-    "@type": [
-      "http://example.com/lane",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/polygon"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_up/lane_right/line2"
-      },
-      {
-        "@id": "http://example.com/intersection/road_up/lane_right/line3"
-      },
-      {
-        "@id": "http://example.com/intersection/road_up/lane_right/line1"
-      },
-      {
-        "@id": "http://example.com/intersection/road_up/lane_right/interior"
-      },
-      {
-        "@id": "http://example.com/intersection/road_up/lane_right/line4"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/lane",
-    "@type": [
-      "http://example.com/polygon",
+      "http://example.com/line",
       "http://example.com/geometry",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/lane/line3"
-      },
-      {
-        "@id": "http://example.com/lane/line4"
-      },
-      {
-        "@id": "http://example.com/lane/line1"
-      },
-      {
-        "@id": "http://example.com/lane/line2"
-      },
-      {
-        "@id": "http://example.com/lane/interior"
-      }
     ]
   },
   {
@@ -1050,7 +945,7 @@
     ]
   },
   {
-    "@id": "http://example.com/road/lane_left/line2",
+    "@id": "http://example.com/intersection/road_right/lane_right/line2",
     "@type": [
       "http://example.com/line",
       "http://example.com/geometry",
@@ -1058,106 +953,13 @@
     ]
   },
   {
-    "@id": "http://example.com/lane/line4",
+    "@id": "http://example.com/interior",
     "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_right/lane_right",
-    "@type": [
-      "http://example.com/lane",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/polygon"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_right/lane_right/line3"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_right/line4"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_right/line2"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_right/interior"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_right/line1"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane_left/line3",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/side_left",
-    "@type": [
-      "http://example.com/side",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry",
-      "http://example.com/line"
-    ]
-  },
-  {
-    "@id": "http://example.com/road/side_left",
-    "@type": [
-      "http://example.com/side",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/line",
-      "http://example.com/geometry"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/road/lane_left"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/road/lane_left",
-    "@type": [
-      "http://example.com/lane",
-      "http://example.com/polygon",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/road/side_left"
-      },
-      {
-        "@id": "http://example.com/road/centerline"
-      }
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/road/lane_left/line3"
-      },
-      {
-        "@id": "http://example.com/road/lane_left/interior"
-      },
-      {
-        "@id": "http://example.com/road/lane_left/line4"
-      },
-      {
-        "@id": "http://example.com/road/lane_left/line1"
-      },
-      {
-        "@id": "http://example.com/road/lane_left/line2"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right/centerline",
+    "@id": "http://example.com/intersection/road_up/centerline",
     "@type": [
       "http://example.com/centerline",
       "http://example.com/geometry",
@@ -1166,7 +968,53 @@
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_up/lane_right/line4",
+    "@id": "http://example.com/intersection/road_left/lane_left/interior",
+    "@type": [
+      "http://example.com/interior",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/middle/line3",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/polygon/line2",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/line",
+    "@type": [
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/lane_left/line1",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_up/lane_left/line1",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/lane_right/line4",
     "@type": [
       "http://example.com/line",
       "http://www.w3.org/2000/01/rdf-schema#Resource",
@@ -1174,50 +1022,256 @@
     ]
   },
   {
-    "@id": "http://example.com/geometry",
+    "@id": "http://example.com/intersection/road_down/lane_right/line3",
     "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "http://example.com/line",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
     ]
   },
   {
-    "@id": "http://example.com/middle",
+    "@id": "http://example.com/intersection/road_up/lane_left/interior",
     "@type": [
-      "http://example.com/polygon",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/middle/line3"
-      },
-      {
-        "@id": "http://example.com/middle/interior"
-      },
-      {
-        "@id": "http://example.com/middle/line2"
-      },
-      {
-        "@id": "http://example.com/middle/line1"
-      },
-      {
-        "@id": "http://example.com/middle/line4"
-      }
+      "http://example.com/interior",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
     "@id": "http://example.com/side",
     "@type": [
       "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
-    "@id": "http://example.com/lane/line3",
+    "@id": "http://example.com/intersection/middle/line2",
     "@type": [
       "http://example.com/line",
       "http://example.com/geometry",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/side_right",
+    "@type": [
+      "http://example.com/side",
+      "http://example.com/geometry",
+      "http://example.com/line",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_up/lane_right",
+    "@type": [
+      "http://example.com/lane",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/polygon",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_up/lane_right/interior"
+      },
+      {
+        "@id": "http://example.com/intersection/road_up/lane_right/line1"
+      },
+      {
+        "@id": "http://example.com/intersection/road_up/lane_right/line3"
+      },
+      {
+        "@id": "http://example.com/intersection/road_up/lane_right/line4"
+      },
+      {
+        "@id": "http://example.com/intersection/road_up/lane_right/line2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/road/lane_right/line3",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane_right",
+    "@type": [
+      "http://example.com/lane",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/polygon"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_down/lane_right/line3"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane_right/line2"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane_right/line4"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane_right/line1"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane_right/interior"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/lane_left/line3",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane_right/line1",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_up/side_left",
+    "@type": [
+      "http://example.com/side",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/line"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/lane_left",
+    "@type": [
+      "http://example.com/lane",
+      "http://example.com/polygon",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_right/lane_left/line1"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_left/line4"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_left/line2"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_left/line3"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane_left/interior"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_up/lane_right/line4",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/lane_left/line2",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_up/lane_left/line4",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/has_a",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/has_a"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/lane/line4",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/polygon",
+    "@type": [
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/polygon/interior"
+      },
+      {
+        "@id": "http://example.com/polygon/line1"
+      },
+      {
+        "@id": "http://example.com/polygon/line2"
+      },
+      {
+        "@id": "http://example.com/polygon/line3"
+      },
+      {
+        "@id": "http://example.com/polygon/line4"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/side_right",
+    "@type": [
+      "http://example.com/side",
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/lane_left",
+    "@type": [
+      "http://example.com/lane",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/polygon",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_left/lane_left/line3"
+      },
+      {
+        "@id": "http://example.com/intersection/road_left/lane_left/line1"
+      },
+      {
+        "@id": "http://example.com/intersection/road_left/lane_left/line2"
+      },
+      {
+        "@id": "http://example.com/intersection/road_left/lane_left/interior"
+      },
+      {
+        "@id": "http://example.com/intersection/road_left/lane_left/line4"
+      }
     ]
   },
   {
@@ -1233,24 +1287,24 @@
     ],
     "http://example.com/has_a": [
       {
-        "@id": "http://example.com/intersection/road_up/side_right"
-      },
-      {
         "@id": "http://example.com/intersection/road_up/centerline"
       },
       {
-        "@id": "http://example.com/intersection/road_up/side_left"
+        "@id": "http://example.com/intersection/road_up/side_right"
       },
       {
         "@id": "http://example.com/intersection/road_up/lane_right"
       },
       {
         "@id": "http://example.com/intersection/road_up/lane_left"
+      },
+      {
+        "@id": "http://example.com/intersection/road_up/side_left"
       }
     ]
   },
   {
-    "@id": "http://example.com/middle/line4",
+    "@id": "http://example.com/intersection/middle/line1",
     "@type": [
       "http://example.com/line",
       "http://example.com/geometry",
@@ -1258,96 +1312,42 @@
     ]
   },
   {
-    "@id": "http://example.com/road/lane_left/line1",
+    "@id": "http://example.com/lane/line2",
     "@type": [
       "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/road/lane_right/line2",
+    "@type": [
+      "http://example.com/line",
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/centerline",
+    "@type": [
+      "http://example.com/centerline",
+      "http://example.com/geometry",
       "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
+      "http://example.com/line"
     ]
   },
   {
-    "@id": "http://example.com/intersection/road_left/lane_right/line1",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/lane_left/line1",
-    "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ]
-  },
-  {
-    "@id": "http://example.com/polygon/line3",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right",
-    "@type": [
-      "http://example.com/road",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/middle"
-      }
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_right/centerline"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_right"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/side_right"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/side_left"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane_left"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/lane_left/line4",
-    "@type": [
-      "http://example.com/line",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/side_right",
-    "@type": [
-      "http://example.com/side",
-      "http://example.com/geometry",
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/middle/interior",
+    "@id": "http://example.com/intersection/road_right/lane_left/interior",
     "@type": [
       "http://example.com/interior",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
-    "@id": "http://example.com/intersection/middle/line2",
+    "@id": "http://example.com/intersection/road_left/lane_right/interior",
     "@type": [
-      "http://example.com/line",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
+      "http://example.com/interior",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   }
 ]

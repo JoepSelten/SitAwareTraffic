@@ -57,6 +57,13 @@ class WorldModel(): # moet uiteindelijk n keus maken tussen relatief of absoluut
         pass
 
     def update_kg(self, sim):
+        self.update_current_pos()
+        self.update_approaching()
+        self.update_is_on(sim)
+        ## only check is on for the road when not approaching intersection yet
+        
+
+    def update_current_pos(self):
         current_pos = self.check_current_area()
         if current_pos == None:
             self.robot.random_reset()
@@ -68,8 +75,21 @@ class WorldModel(): # moet uiteindelijk n keus maken tussen relatief of absoluut
             self.same_situation = False
             self.kg.remove((self.AV_uri, EX.is_on, None))
             self.kg.add((self.AV_uri, EX.is_on, current_pos))
+            self.scope = query_part_of(self.kg, current_pos)
+            print(self.scope)
+
+    def update_is_on(self, sim):
+        print('hoi')
+        # ik moet hier niet queryen maar juist toevoegen. Ook kijk ik nu nog steeds alleen naar dezelfde robot. 
+        for robot in sim.robots:
+            print(query_is_on_within_scope(self.kg, self.AV_uri, self.scope))
+            
         
-        
+    def update_approaching(self):
+        self.approaching = False
+        if self.approaching:
+            self.scope = URIRef("http://example.com/intersection")
+
     def set_goal(self, direction):
         # human grounding, miss ook met bepaalde intersection geven, of met de whole queryen
         ## moet deze relatie niet in de graph staan
@@ -88,10 +108,17 @@ class WorldModel(): # moet uiteindelijk n keus maken tussen relatief of absoluut
     def robot_pos(self):
         pass
 
-    def check_current_area(self):     
+    def check_current_area(self):
+        self.current_areas = {}
+        total = 0
         for key, value in self.map_dict.items():
-            if self.robot.poly.intersection(value['poly']).area > 0.5*self.robot.poly.area:
-               return key
+            if value['poly'].intersects(self.robot.poly):
+                intersect_area = self.robot.poly.intersection(value['poly']).area
+                self.current_areas[key] = intersect_area
+                total += intersect_area
+        if total > 0.98*self.robot.poly.area:
+            return max(self.current_areas, key=self.current_areas.get)
+               
 
 
 

@@ -78,7 +78,8 @@ def move_figure(f, x, y):
         # You can also use window.setGeometry
         f.canvas.manager.window.move(x, y)
 
-def shift_line(coords, d):
+def shift_line(line, d):
+        coords = line.coords[:]
         x1 = coords[0][0]
         x2 = coords[1][0]
         y1 = coords[0][1]
@@ -91,3 +92,13 @@ def shift_line(coords, d):
         y3 = y1 + dy
         y4 = y2 + dy
         return LineString([(x3, y3),(x4, y4)])
+
+def extend_line(line, phi, d):
+        coords = line.coords[:]
+        x1 = coords[0][0]
+        x2 = coords[1][0]
+        y1 = coords[0][1]
+        y2 = coords[1][1]
+        x3 = x2 - math.cos(phi)*d
+        y3 = y2 - math.sin(phi)*d
+        return LineString([(x1, y1),(x3, y3)])

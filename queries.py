@@ -19,6 +19,23 @@ def query_is_on(g, robot):
     
     return answer
 
+def query_is_on_within_scope(g, robot, scope):
+    query = """
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX ex: <http://example.com/>
+
+        SELECT DISTINCT ?pos
+        WHERE {
+            ?robot ex:is_on ?pos .
+            ?scope ex:has_a ?pos .
+        }
+        """
+    answer = 0
+    for r in g.query(query, initBindings={'robot': robot, 'scope': scope}):
+        answer = r[0]
+    
+    return answer
+
 def query_type(g, subject):
     query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -37,6 +54,22 @@ def query_type(g, subject):
         answer = r[0]
     
     return answer
+
+def query_part_of(g, part):
+    query = """
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX ex: <http://example.com/>
+
+        SELECT DISTINCT ?whole
+        WHERE {
+            ?whole ex:has_a ?part .
+        }"""
+
+    whole = []
+    for r in g.query(query, initBindings={'part': part}):
+        whole.append(r[0])
+
+    return whole[0]
 
 def uri_from_label(label):
     query = """
@@ -195,20 +228,7 @@ def query_connectivity(start, goal):    # zou met zowel uris als labels moeten w
         #print("NO connection found!")
         return is_connected
 
-def query_part_of(part):
-    query = """
-        PREFIX ex: <http://example.com/>
 
-        SELECT DISTINCT ?whole
-        WHERE {
-            ?whole ex:has_a ?part .
-        }"""
-
-    whole = []
-    for r in g.query(query, initBindings={'part': URIRef(part)}):
-        whole.append(r[0])
-
-    return whole[0]
 
 def simple_check(subject, predicate, object):
     query = """

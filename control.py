@@ -20,56 +20,56 @@ class Control():
 
     def move_in_lane(self, world, phi_des):
         # this skill requires the orientation of the lane
-        prev_pos = world.robot.pos[0]
+        world.robot.yaw = world.robot.yaw%(2*math.pi)
+        phi_des = phi_des%(2*math.pi)
         yaw_error = world.robot.yaw - phi_des
-        self.velocity = world.robot.velocity
-        self.omega = -yaw_error
+        if abs(yaw_error) > math.pi:
+            yaw_error -= np.sign(yaw_error)*2*math.pi
+        world.velocity = world.robot.velocity_max
+        world.omega = -yaw_error
         world.skill_finished = True
 
-    def turn(self, world, phi_des, centerline):
-        self.velocity = world.robot.velocity
+    def turn(self, world, phi_des, extended_centerline):
+        world.velocity = world.robot.velocity_max
         reduced_velocity = False
+        world.robot.yaw = world.robot.yaw%(2*math.pi)
+        phi_des = phi_des%(2*math.pi)
         yaw_error = world.robot.yaw - phi_des
-        T_omega = phi_des/world.robot.omega_max
-        turn_dist = self.velocity/world.robot.omega_max
-    
+        if abs(yaw_error) > math.pi:
+            yaw_error -= np.sign(yaw_error)*2*math.pi
+
+        # print(f'robot_yaw, {world.robot.name}: {world.robot.yaw}')
+        # print(f'phi_des, {world.robot.name}: {phi_des}')
+        # print(f'yaw_error, {world.robot.name}: {yaw_error}')
+        
+        turn_dist = world.velocity/world.robot.omega_max
         if turn_dist > 5:
             turn_dist = 5
             reduced_velocity = True
         ## kan later nog n bepaalde skill hebben die altijd afremt voor n intersection
-        print(world.robot.point.distance(centerline))
-        turn_pos = 55-turn_dist
+        lane_dist = world.robot.point.distance(extended_centerline)
         
-        if world.robot.pos[1] < turn_pos:
-            self.omega = 0
-        elif world.robot.pos[1] >= turn_pos and abs(yaw_error) > 0.05:
-            self.omega = -1*np.sign(yaw_error)*world.robot.omega_max
+        #print(f'lane_dist: {lane_dist}')
+        if lane_dist > turn_dist:
+            world.omega = 0
+        elif lane_dist <= turn_dist and abs(yaw_error) > 0.05:
+            world.omega = -1*np.sign(yaw_error)*world.robot.omega_max
             if reduced_velocity:
-                self.velocity = world.robot.omega_max*5
-
-        #elif world.robot.pos[1] >= turn_pos and yaw_error > 0.05:
-         #   self.omega = -world.robot.omega_max
+                world.velocity = world.robot.omega_max*5
         else:
-            self.omega = 0
+            world.omega = 0
             world.skill_finished = True
 
     def stop(self, world):
-        self.velocity = 0
-        self.omega = 0
+        world.velocity = 0
+        world.omega = 0
         world.skill_finished = True
 
 
-    def actuate(self, simulator):
-        AV = simulator.robots[0]
-        simulator.move_robot(AV, self.velocity, self.omega)
-        # prev_yaw = AV.yaw
-        # prev_pos = AV.pos
-
-        # self.yaw = prev_yaw + self.omega*dt
-        # self.pos[0] = x_prev + self.velocity*math.cos(self.yaw)*dt
-        # self.pos[1] = y_prev + self.velocity*math.sin(self.yaw)*dt
-        # simulator.robots[0].pos = self.pos
-
+    def actuate(self, world, simulator):
+        AV = simulator.robots[world.robot.name]
+        simulator.move_robot(AV, world.velocity, world.omega)
+ 
 
 
 

@@ -13,7 +13,7 @@ from reasoner import Reasoner
 from simulator import Simulator
 from monitor import Monitor
 from control import Control
-from global_variables import g, dt, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, EX     
+from global_variables import g, dt, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, w, l, EX    
 from queries import *      
 import time
 from skills import *
@@ -22,47 +22,54 @@ from skills import *
 map = 'two-lane_intersection'
 
 ## initialize objects
-simulator = Simulator()       # configure global map
+simulator = Simulator()
 simulator.set_map(map)
 
-simulator.add_robot('AV', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='left')
-#simulator.robots[0].yaw += 0.1
+simulator.add_robot('AV1', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='right')
+simulator.add_robot('AV2', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='down', color='purple')
 
-#world = Worldmodel(simulator.robots[0])
-world = WorldModel(simulator.robots[0])
-world.init_geometric_map(simulator.map)
-world.init_kg(g)
+AV1_world = WorldModel(simulator.robots['AV1'])
+AV1_world.init_geometric_map(simulator.map)
+AV1_world.init_kg(g)
+
+AV2_world = WorldModel(simulator.robots['AV2'])
+AV2_world.init_geometric_map(simulator.map)
+AV2_world.init_kg(g)
 
 skill_model = SkillModel()
 control = Control()
 
-#world.set_goal('left')
-#world.update()
-
-
 figure(num=1, figsize=(8, 8), dpi=80)
 fig = figure(1)
 move_figure(fig, 1100, 150)
-# figure(num=2, figsize=(6, 6), dpi=80)
-# fig = figure(2)
-# move_figure(fig, 700, 400)
 
 t = 0
 waiting = True
 while True:
     plt.figure(1)   
     plt.cla()
+    plt.xlim(0, 2*l+w)
+    plt.ylim(0, 2*l+w)
+    plt.axis('equal')
     plt.title('Simulator')
     simulator.simulate()
+
+    plt.text(0.05, 22, "AV1: ", fontsize = 16)
+    plt.text(0.05, 18, AV1_world.robot.task, fontsize = 16)
+    plt.text(0.05, 12, "AV2: ", fontsize = 16)
+    plt.text(0.05, 8, AV2_world.robot.task, fontsize = 16)
     
-    world.update(simulator)
+    AV1_world.update(simulator)
+    AV2_world.update(simulator)
 
     #print(query_current_pos(world.kg, world.AV_uri))
     
-    skill_model.monitor_skills(world, control)
+    skill_model.monitor_skills(AV1_world, control)
+    skill_model.monitor_skills(AV2_world, control)
     
     #control.execute_skill(world)
-    control.actuate(simulator)
+    control.actuate(AV1_world, simulator)
+    control.actuate(AV2_world, simulator)
 
     plt.pause(dt/5)
     #round(t/dt) % 10

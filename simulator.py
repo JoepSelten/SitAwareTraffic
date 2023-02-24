@@ -14,16 +14,16 @@ import random
 
 class Simulator():
     def __init__(self):
-        self.robots = []
+        self.robots = {}
         self.num_robots = 0
         #self.input_features = []
 
     def set_map(self, sit):
         self.map = Map(sit)
         
-    def add_robot(self, name, l, w, vel, omega_max, start='down', task='left'):
-        robot = Robot(name, l, w, vel, omega_max, start, task)
-        self.robots.append(robot)
+    def add_robot(self, name, l, w, vel, omega_max, start='down', task='left', color='blue'):
+        robot = Robot(name, l, w, vel, omega_max, start, task, color)
+        self.robots[name] = robot
         self.num_robots += 1
 
     def simulate(self):
@@ -31,7 +31,7 @@ class Simulator():
         self.plot_robots()
         
     def plot_robots(self):
-        for robot in self.robots:
+        for robot in self.robots.values():
             robot.plot_robot()
 
     def perceived_features(self):   # gives all features inside a certain radius, maybe later use a part of the circle
@@ -108,18 +108,17 @@ class Map():
                         '10': {'type': 'boundary', 'location': 'down', 
                             'poly': LineString([(l, 0), (l, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
                         '11': {'type': 'boundary', 'location': 'right', 
-                            'poly': LineString([(l+w, l+w), (2*l+w, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                            'poly': LineString([(2*l+w, l+w), (l+w, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
                         '12': {'type': 'boundary', 'location': 'right', 
-                            'poly': LineString([(l+w, l), (2*l+w, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                            'poly': LineString([(2*l+w, l), (l+w, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
                         '13': {'type': 'boundary', 'location': 'up', 
-                            'poly': LineString([(l, l+w), (l, 2*l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                            'poly': LineString([(l, 2*l+w), (l, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
                         '14': {'type': 'boundary', 'location': 'up', 
-                            'poly': LineString([(l+w, l+w), (l+w, 2*l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                            'poly': LineString([(l+w, 2*l+w), (l+w, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
                         '15': {'type': 'boundary', 'location': 'left', 
                             'poly': LineString([(0, l), (l, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
                         '16': {'type': 'boundary', 'location': 'left', 
                             'poly': LineString([(0, l+w), (l, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
-
                         '17': {'type': 'centerline', 'location': 'down', 
                             'poly': LineString([(l+0.5*w, 0), (l+0.5*w, l)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1},
                         '18': {'type': 'centerline', 'location': 'right', 
@@ -170,11 +169,11 @@ class Map():
     
 
 class Robot():
-    def __init__(self, name, length, width, velocity, omega_max, start, task, color='blue'):
+    def __init__(self, name, length, width, velocity_max, omega_max, start, task, color):
         self.name = name
         self.length = length
         self.width = width
-        self.velocity = velocity
+        self.velocity_max = velocity_max
         self.start = start
         self.color = color
         self.omega_max = omega_max
