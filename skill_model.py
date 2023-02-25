@@ -17,7 +17,7 @@ class SkillModel():
         self.execute_skill(world, control)
 
     def select_skill(self, world):
-        world.robot_pos = query_is_on(world.kg, world.AV_uri)
+        world.robot_pos = query_is_on(world.kg, world.robot.uri)
         type_pos = query_type(world.kg, world.robot_pos)
         #print(type_pos)
         #if str(self.robot_pos) == "http://example.com/intersection/road_down/lane_right" or str(self.robot_pos) == "http://example.com/intersection/road_right/lane_left" or \

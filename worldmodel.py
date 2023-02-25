@@ -4,16 +4,16 @@ from rdflib import URIRef
 from basic_functions import *
 from simplegraph3 import EX
 from queries import *
+from global_variables import *
 
-class WorldModel(): # moet uiteindelijk n keus maken tussen relatief of absoluut
+class WorldModel():
     def __init__(self, robot):
         self.robot = robot
-        self.AV_uri = URIRef("http://example.com/" + robot.name)
-        #self.task = robot.task
         self.skill_selected = False
         self.skill_configured = False
         self.skill_finished = True
         self.same_situation = False
+        self.task_completed = False
 
     def init_geometric_map(self, map):
         if map.traffic_situation == "two-lane_intersection":
@@ -59,66 +59,72 @@ class WorldModel(): # moet uiteindelijk n keus maken tussen relatief of absoluut
     def update_kg(self, sim):
         self.update_current_pos()
         self.update_approaching()
+        
         self.update_is_on(sim)
         ## only check is on for the road when not approaching intersection yet
         
 
     def update_current_pos(self):
-        current_pos = self.check_current_area()
+        current_pos = self.current_area()
         if current_pos == None:
             self.robot.random_reset()
-            current_pos = self.check_current_area()
-        prev_pos = query_is_on(self.kg, self.AV_uri)
+            current_pos = self.current_area()
+        prev_pos = query_is_on(self.kg, self.robot.uri)
         if current_pos == prev_pos:
             self.same_situation = True
         else:
             self.same_situation = False
-            self.kg.remove((self.AV_uri, EX.is_on, None))
-            self.kg.add((self.AV_uri, EX.is_on, current_pos))
+            self.kg.remove((self.robot.uri, EX.is_on, None))
+            self.kg.add((self.robot.uri, EX.is_on, current_pos))
             self.scope = query_part_of(self.kg, current_pos)
-            print(self.scope)
+            self.update_scope()
+            #print(self.scope)
+
+    def update_scope(self):
+        self.scope_list = query_parts(self.kg, self.scope)
 
     def update_is_on(self, sim):
-        print('hoi')
-        # ik moet hier niet queryen maar juist toevoegen. Ook kijk ik nu nog steeds alleen naar dezelfde robot. 
-        for robot in sim.robots:
-            print(query_is_on_within_scope(self.kg, self.AV_uri, self.scope))
-            
-        
+        for name, robot in sim.robots.items():
+            if name == self.robot.name:
+                continue
+            robot_pos = self.robot_in_scope(robot)
+            #print(f'scope: {self.scope}')
+            #print(f'robot_pos: {robot_pos}')
+            if robot_pos:
+                self.kg.remove((robot.uri, EX.is_on, None))
+                self.kg.add((robot.uri, EX.is_on, robot_pos))
+
+           
     def update_approaching(self):
         self.approaching = False
-        if self.approaching:
-            self.scope = URIRef("http://example.com/intersection")
+        if not self.task_completed: # miss n check hier of je achter de intersection bent. Miss moet ik hier de hgh level plan queryen
+            if query_check_on_road(self.kg, self.robot.uri):
+                if self.robot.poly.distance(self.map_dict[URIRef("http://example.com/intersection/middle")]['poly']) < APPROACH_DISTANCE:
+                    self.kg.add((self.robot.uri, EX.approaches, URIRef("http://example.com/intersection/middle")))
+                    self.scope = URIRef("http://example.com/intersection")
 
-    def set_goal(self, direction):
-        # human grounding, miss ook met bepaalde intersection geven, of met de whole queryen
-        ## moet deze relatie niet in de graph staan
-        self.goal_finished = False
-        self.start = URIRef("http://example.com/intersection/road_current")
 
-        if direction == 'right':
-            self.goal = URIRef("http://example.com/intersection/road_right")
-        
-        if direction == 'straight':
-            self.goal = URIRef("http://example.com/intersection/road_straight")
-        
-        if direction == 'left':
-            self.goal = URIRef("http://example.com/intersection/road_left")
-
-    def robot_pos(self):
-        pass
-
-    def check_current_area(self):
+    def current_area(self):
         self.current_areas = {}
         total = 0
         for key, value in self.map_dict.items():
-            if value['poly'].intersects(self.robot.poly):
+            if self.robot.poly.intersects(value['poly']):
                 intersect_area = self.robot.poly.intersection(value['poly']).area
                 self.current_areas[key] = intersect_area
                 total += intersect_area
         if total > 0.98*self.robot.poly.area:
             return max(self.current_areas, key=self.current_areas.get)
-               
+
+    def robot_in_scope(self, robot):
+        robot_areas = {}
+        for uri in self.scope_list:
+            #print(uri)
+            if robot.poly.intersects(self.map_dict[uri]['poly']):
+                intersect_area = self.robot.poly.intersection(self.map_dict[uri]['poly']).area
+                robot_areas[uri] = intersect_area
+        if robot_areas:
+            if max(robot_areas) >= 0.5:
+                return max(robot_areas, key=robot_areas.get)
 
 
 

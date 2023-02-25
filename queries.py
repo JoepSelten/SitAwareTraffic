@@ -71,6 +71,39 @@ def query_part_of(g, part):
 
     return whole[0]
 
+def query_parts(g, whole):
+    query = """
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX ex: <http://example.com/>
+
+        SELECT DISTINCT ?part
+        WHERE {
+            ?whole ex:has_a* ?part .
+            ?part rdf:type ex:polygon .
+        }"""
+
+    parts = []
+    for r in g.query(query, initBindings={'whole': whole}):
+        parts.append(r[0])
+
+    return parts
+
+def query_check_on_road(g, robot):
+        query = """
+        PREFIX ex: <http://example.com/>
+        PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+        ASK {
+            ?robot ex:is_on ?lane .
+            ?road ex:has_a ?lane .
+            ?road rdf:type ex:road .
+        }
+        """
+        for r in g.query(query, initBindings={'robot': robot}):
+            answer = r
+        return answer
+
+
+
 def uri_from_label(label):
     query = """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

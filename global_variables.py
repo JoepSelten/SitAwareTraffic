@@ -22,7 +22,8 @@ l = config['road_length']
 w = config['road_width']
 c = config['stop_area_size']
 
-
+MAX_TURN_DISTANCE = 5
+APPROACH_DISTANCE = 20
 
 ## load property graph , later miss met externe server doen oid
 #g = Graph(store="Oxigraph")

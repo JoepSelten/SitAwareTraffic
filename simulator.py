@@ -9,6 +9,7 @@ from traffic_areas import *
 from basic_functions import *
 from global_variables import *
 import random
+from rdflib import URIRef
 ## This script should be replaceble by real robots
 
 
@@ -179,6 +180,7 @@ class Robot():
         self.omega_max = omega_max
         self.reset(start, task)
         self.point = Point(self.pos[0], self.pos[1])
+        self.uri = URIRef("http://example.com/" + self.name)
         
 
     def plot_robot(self):
