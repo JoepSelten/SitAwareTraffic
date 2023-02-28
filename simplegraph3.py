@@ -84,6 +84,8 @@ g.add((polygon_line4, RDF.type, EX.line))
 #g.add((EX.side, EX.affordance, EX.perceivable))
 
 DeductiveClosure(Semantics).expand(g)
+DeductiveClosure(Semantics).expand(g)
+DeductiveClosure(Semantics).expand(g)
 
 # ## moet de uris eigenlijk queryen, dit kan miss ook uit de lagere level gehaald worden ipv los allemaal gedefinieerd
 # ## nu is namelijk niet schaalbaar

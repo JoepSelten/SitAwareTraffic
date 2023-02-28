@@ -102,7 +102,47 @@ def query_check_on_road(g, robot):
             answer = r
         return answer
 
+def query_check(g, subject, relation, object):
+    query = """
+        PREFIX ex: <http://example.com/>
 
+        ASK {
+            ?subject ?relation ?object .
+        }
+        """
+    for r in g.query(query, initBindings={'subject': subject, 'relation': relation, 'object': object}):
+            answer = r
+    return answer
+
+def query_check_for_all(g, subject_type, relation, object):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        ASK {
+            ?subject rdf:type ?subject_type .
+            ?subject ?relation ?object .
+        }
+        """
+    for r in g.query(query, initBindings={'subject_type': subject_type, 'relation': relation, 'object': object}):
+            answer = r
+    return answer
+
+def query_side_from_lane(g, lane):
+    query = """
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?side
+        WHERE {
+            ?lane ex:connects ?side .
+            ?side rdf:type ex:side .
+        }
+        """
+    answer = 0
+    for r in g.query(query, initBindings={'lane': lane}):
+        answer = r[0]
+    
+    return answer
 
 def uri_from_label(label):
     query = """

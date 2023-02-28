@@ -10,10 +10,12 @@ ex:intersection a rdfs:Resource ;
         <http://example.com/intersection/road_right>,
         <http://example.com/intersection/road_up> .
 
-ex:connects a rdf:Property ;
+ex:connects a rdf:Property,
+        rdfs:Resource ;
     rdfs:subPropertyOf ex:connects .
 
-ex:has_a a rdf:Property ;
+ex:has_a a rdf:Property,
+        rdfs:Resource ;
     rdfs:subPropertyOf ex:has_a .
 
 <http://example.com/intersection/middle/interior> a ex:interior,
@@ -431,13 +433,16 @@ ex:middle a ex:geometry,
         ex:line,
         rdfs:Resource .
 
-rdf:type a rdf:Property ;
+rdf:type a rdf:Property,
+        rdfs:Resource ;
     rdfs:subPropertyOf rdf:type .
 
-rdfs:label a rdf:Property ;
+rdfs:label a rdf:Property,
+        rdfs:Resource ;
     rdfs:subPropertyOf rdfs:label .
 
-rdfs:subPropertyOf a rdf:Property ;
+rdfs:subPropertyOf a rdf:Property,
+        rdfs:Resource ;
     rdfs:subPropertyOf rdfs:subPropertyOf .
 
 "intersection" a rdfs:Resource .
@@ -549,6 +554,8 @@ ex:centerline a ex:geometry,
         <http://example.com/intersection/middle/line3>,
         <http://example.com/intersection/middle/line4> .
 
+rdf:Property a rdfs:Resource .
+
 ex:lane a ex:geometry,
         ex:polygon,
         rdfs:Resource ;
@@ -576,4 +583,6 @@ ex:line a ex:geometry,
         rdfs:Resource .
 
 ex:geometry a rdfs:Resource .
+
+rdfs:Resource a rdfs:Resource .
 

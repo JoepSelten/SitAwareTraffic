@@ -25,16 +25,14 @@ map = 'two-lane_intersection'
 simulator = Simulator()
 simulator.set_map(map)
 
-simulator.add_robot('AV1', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='right')
+simulator.add_robot('AV1', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='up', task='left')
 simulator.add_robot('AV2', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='down', color='purple')
 
 AV1_world = WorldModel(simulator.robots['AV1'])
 AV1_world.init_geometric_map(simulator.map)
-AV1_world.init_kg(g)
 
 AV2_world = WorldModel(simulator.robots['AV2'])
 AV2_world.init_geometric_map(simulator.map)
-AV2_world.init_kg(g)
 
 skill_model = SkillModel()
 control = Control()
@@ -59,19 +57,20 @@ while True:
     plt.text(0.05, 12, "AV2: ", fontsize = 16)
     plt.text(0.05, 8, AV2_world.robot.task, fontsize = 16)
     
-    AV1_world.update(simulator)
-    AV2_world.update(simulator)
-
+    
     #print(query_current_pos(world.kg, world.AV_uri))
     
     skill_model.monitor_skills(AV1_world, control)
     skill_model.monitor_skills(AV2_world, control)
+
+    AV1_world.update(simulator)
+    AV2_world.update(simulator)
     
     #control.execute_skill(world)
     control.actuate(AV1_world, simulator)
     control.actuate(AV2_world, simulator)
 
-    plt.pause(dt/5)
+    plt.pause(dt/10)
     #round(t/dt) % 10
     t += dt
 

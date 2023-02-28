@@ -3,7 +3,7 @@ import numpy as np
 from turtle import pos
 from basic_functions import trans, coordinate_transform
 import matplotlib.pyplot as plt
-from global_variables import H, dt
+from global_variables import H, dt, MAX_TURN_DISTANCE
 
 class Control():
     def __init__(self):
@@ -38,18 +38,18 @@ class Control():
         if abs(yaw_error) > math.pi:
             yaw_error -= np.sign(yaw_error)*2*math.pi
 
-        # print(f'robot_yaw, {world.robot.name}: {world.robot.yaw}')
-        # print(f'phi_des, {world.robot.name}: {phi_des}')
-        # print(f'yaw_error, {world.robot.name}: {yaw_error}')
+        #print(f'robot_yaw, {world.robot.name}: {world.robot.yaw}')
+        #print(f'phi_des, {world.robot.name}: {phi_des}')
+        #print(f'yaw_error, {world.robot.name}: {yaw_error}')
         
         turn_dist = world.velocity/world.robot.omega_max
-        if turn_dist > 5:
-            turn_dist = 5
+        if turn_dist > MAX_TURN_DISTANCE:
+            turn_dist = MAX_TURN_DISTANCE
             reduced_velocity = True
         ## kan later nog n bepaalde skill hebben die altijd afremt voor n intersection
         lane_dist = world.robot.point.distance(extended_centerline)
         
-        #print(f'lane_dist: {lane_dist}')
+        #print(f'lane_dist, {world.robot.name}: {lane_dist}')
         if lane_dist > turn_dist:
             world.omega = 0
         elif lane_dist <= turn_dist and abs(yaw_error) > 0.05:

@@ -156,10 +156,16 @@ class Semantics(Core):
             self.store_triple((s, RDFS.subClassOf, RDFS.Literal))
         
         ## added rules
-        if p == RDF.type or p == EX.conforms_to:          
+        if p == RDF.type:          
             for Z, Y, xxx in self.graph.triples((o, EX.has_a, None)):
                 new_uri = URIRef(xxx.replace(o,s))
                 self.store_triple((s, EX.has_a, new_uri))
+                xxx_type = self.query_type(xxx)
+                self.store_triple((new_uri, RDF.type, xxx_type))
+
+            for Z, Y, xxx in self.graph.triples((o, EX.connects, None)):
+                new_uri = URIRef(xxx.replace(o,s))
+                self.store_triple((s, EX.connects, new_uri))
                 xxx_type = self.query_type(xxx)
                 self.store_triple((new_uri, RDF.type, xxx_type))
 
@@ -170,16 +176,16 @@ class Semantics(Core):
             #     new_uri = URIRef(xxx.replace(o,s))
             #     self.store_triple((s, EX.connects, new_uri))
 
-            for Z, Y, xxx in self.graph.triples((o, EX.conforms_to, None)):
-                self.store_triple((s, EX.conforms_to, xxx))
+            # for Z, Y, xxx in self.graph.triples((o, EX.conforms_to, None)):
+            #     self.store_triple((s, EX.conforms_to, xxx))
             
-            for Z, Y, xxx in self.graph.triples((o, EX.affordance, None)):
-                self.store_triple((s, EX.affordance, xxx))
+            # for Z, Y, xxx in self.graph.triples((o, EX.affordance, None)):
+            #     self.store_triple((s, EX.affordance, xxx))
 
         
 
 
-        if p == EX.connects or p == EX.equals:
+        if p == EX.connects:
             self.store_triple((o, p, s))
     
     

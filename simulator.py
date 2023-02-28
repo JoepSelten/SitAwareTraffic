@@ -175,7 +175,6 @@ class Robot():
         self.length = length
         self.width = width
         self.velocity_max = velocity_max
-        self.start = start
         self.color = color
         self.omega_max = omega_max
         self.reset(start, task)
@@ -193,6 +192,7 @@ class Robot():
         self.reset(start, task)
 
     def reset(self, start, task):
+        self.start = start
         self.task = task
         if start == 'down':
             self.pos = np.array([l+0.75*w, self.length/2])
