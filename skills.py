@@ -14,7 +14,7 @@ class MoveInLane():
         self.condition_list = []
         self.init_effects()
         self.init_conditions()
-
+        
     def init_effects(self):
         self.effect = Condition('positional', effect=True)
         self.effect.subject = self.robot.uri

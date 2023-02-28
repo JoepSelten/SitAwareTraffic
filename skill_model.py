@@ -5,6 +5,7 @@ import math
 from global_variables import w
 from basic_functions import shift_line, extend_line
 from skills import MoveInLane, Turn
+from traffic_rules import TrafficRules
 
 class SkillModel():
     def __init__(self):
@@ -49,23 +50,10 @@ class SkillModel():
             return not check
         return check
 
-
-    def associate(self, world):
-        pass
-
     def monitor_skills(self, world, control):
-        #print(f'same situation, {world.robot.name}: {world.same_situation}')
         self.check_conditions(world)
         if world.condition_failed:
-            self.select_skill(world)
-
-        # print(world.skill_finished)
-        # print(world.same_situation)
-        #if world.skill_finished and not world.same_situation:
-         #   world.skill_finished = False
-            ## moet hier ook nog n losse check of de is_on ook echt anders is
-          #  self.select_default_skill(world)
-            
+            self.select_skill(world)          
 
         self.config_skill(world)
         self.execute_skill(world, control)
@@ -74,17 +62,14 @@ class SkillModel():
         if self.failed_condition.effect:
             self.select_default_skill(world)
         if self.failed_condition.type == 'traffic_rule':
-            #check_traffic_rules
-            pass
+            self.check_traffic_rules(world, self.failed_condition)
+            
 
     def select_default_skill(self, world):
+        ## ipv queryen kun je ook gwn de context meenemen, bijv als de move in lane succesvol is dan weet je waar het nu is
         world.robot_pos = query_is_on(world.kg, world.robot.uri)
         type_pos = query_type(world.kg, world.robot_pos)
-        #print(f'robot pos, {world.robot.name}: {world.robot_pos}')
-        #print(f'robot current pos, {world.robot.name}: {world.current_pos}')
-        #print(type_pos)
-        #if str(self.robot_pos) == "http://example.com/intersection/road_down/lane_right" or str(self.robot_pos) == "http://example.com/intersection/road_right/lane_left" or \
-         #       str(self.robot_pos) == "http://example.com/intersection/road_up/lane_left" or str(self.robot_pos) == "http://example.com/intersection/road_left/lane_left":
+     
         if str(type_pos) == "http://example.com/lane":
             world.skill = 'move_in_lane'
         elif str(type_pos) == "http://example.com/middle":
@@ -92,6 +77,20 @@ class SkillModel():
         else:
             world.skill = 'stop'
         #print(f'skill, {world.robot.name}: {world.skill}')
+
+    def check_traffic_rules(self, world, context):
+        ## check what to do when robot approaching middle
+        rule_obj = TrafficRules()
+        rule_obj.config_rules(world)
+        rule_list = rule_obj.get_rules(context)
+        for condition in rule_list:
+            check = self.check_condition(world, condition)
+            #print(f'{condition.subject}, {condition.object}: {check}')
+            if check == False:
+                world.condition_failed = True
+                self.failed_condition = condition
+                return
+
     
     def config_skill(self, world):
         world.skill_params = []
