@@ -1,9 +1,5 @@
 from rdflib import URIRef
 
-class Skills():
-    def __init__(self):
-        self.skill_dict = {'move_in_lane': MoveInLane()}
-
 class MoveInLane():
     def __init__(self):
         pass
@@ -21,8 +17,7 @@ class MoveInLane():
         self.effect.relation = URIRef("http://example.com/is_on")
         self.effect.object = URIRef("http://example.com/intersection/middle")
         self.condition_list.append(self.effect)
-        
-        
+                
     def init_conditions(self):
         self.condition1 = Condition('positional')
         self.condition1.subject = self.robot.uri
@@ -44,7 +39,7 @@ class MoveInLane():
         self.condition_list.append(self.condition3)
 
         ## of hoort dit bij traffic rules?
-        self.condition4 = Condition('traffic_rule', negation=True)
+        self.condition4 = Condition('check_rules', negation=True)
         self.condition4.subject = self.robot.uri
         self.condition4.relation = URIRef("http://example.com/approaches")
         self.condition4.object = URIRef("http://example.com/intersection/middle")
@@ -69,7 +64,6 @@ class Turn():
         self.effect.object = self.task
         self.condition_list.append(self.effect)
         
-        
     def init_conditions(self):
         self.condition1 = Condition('positional')
         self.condition1.subject = self.robot.uri
@@ -90,6 +84,25 @@ class Turn():
         self.condition3.object = self.robot.uri
         self.condition_list.append(self.condition3)
 
+class SlowDownAndStop():
+    def __init__(self):
+        pass
+
+    def config_skill(self, world):
+        self.robot = world.robot
+        self.task = world.goal
+        self.lane = world.current_pos
+        self.condition_list = []
+        self.init_effects()
+        self.init_conditions()
+
+    def init_effects(self):
+        self.effect = Condition('positional', effect=True)
+        self.effect.subject = self.robot.uri
+        self.effect.relation = URIRef("http://example.com/is_on")
+        self.effect.object = self.task
+        self.condition_list.append(self.effect)
+
 class Condition():
     def __init__(self, type, effect=False, negation=False, for_all=False):
         self.type = type
@@ -97,3 +110,6 @@ class Condition():
         self.negation = negation
         self.for_all = for_all
         
+class MultipleConditions():
+    def __init__(self):
+        pass

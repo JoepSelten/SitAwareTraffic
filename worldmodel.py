@@ -13,17 +13,18 @@ class WorldModel():
 
     def reset(self, robot):
         self.robot = robot
+        g.remove((self.robot.uri, None, None))
+        g.add((self.robot.uri, RDF.type, EX.vehicle))
         self.current_pos = None
         self.skill_selected = False
         self.skill_configured = False
         self.skill_finished = True
         self.same_situation = False
-        self.task_completed = False
+        self.before_intersection = True
         self.approaching = False
         self.condition_failed = False
         self.omega = 0
         self.velocity = 0
-        self.kg = g
         self.skill = 'move_in_lane'
         if self.robot.start == 'down':
             self.current_pos = URIRef("http://example.com/intersection/road_down/lane_right")
@@ -91,6 +92,8 @@ class WorldModel():
     def update_kg(self, sim):
         self.update_current_pos()
         self.update_approaching()
+        #print(f'scope, {self.robot.name}: {self.scope}')
+        self.update_vehicles()
         
         #self.update_is_on(sim)
         ## only check is on for the road when not approaching intersection yet
@@ -116,13 +119,13 @@ class WorldModel():
             #print(self.scope)
         
     def update_av_is_on(self):
-        self.kg.remove((self.robot.uri, EX.is_on, None))
-        self.kg.add((self.robot.uri, EX.is_on, self.current_pos))
-        self.scope = query_part_of(self.kg, self.current_pos)
+        g.remove((self.robot.uri, EX.is_on, None))
+        g.add((self.robot.uri, EX.is_on, self.current_pos))
+        self.scope = query_part_of(g, self.current_pos)
         self.update_scope()
 
     def update_scope(self):
-        self.scope_list = query_parts(self.kg, self.scope)
+        self.scope_list = query_parts(g, self.scope)
 
     def update_is_on(self, sim):
         for name, robot in sim.robots.items():
@@ -132,19 +135,59 @@ class WorldModel():
             #print(f'scope: {self.scope}')
             #print(f'robot_pos: {robot_pos}')
             if robot_pos:
-                self.kg.remove((robot.uri, EX.is_on, None))
-                self.kg.add((robot.uri, EX.is_on, robot_pos))
+                g.remove((robot.uri, EX.is_on, None))
+                g.add((robot.uri, EX.is_on, robot_pos))
 
            
     def update_approaching(self):
-        if not self.approaching and not self.task_completed: # miss n check hier of je achter de intersection bent. Miss moet ik hier de hgh level plan queryen
-            if query_check_on_road(self.kg, self.robot.uri):
+        if self.before_intersection and not self.approaching: # miss n check hier of je achter de intersection bent. Miss moet ik hier de hgh level plan queryen
+            if query_check_on_road(g, self.robot.uri):
                 if self.robot.poly.distance(self.map_dict[URIRef("http://example.com/intersection/middle")]['poly']) < APPROACH_DISTANCE:
-                    self.kg.add((self.robot.uri, EX.approaches, URIRef("http://example.com/intersection/middle")))
+                    g.add((self.robot.uri, EX.approaches, URIRef("http://example.com/intersection/middle")))
                     # moet ik dit ook nog ergens uit de graph halen?
                     self.approaching = True
                     self.scope = URIRef("http://example.com/intersection")
+        if self.approaching and self.current_pos == URIRef("http://example.com/intersection/middle"):
+            self.before_intersection = False
+            self.approaching = False
+            g.remove((self.robot.uri, EX.approaches, URIRef("http://example.com/intersection/middle")))
 
+    def update_vehicles(self):
+        ## in front of, behind, right of etc
+        self.vehicles_in_scope = query_vehicles(g, self.scope)
+        self.vehicles_in_scope.remove(self.robot.uri)
+        #print(self.vehicles_in_scope)
+        
+        if self.vehicles_in_scope:
+            for vehicle in self.vehicles_in_scope:
+                self.associate_vehicle(vehicle)
+
+            
+    def associate_vehicle(self, vehicle):
+        #pos = query_is_on_within_scope(g, vehicle, self.scope)
+        
+        ## check if and which road
+        #print(self.scope)
+        if query_check_on_road(g, vehicle) and query_check_on_road(g, self.robot.uri):
+            
+            road_vehicle = query_road(g, vehicle, self.scope)
+            road_current = query_road(g, self.robot.uri, self.scope)
+            #print(f'road_current: {road_current}')
+            #print(f'road_vehicle: {road_vehicle}')
+            if road_current == URIRef("http://example.com/intersection/road_down"):
+                if road_vehicle == URIRef("http://example.com/intersection/road_right"):
+                    g.add((vehicle, EX.right_of, self.robot.uri))
+            if road_current == URIRef("http://example.com/intersection/road_right"):
+                if road_vehicle == URIRef("http://example.com/intersection/road_up"):
+                    g.add((vehicle, EX.right_of, self.robot.uri))
+
+            if road_current == URIRef("http://example.com/intersection/road_up"):
+                if road_vehicle == URIRef("http://example.com/intersection/road_left"):
+                    g.add((vehicle, EX.right_of, self.robot.uri))
+
+            if road_current == URIRef("http://example.com/intersection/road_left"):
+                if road_vehicle == URIRef("http://example.com/intersection/road_down"):
+                    g.add((vehicle, EX.right_of, self.robot.uri))
 
     def current_area(self):
         self.current_areas = {}

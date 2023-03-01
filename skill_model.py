@@ -2,17 +2,23 @@ from queries import *
 from simplegraph3 import EX
 import shapely
 import math
+import matplotlib.pyplot as plt
 from global_variables import w
 from basic_functions import shift_line, extend_line
-from skills import MoveInLane, Turn
-from traffic_rules import TrafficRules
+from skills import MoveInLane, Turn, SlowDownAndStop
+from traffic_rules import ApproachingMiddle, Priority
 
 class SkillModel():
     def __init__(self):
         self.skill_dict = {'move_in_lane': MoveInLane(),
-                            'turn': Turn()
+                            'turn': Turn(),
+                            'slow_down_and_stop:': SlowDownAndStop()
+        }
+        self.rule_dict = {'approaching_middle': ApproachingMiddle(),
+                            'priority': Priority()
         }
         self.condition_failed = False
+        self.traffic_rules = None
 
     def check_conditions(self, world):
         ## het initializeren moet eigenlijk niet iedere keer opnieuw gebeuren. later beter mengen met configuration enzo
@@ -25,8 +31,11 @@ class SkillModel():
             #print(f'{condition.subject}, {condition.object}: {check}')
             if check == False:
                 world.condition_failed = True
-                self.failed_condition = condition
+                world.failed_condition = condition
                 return
+        world.condition_failed = False
+
+        
 
         ## eerst effect checken, als het gesatisfied is set skill finished op true, dan moet ie in t skill model automatisch naar de volgende skill gaan
         ## als het effect nog niet gesatisfied is check het de guards
@@ -42,9 +51,9 @@ class SkillModel():
 
     def check_condition(self, world, condition):
         if not condition.for_all:
-            check = query_check(world.kg, condition.subject, condition.relation, condition.object)
+            check = query_check(g, condition.subject, condition.relation, condition.object)
         elif condition.for_all:
-            check = query_check_for_all(world.kg, condition.subject, condition.relation, condition.object)
+            check = query_check_for_all(g, condition.subject, condition.relation, condition.object)
        
         if condition.effect is not condition.negation:
             return not check
@@ -52,23 +61,39 @@ class SkillModel():
 
     def monitor_skills(self, world, control):
         self.check_conditions(world)
-        if world.condition_failed:
-            self.select_skill(world)          
-
+        #self.select_skill(world) 
+        while world.condition_failed:
+            self.select_skill(world)
+            #self.check_conditions(world)        
+        
+        #self.select_default_skill(world)
         self.config_skill(world)
         self.execute_skill(world, control)
         
     def select_skill(self, world):
-        if self.failed_condition.effect:
+        if world.failed_condition.effect:
             self.select_default_skill(world)
-        if self.failed_condition.type == 'traffic_rule':
-            self.check_traffic_rules(world, self.failed_condition)
-            
+        if world.failed_condition.type == 'check_rules':
+            world.check_rules = True
+        while world.check_rules:
+            if world.failed_condition.object == URIRef("http://example.com/intersection/middle") and world.failed_condition.relation == URIRef("http://example.com/approaches"):
+                if world.failed_condition.subject == world.robot.uri:
+                    self.traffic_rules = 'approaching_middle'
+                elif world.failed_condition.subject == URIRef("http://example.com/vehicle") and world.failed_condition.relation == URIRef("http://example.com/approaches"):
+                    self.traffic_rules = 'priority'
+            elif world.failed_condition.subject == URIRef("http://example.com/vehicle") and world.failed_condition.relation == URIRef("http://example.com/right_of"):
+                #print(f'{world.robot.name}, give priority!!!')
+                plt.text(65, 22, f'{world.robot.name}, give priority!!!' , fontsize = 16)
+                world.check_rules == False
+                world.condition_failed = False
+                return
+            self.check_traffic_rules(world, self.traffic_rules)
+        world.condition_failed = False
 
     def select_default_skill(self, world):
         ## ipv queryen kun je ook gwn de context meenemen, bijv als de move in lane succesvol is dan weet je waar het nu is
-        world.robot_pos = query_is_on(world.kg, world.robot.uri)
-        type_pos = query_type(world.kg, world.robot_pos)
+        world.robot_pos = query_is_on(g, world.robot.uri)
+        type_pos = query_type(g, world.robot_pos)
      
         if str(type_pos) == "http://example.com/lane":
             world.skill = 'move_in_lane'
@@ -78,20 +103,22 @@ class SkillModel():
             world.skill = 'stop'
         #print(f'skill, {world.robot.name}: {world.skill}')
 
-    def check_traffic_rules(self, world, context):
+    def check_traffic_rules(self, world, traffic_rules):
+        #input("Press Enter to continue...")
         ## check what to do when robot approaching middle
-        rule_obj = TrafficRules()
+        #print(traffic_rules)
+        rule_obj = self.rule_dict[traffic_rules]
         rule_obj.config_rules(world)
-        rule_list = rule_obj.get_rules(context)
-        for condition in rule_list:
+        for condition in rule_obj.condition_list:
             check = self.check_condition(world, condition)
-            #print(f'{condition.subject}, {condition.object}: {check}')
+            
             if check == False:
-                world.condition_failed = True
-                self.failed_condition = condition
+                world.failed_condition = condition
+                #print(f'{condition.subject}, {condition.relation}, {condition.object}: {check}')
+                #input("Press Enter to continue...")
                 return
+        world.check_rules = False
 
-    
     def config_skill(self, world):
         world.skill_params = []
         if world.skill == 'move_in_lane':

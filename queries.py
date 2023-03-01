@@ -27,7 +27,7 @@ def query_is_on_within_scope(g, robot, scope):
         SELECT DISTINCT ?pos
         WHERE {
             ?robot ex:is_on ?pos .
-            ?scope ex:has_a ?pos .
+            ?scope ex:has_a* ?pos .
         }
         """
     answer = 0
@@ -143,6 +143,39 @@ def query_side_from_lane(g, lane):
         answer = r[0]
     
     return answer
+
+def query_vehicles(g, scope):
+    query = """
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?vehicle
+        WHERE {
+            ?scope ex:has_a* ?area .
+            ?vehicle ex:is_on ?area .
+        }
+        """
+    answer = []
+    for r in g.query(query, initBindings={'scope': scope}):
+        answer.append(r[0])
+    
+    return answer
+
+def query_road(g, robot, scope):
+        query = """
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX ex: <http://example.com/>
+        SELECT ?road
+        WHERE {
+            ?robot ex:is_on ?pos .
+            ?scope ex:has_a* ?pos .
+            ?road ex:has_a ?pos .
+            ?road rdf:type ex:road
+        }
+        """
+        for r in g.query(query, initBindings={'robot': robot, 'scope': scope}):
+            answer = r[0]
+        return answer
 
 def uri_from_label(label):
     query = """

@@ -25,8 +25,8 @@ map = 'two-lane_intersection'
 simulator = Simulator()
 simulator.set_map(map)
 
-simulator.add_robot('AV1', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='up', task='left')
-simulator.add_robot('AV2', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='down', color='purple')
+simulator.add_robot('AV1', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='left')
+simulator.add_robot('AV2', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='up', color='purple')
 
 AV1_world = WorldModel(simulator.robots['AV1'])
 AV1_world.init_geometric_map(simulator.map)
