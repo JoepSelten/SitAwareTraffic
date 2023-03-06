@@ -5,6 +5,7 @@ from basic_functions import *
 from simplegraph3 import EX
 from queries import *
 from global_variables import *
+from shapely.validation import make_valid
 
 class WorldModel():
     def __init__(self, robot, map):
@@ -19,7 +20,7 @@ class WorldModel():
         self.skill_selected = False
         self.skill_configured = False
         self.skill_finished = True
-        self.same_situation = False
+        self.same_situation = True
         self.before_intersection = True
         self.approaching = False
         self.condition_failed = False
@@ -131,10 +132,11 @@ class WorldModel():
             self.same_situation = True
         else:
             self.same_situation = False
+            #self.check_progress()
             self.update_av_is_on()
             
             #print(self.scope)
-        
+
     def update_av_is_on(self):
         g.remove((self.robot.uri, EX.is_on, None))
         g.add((self.robot.uri, EX.is_on, self.current_pos))
@@ -235,30 +237,69 @@ class WorldModel():
         y = self.robot.pos[1]
         lane_width = 10
         l = self.robot.length
-        H = 20
+        H = 10
         self.horizon = None
 
         for i in range(self.plan_step, len(self.plan)):
             step = self.plan[str(i)]
             type_step = query_type(g, step['area'])
+            #print(type_step)
             #print(step['area'].split('/')[-1])
-            if str(type_step) == "http://example.com/lane":              
+            if str(type_step) == "http://example.com/lane" and i==0:              
                 phi = step['parameters'][0]
-                self.horizon = Polygon([(x+0.5*l*math.cos(phi)-lane_width*math.sin(phi), y+0.5*l*math.sin(phi)-lane_width*math.cos(phi)),
+                new_horizon = Polygon([(x+0.5*l*math.cos(phi)-lane_width*math.sin(phi), y+0.5*l*math.sin(phi)-lane_width*math.cos(phi)),
                     (x+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
                     (x+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
-                    (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(self.map_dict[self.current_pos]['poly'])
+                    (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(self.map_dict[step['area']]['poly'])
+
+            elif str(type_step) == "http://example.com/lane" and i==2:
+                phi = step['parameters'][0]
+                #print(self.map_dict[URIRef("http://example.com/intersection/middle")]['poly'].intersection(self.map_dict[step['area']]['poly']).coords[0])
+                intersection_line = self.map_dict[URIRef("http://example.com/intersection/middle")]['poly'].intersection(self.map_dict[step['area']]['poly'])
+                x0 = intersection_line.coords[0][0]
+                y0 = intersection_line.coords[0][1]
+                x1 = intersection_line.coords[1][0]
+                y1 = intersection_line.coords[1][1]
+                x2 = x0+H*math.cos(phi)
+                x3 = x1+H*math.cos(phi)
+                y2 = y0+H*math.sin(phi)
+                y3 = y1+H*math.sin(phi)
+                #new_horizon = Polygon([(x0, y0),(x1, y1),(x2, y2),(x3, y3)])
+                if self.robot.task == 'left':
+                    new_horizon = Polygon([(40-H,50),(40,50),(40,60),(40-H,60)])
+                elif self.robot.task == 'up':
+                    new_horizon = Polygon([(50,60),(60,60),(60,60+H),(50,60+H)])
+                elif self.robot.task == 'right':
+                    new_horizon = Polygon([(60,40),(60+H,40),(60+H,50),(60,50)])
+                elif self.robot.task == 'down':
+                    new_horizon = Polygon([(40,40-H),(50,40-H),(50,40),(40,40)])
+                #print(f'{self.robot.name}: {new_horizon.exterior.coords.xy}')
+
+                
                 #can_wait = query_if_affordance(g, step['area'], "http://example.com/waiting")
                 #if step['area'].split('/')[-1]=='lane_right':
                 #horizon_length = 
                 #print(self.horizon.bounds)
-                if str(type_step) == "http://example.com/lane":
-                    break
-                if self.approaching:
-                    self.horizon = self.horizon.union(self.map_dict[self.plan[1]]['poly'])
+                
 
-            if str(type_step) == "http://example.com/middle":  
-                self.horizon = self.map_dict[self.plan['1']['area']]['poly']
+                #if str(type_step) == "http://example.com/lane":
+                 #   pass
+                #if self.approaching:
+                 #   self.horizon = self.horizon.union(self.map_dict[self.plan['1']['area']]['poly'])
+
+            elif str(type_step) == "http://example.com/middle":  
+                new_horizon = self.map_dict[URIRef("http://example.com/intersection/middle")]['poly']
+
+
+            if not self.horizon:
+                self.horizon = new_horizon
+            elif self.horizon.intersects(new_horizon):
+                #print(self.horizon.union(new_horizon))
+                self.horizon = self.horizon.union(new_horizon)
+                
+            
+                #self.horizon = self.horizon.union(self.map_dict[self.plan['1']['area']]['poly'])
+            
     
         self.robot.horizon = self.horizon
 

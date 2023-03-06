@@ -22,7 +22,8 @@ class SkillModel():
 
     def check_conditions(self, world):
         ## het initializeren moet eigenlijk niet iedere keer opnieuw gebeuren. later beter mengen met configuration enzo
-        skill_obj = self.skill_dict.get(world.skill)
+        skill = world.plan[str(world.plan_step)]['skill']
+        skill_obj = self.skill_dict.get(skill)
         if skill_obj:
             skill_obj.config_skill(world)
 
@@ -36,20 +37,7 @@ class SkillModel():
                     return
         world.condition_failed = False
 
-        
-
-        ## eerst effect checken, als het gesatisfied is set skill finished op true, dan moet ie in t skill model automatisch naar de volgende skill gaan
-        ## als het effect nog niet gesatisfied is check het de guards
-        ## bij de move in lane skill hoort ook n skill, ben er nog niet uit of ik de hele road check of alleen de lane
-        ## eerst guard is of de robot is-on lane, zo niet vergroot scope, check waar je wel bent en redeneer hoe je weer terug bij je plan komt
-        ## dit is miss iets te complex, dus ik ga in het begin uit dat dit altijd zal kloppen
-        ## Dan check je de overige positionele conditions. eerst de mereology van de scope. en evt als het nodig is de topology
-        ## Als ze niet gesatisfied zijn check je hoe je dit moet oplossen. bijv overtaken of achter de andere vehicle blijven
-        ## wat precies hangt af van de overtake rules
-        ## Als het wel satisfied is check je de traffic rules. wat hierbij is, if robot approaches middle, check corresponding rules
-        ## dit houdt in pas oversteken als je in een beweging kunt oversteken, dit houdt vervolgens in dat de target lane vrij moet zijn en dat de robot voorrang moet hebben
-        ## wat als het geen voorrang heeft? dan wachten. Wat als de target lane niet vrij is? Oplossing reasonen met combi van turning en switch lane
-
+    
     def check_condition(self, world, condition):
         if not condition.for_all:
             check = query_check(g, condition.subject, condition.relation, condition.object)
@@ -61,14 +49,17 @@ class SkillModel():
         return check
 
     def monitor_skills(self, world, control):
-        self.check_conditions(world)
-        #self.select_skill(world) 
-        while world.condition_failed:
-            self.select_skill(world)
-            #self.check_conditions(world)        
+        # self.check_conditions(world)
+        # #self.select_skill(world) 
+        # while world.condition_failed:
+        #     self.select_skill(world)
+        #     self.check_conditions(world)        
         
-        #self.select_default_skill(world)
-            self.config_skill(world)
+        # #self.select_default_skill(world)
+        #     self.config_skill(world)
+        if not world.same_situation:
+            self.select_default_skill(world)
+            
         self.execute_skill(world, control)
         
     def select_skill(self, world):
@@ -94,7 +85,7 @@ class SkillModel():
             self.check_traffic_rules(world, self.traffic_rules)
         world.condition_failed = False
 
-    def select_default_skill(self, world):
+    def select_default_skill2(self, world):
         ## ipv queryen kun je ook gwn de context meenemen, bijv als de move in lane succesvol is dan weet je waar het nu is
         world.robot_pos = query_is_on(g, world.robot.uri)
         type_pos = query_type(g, world.robot_pos)
@@ -106,6 +97,10 @@ class SkillModel():
         else:
             world.skill = 'stop'
         #print(f'skill, {world.robot.name}: {world.skill}')
+
+    def select_default_skill(self, world):
+        world.plan_step += 1
+
 
     def check_traffic_rules(self, world, traffic_rules):
         #input("Press Enter to continue...")
@@ -163,6 +158,7 @@ class SkillModel():
     def execute_skill(self, world, control):
         #print(f'omega {world.robot.name}: {world.omega}')
         skill = world.plan[str(world.plan_step)]['skill']
+        print(skill)
         if skill == 'move_in_lane':
             control.move_in_lane(world)
 
