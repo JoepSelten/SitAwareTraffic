@@ -162,20 +162,32 @@ def query_vehicles(g, scope):
     return answer
 
 def query_road(g, robot, scope):
-        query = """
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    query = """
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX ex: <http://example.com/>
+    SELECT ?road
+    WHERE {
+        ?robot ex:is_on ?pos .
+        ?scope ex:has_a* ?pos .
+        ?road ex:has_a ?pos .
+        ?road rdf:type ex:road
+    }
+    """
+    for r in g.query(query, initBindings={'robot': robot, 'scope': scope}):
+        answer = r[0]
+    return answer
+
+def query_if_affordance(g, subject, affordance):
+    query = """
         PREFIX ex: <http://example.com/>
-        SELECT ?road
-        WHERE {
-            ?robot ex:is_on ?pos .
-            ?scope ex:has_a* ?pos .
-            ?road ex:has_a ?pos .
-            ?road rdf:type ex:road
+
+        ASK {
+            ?subject ex:affordance ?object .
         }
         """
-        for r in g.query(query, initBindings={'robot': robot, 'scope': scope}):
-            answer = r[0]
-        return answer
+    for r in g.query(query, initBindings={'subject': subject, 'object': affordance}):
+            answer = r
+    return answer
 
 def uri_from_label(label):
     query = """

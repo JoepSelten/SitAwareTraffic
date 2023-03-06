@@ -22,17 +22,18 @@ class SkillModel():
 
     def check_conditions(self, world):
         ## het initializeren moet eigenlijk niet iedere keer opnieuw gebeuren. later beter mengen met configuration enzo
-        skill_obj = self.skill_dict[world.skill]
-        skill_obj.config_skill(world)
+        skill_obj = self.skill_dict.get(world.skill)
+        if skill_obj:
+            skill_obj.config_skill(world)
 
-        # nu check ik alle conditions altijd, kan dit slimmer? Miss pas de external dingen checken als er een detectie is
-        for condition in skill_obj.condition_list:
-            check = self.check_condition(world, condition)
-            #print(f'{condition.subject}, {condition.object}: {check}')
-            if check == False:
-                world.condition_failed = True
-                world.failed_condition = condition
-                return
+            # nu check ik alle conditions altijd, kan dit slimmer? Miss pas de external dingen checken als er een detectie is
+            for condition in skill_obj.condition_list:
+                check = self.check_condition(world, condition)
+                #print(f'{condition.subject}, {condition.object}: {check}')
+                if check == False:
+                    world.condition_failed = True
+                    world.failed_condition = condition
+                    return
         world.condition_failed = False
 
         
@@ -67,10 +68,11 @@ class SkillModel():
             #self.check_conditions(world)        
         
         #self.select_default_skill(world)
-        self.config_skill(world)
+            self.config_skill(world)
         self.execute_skill(world, control)
         
     def select_skill(self, world):
+        ## miss moet dit gwn n reasoning functie worden. Dan ga je echt adh van failed conditions iets queryen. 
         if world.failed_condition.effect:
             self.select_default_skill(world)
         if world.failed_condition.type == 'check_rules':
@@ -84,6 +86,8 @@ class SkillModel():
             elif world.failed_condition.subject == URIRef("http://example.com/vehicle") and world.failed_condition.relation == URIRef("http://example.com/right_of"):
                 #print(f'{world.robot.name}, give priority!!!')
                 plt.text(65, 22, f'{world.robot.name}, give priority!!!' , fontsize = 16)
+                world.skill = 'stop'
+
                 world.check_rules == False
                 world.condition_failed = False
                 return
@@ -153,13 +157,17 @@ class SkillModel():
             world.skill_params.append(extended_centerline)
         #print(f'{world.robot.name}: {world.skill}')
 
+        if world.skill == 'stop':
+            pass
+
     def execute_skill(self, world, control):
         #print(f'omega {world.robot.name}: {world.omega}')
-        if world.skill == 'move_in_lane':
-            control.move_in_lane(world, *world.skill_params)
+        skill = world.plan[str(world.plan_step)]['skill']
+        if skill == 'move_in_lane':
+            control.move_in_lane(world)
 
-        if world.skill == 'turn':
-            control.turn(world, *world.skill_params)
+        if skill == 'turn':
+            control.turn(world)
 
-        if world.skill == 'stop':
+        if skill == 'stop':
             control.stop(world)

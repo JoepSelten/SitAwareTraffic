@@ -18,19 +18,25 @@ class Control():
         else:
             self.stop()
 
-    def move_in_lane(self, world, phi_des):
-        # this skill requires the orientation of the lane
+    def move_in_lane(self, world):
+        phi_des = world.plan[str(world.plan_step)]['parameters'][0]
+        vel_des = world.plan[str(world.plan_step)]['parameters'][1]
+        # this skill requires the orientation of the lane      
         world.robot.yaw = world.robot.yaw%(2*math.pi)
         phi_des = phi_des%(2*math.pi)
         yaw_error = world.robot.yaw - phi_des
         if abs(yaw_error) > math.pi:
             yaw_error -= np.sign(yaw_error)*2*math.pi
-        world.velocity = world.robot.velocity_max
+        world.velocity = vel_des
         world.omega = -yaw_error
         world.skill_finished = True
 
-    def turn(self, world, phi_des, extended_centerline):
-        world.velocity = world.robot.velocity_max
+    def turn(self, world):
+        phi_des = world.plan[str(world.plan_step)]['parameters'][0]
+        vel_des = world.plan[str(world.plan_step)]['parameters'][1]
+        extended_centerline = world.plan[str(world.plan_step)]['parameters'][2]
+
+        world.velocity = vel_des
         reduced_velocity = False
         world.robot.yaw = world.robot.yaw%(2*math.pi)
         phi_des = phi_des%(2*math.pi)

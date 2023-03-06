@@ -30,10 +30,12 @@ class Simulator():
     def simulate(self):
         self.map.plot_map()
         self.plot_robots()
-        
+
     def plot_robots(self):
         for robot in self.robots.values():
             robot.plot_robot()
+            if robot.horizon and robot.horizon.geom_type=='Polygon':
+                plt.fill(*robot.horizon.exterior.xy, color='lightgreen', alpha=0.7)
 
     def perceived_features(self):   # gives all features inside a certain radius, maybe later use a part of the circle
         robot = self.robots[0]
@@ -180,6 +182,7 @@ class Robot():
         self.reset(start, task)
         self.point = Point(self.pos[0], self.pos[1])
         self.uri = URIRef("http://example.com/" + self.name)
+        self.horizon = None
         
 
     def plot_robot(self):

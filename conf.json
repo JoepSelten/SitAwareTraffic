@@ -4,13 +4,13 @@
     "av_omega": 2,
     "av_length": 6,
     "av_width": 4,
-    "prediction_horizon": 3,
+    "prediction_horizon": 10,
     "radius_turning_left": 15,
     "radius_turning_right": 5,
     "boundary_thickness": 1,
     "road_width": 20,
     "road_length": 40,
     "stop_area_size": 10,
-    "intersection_monitor_size": 20,
+    "intersection_monitor_size": 10,
     "perception_radius": 30
 }

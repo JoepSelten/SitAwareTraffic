@@ -7,9 +7,9 @@ from queries import *
 from global_variables import *
 
 class WorldModel():
-    def __init__(self, robot):
+    def __init__(self, robot, map):
+        self.init_geometric_map(map)
         self.reset(robot)
-        ## of doe ik hier scope ipv pos? is miss wel beter
 
     def reset(self, robot):
         self.robot = robot
@@ -23,32 +23,44 @@ class WorldModel():
         self.before_intersection = True
         self.approaching = False
         self.condition_failed = False
+        self.horizon = None
         self.omega = 0
         self.velocity = 0
         self.skill = 'move_in_lane'
         if self.robot.start == 'down':
-            self.current_pos = URIRef("http://example.com/intersection/road_down/lane_right")
+            self.start_pos = URIRef("http://example.com/intersection/road_down/lane_right")
         elif self.robot.start == 'right':
-            self.current_pos = URIRef("http://example.com/intersection/road_right/lane_right")
+            self.start_pos = URIRef("http://example.com/intersection/road_right/lane_right")
         elif self.robot.start == 'up':
-            self.current_pos = URIRef("http://example.com/intersection/road_up/lane_right")
+            self.start_pos = URIRef("http://example.com/intersection/road_up/lane_right")
         elif self.robot.start == 'left':
-            self.current_pos = URIRef("http://example.com/intersection/road_left/lane_right")
+            self.start_pos = URIRef("http://example.com/intersection/road_left/lane_right")
 
         if self.robot.task == 'down':
             self.goal = URIRef("http://example.com/intersection/road_down/lane_left")
+            self.side_uri = URIRef("http://example.com/intersection/road_down/side_left")
             
         if self.robot.task == 'right':
             self.goal = URIRef("http://example.com/intersection/road_right/lane_left")
+            self.side_uri = URIRef("http://example.com/intersection/road_right/side_left")
 
         if self.robot.task == 'up':
             self.goal = URIRef("http://example.com/intersection/road_up/lane_left")
+            self.side_uri = URIRef("http://example.com/intersection/road_up/side_left")
 
         if self.robot.task == 'left':
             self.goal = URIRef("http://example.com/intersection/road_left/lane_left")
+            self.side_uri = URIRef("http://example.com/intersection/road_left/side_left")
 
-        self.plan = [self.current_pos, URIRef("http://example.com/intersection/middle"), self.goal]
 
+        self.phi_before = self.map_dict[self.start_pos].get('orientation')
+        self.phi_after = self.map_dict[self.goal].get('orientation')
+        self.current_pos = self.start_pos
+        side = self.map_dict[self.side_uri].get('poly')
+        centerline = shift_line(side, -0.25*w)
+        self.extended_centerline = extend_line(centerline, self.phi_after, w)
+
+        self.init_plan()
         self.update_av_is_on()
 
     def init_geometric_map(self, map):
@@ -82,14 +94,19 @@ class WorldModel():
             print("Unknown map!")
         
 
-    def update(self, sim):
-        self.update_map(sim)
-        self.update_kg(sim)
+    def init_plan(self):
+        self.plan = {'0': {'area': self.start_pos, 'skill': 'move_in_lane', 'parameters': [self.phi_before, self.robot.velocity_max]},
+                    '1': {'area': URIRef("http://example.com/intersection/middle"), 'skill': 'turn', 'parameters': [self.phi_after, self.robot.velocity_max, self.extended_centerline]},
+                    '2': {'area': self.goal, 'skill': 'move_in_lane', 'parameters': [self.phi_after, self.robot.velocity_max]}
+        }
+        #self.plan = [self.current_pos, URIRef("http://example.com/intersection/middle"), self.goal]
+        self.plan_step = 0
 
-    def update_map(self, sim):
-        pass
+    def update(self):
+        self.update_kg()
+        self.prediction_horizon()
 
-    def update_kg(self, sim):
+    def update_kg(self):
         self.update_current_pos()
         self.update_approaching()
         #print(f'scope, {self.robot.name}: {self.scope}')
@@ -211,6 +228,41 @@ class WorldModel():
         if robot_areas:
             if max(robot_areas) >= 0.5*self.robot.poly.area:
                 return max(robot_areas, key=robot_areas.get)
+
+    def prediction_horizon(self):
+        ## de eerste grid waar je kunt wachten
+        x = self.robot.pos[0]
+        y = self.robot.pos[1]
+        lane_width = 10
+        l = self.robot.length
+        H = 20
+        self.horizon = None
+
+        for i in range(self.plan_step, len(self.plan)):
+            step = self.plan[str(i)]
+            type_step = query_type(g, step['area'])
+            #print(step['area'].split('/')[-1])
+            if str(type_step) == "http://example.com/lane":              
+                phi = step['parameters'][0]
+                self.horizon = Polygon([(x+0.5*l*math.cos(phi)-lane_width*math.sin(phi), y+0.5*l*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
+                    (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(self.map_dict[self.current_pos]['poly'])
+                #can_wait = query_if_affordance(g, step['area'], "http://example.com/waiting")
+                #if step['area'].split('/')[-1]=='lane_right':
+                #horizon_length = 
+                #print(self.horizon.bounds)
+                if str(type_step) == "http://example.com/lane":
+                    break
+                if self.approaching:
+                    self.horizon = self.horizon.union(self.map_dict[self.plan[1]]['poly'])
+
+            if str(type_step) == "http://example.com/middle":  
+                self.horizon = self.map_dict[self.plan['1']['area']]['poly']
+    
+        self.robot.horizon = self.horizon
+
+        
 
 
 
