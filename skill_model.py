@@ -38,6 +38,7 @@ class SkillModel():
                     #print(condition.relation)
                     return
         world.condition_failed = False
+        world.wait = False
 
     
     def check_condition(self, world, condition):
@@ -79,7 +80,8 @@ class SkillModel():
             #print(world.condition_failed)
             if world.condition_failed:
                 #world.skill = 'stop'
-                world.plan[str(world.plan_step)]['parameters']['velocity'] = 0
+                world.wait = True
+                
             
         world.check_rules = False
         while world.check_rules:
@@ -176,6 +178,14 @@ class SkillModel():
     def execute_skill(self, world, control):
         #print(f'omega {world.robot.name}: {world.omega}')
         skill = world.plan[str(world.plan_step)]['skill']
+
+        if world.wait:
+            distance = 40-world.robot.pos[1]
+            if distance < 0.5*world.robot.length + 2:
+                world.plan[str(world.plan_step)]['parameters']['velocity'] = 0
+        else:
+            world.plan[str(world.plan_step)]['parameters']['velocity'] = world.robot.velocity_max
+
         #print(skill)
         if skill == 'move_in_lane':
             control.move_in_lane(world)

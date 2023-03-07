@@ -24,6 +24,7 @@ class WorldModel():
         self.before_intersection = True
         self.approaching = False
         self.condition_failed = False
+        self.wait = False
         self.horizon = None
         self.omega = 0
         self.velocity = 0
@@ -104,7 +105,7 @@ class WorldModel():
         self.plan_step = 0
 
     def update(self, sim):
-        self.update_current_pos()
+        self.update_current_pos(sim)
         #print(f'{self.robot.name}: {self.current_pos}')
         self.prediction_horizon()
 
@@ -117,7 +118,7 @@ class WorldModel():
             self.update_approaching(sim)
         self.update_vehicles()       
 
-    def update_current_pos(self):
+    def update_current_pos(self, sim):
         prev_pos = self.current_pos
         self.current_pos = self.current_area()
         #print(f'Current pos, {self.robot.name}: {self.current_pos}')
@@ -160,6 +161,7 @@ class WorldModel():
                 g.add((robot.uri, EX.is_on, robot_pos))
 
     def update_is_on(self, sim):
+        g.remove((None, EX.obstructs, self.robot.uri))
         self.robot_is_on = False
         self.approaching = False
         self.robot_dict = sim.robots.copy()
@@ -177,6 +179,7 @@ class WorldModel():
                         self.robot.obstructed_area = self.map_dict[label]['poly']
                         g.add((robot.uri, EX.obstructs, self.robot.uri))
                         g.add((self.robot.uri, EX.obstructs, label))
+                        g.remove((robot.uri, EX.approaches, self.robot.uri))
                         self.robot_is_on = True
 
            

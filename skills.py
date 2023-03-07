@@ -38,6 +38,12 @@ class MoveInLane():
         self.condition3.object = self.robot.uri
         self.condition_list.append(self.condition3)
 
+        self.condition4 = Condition('check_rules', negation=True, for_all=True)
+        self.condition4.subject = URIRef("http://example.com/vehicle")
+        self.condition4.relation = URIRef("http://example.com/obstructs")
+        self.condition4.object = self.robot.uri
+        self.condition_list.append(self.condition4)
+
         ## of hoort dit bij traffic rules?
         # self.condition4 = Condition('check_rules', negation=True)
         # self.condition4.subject = self.robot.uri
