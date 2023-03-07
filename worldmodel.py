@@ -96,26 +96,26 @@ class WorldModel():
         
 
     def init_plan(self):
-        self.plan = {'0': {'area': self.start_pos, 'skill': 'move_in_lane', 'parameters': [self.phi_before, self.robot.velocity_max]},
-                    '1': {'area': URIRef("http://example.com/intersection/middle"), 'skill': 'turn', 'parameters': [self.phi_after, self.robot.velocity_max, self.extended_centerline]},
-                    '2': {'area': self.goal, 'skill': 'move_in_lane', 'parameters': [self.phi_after, self.robot.velocity_max]}
+        self.plan = {'0': {'area': self.start_pos, 'skill': 'move_in_lane', 'parameters': {'phi': self.phi_before, 'velocity': self.robot.velocity_max}},
+                    '1': {'area': URIRef("http://example.com/intersection/middle"), 'skill': 'turn', 'parameters': {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'turn_line': self.extended_centerline}},
+                    '2': {'area': self.goal, 'skill': 'move_in_lane', 'parameters': {'phi': self.phi_after, 'velocity': self.robot.velocity_max}}
         }
         #self.plan = [self.current_pos, URIRef("http://example.com/intersection/middle"), self.goal]
         self.plan_step = 0
 
-    def update(self):
-        self.update_kg()
+    def update(self, sim):
+        self.update_current_pos()
+        #print(f'{self.robot.name}: {self.current_pos}')
         self.prediction_horizon()
 
-    def update_kg(self):
-        self.update_current_pos()
-        self.update_approaching()
-        #print(f'scope, {self.robot.name}: {self.scope}')
-        self.update_vehicles()
+        #self.robot.horizon = None
+        self.robot.approaching_horizon = None
+        self.robot.obstructed_area = None
+        self.update_is_on(sim)
         
-        #self.update_is_on(sim)
-        ## only check is on for the road when not approaching intersection yet
-        
+        if not self.robot_is_on:
+            self.update_approaching(sim)
+        self.update_vehicles()       
 
     def update_current_pos(self):
         prev_pos = self.current_pos
@@ -132,6 +132,8 @@ class WorldModel():
             self.same_situation = True
         else:
             self.same_situation = False
+            self.plan_step += 1
+            
             #self.check_progress()
             self.update_av_is_on()
             
@@ -146,7 +148,7 @@ class WorldModel():
     def update_scope(self):
         self.scope_list = query_parts(g, self.scope)
 
-    def update_is_on(self, sim):
+    def update_is_on2(self, sim):
         for name, robot in sim.robots.items():
             if name == self.robot.name:
                 continue
@@ -157,8 +159,28 @@ class WorldModel():
                 g.remove((robot.uri, EX.is_on, None))
                 g.add((robot.uri, EX.is_on, robot_pos))
 
+    def update_is_on(self, sim):
+        self.robot_is_on = False
+        self.approaching = False
+        self.robot_dict = sim.robots.copy()
+        self.robots_is_on = []
+        self.scope = URIRef("http://example.com/intersection")
+        del self.robot_dict[self.robot.name]
+        if self.robot.horizon:
+            for robot in self.robot_dict.values():
+                if robot.poly:
+                    if self.robot.horizon.intersects(robot.poly):
+                        self.robots_is_on.append(robot)
+                        self.robot.is_on_horizon = self.robot.horizon.intersection(robot.poly)
+                        ##  dit kunnen er later ook meer zijn
+                        label = self.get_label(self.robot.is_on_horizon)
+                        self.robot.obstructed_area = self.map_dict[label]['poly']
+                        g.add((robot.uri, EX.obstructs, self.robot.uri))
+                        g.add((self.robot.uri, EX.obstructs, label))
+                        self.robot_is_on = True
+
            
-    def update_approaching(self):
+    def update_approaching2(self):
         if self.before_intersection and not self.approaching: # miss n check hier of je achter de intersection bent. Miss moet ik hier de hgh level plan queryen
             if query_check_on_road(g, self.robot.uri):
                 if self.robot.poly.distance(self.map_dict[URIRef("http://example.com/intersection/middle")]['poly']) < APPROACH_DISTANCE:
@@ -171,7 +193,42 @@ class WorldModel():
             self.approaching = False
             g.remove((self.robot.uri, EX.approaches, URIRef("http://example.com/intersection/middle")))
 
-    def update_vehicles(self):
+    def update_approaching(self, sim):
+        self.approaching = False
+        self.robot_dict = sim.robots.copy()
+        self.robots_approaching = []
+        self.scope = URIRef("http://example.com/intersection")
+        del self.robot_dict[self.robot.name]
+        if self.robot.horizon:
+            for robot in self.robot_dict.values():
+                if robot.horizon:
+                    if self.robot.horizon.intersects(robot.horizon):
+                        self.robots_approaching.append(robot)
+                        self.robot.approaching_horizon = self.robot.horizon.intersection(robot.horizon)
+                        if self.robot.approaching_horizon.area < 5:
+                            break
+                        ##  dit kunnen er later ook meer zijn
+                        #print(f'{self.robot.name}: {self.robot.approaching_horizon.area}')
+                        label = self.get_label(self.robot.approaching_horizon)
+                        g.add((robot.uri, EX.approaches, self.robot.uri))
+                        g.add((self.robot.uri, EX.approaches, label))
+                        self.approaching = True
+                        
+
+
+    def get_label(self, geom):
+        prev_intersection = 0
+        for key, value in self.map_dict.items():
+            if geom.intersects(value['poly']):
+                intersect_area = geom.intersection(value['poly']).area
+                if intersect_area > prev_intersection:
+                    new_key = key
+        return new_key
+                
+
+
+
+    def update_vehicles2(self):
         ## in front of, behind, right of etc
         self.vehicles_in_scope = query_vehicles(g, self.scope)
         self.vehicles_in_scope.remove(self.robot.uri)
@@ -181,32 +238,38 @@ class WorldModel():
             for vehicle in self.vehicles_in_scope:
                 self.associate_vehicle(vehicle)
 
+    def update_vehicles(self):
+        #print(f'{self.robot.name}: {self.approaching}')
+        if self.approaching:
+            for robot in self.robots_approaching:
+                self.associate_vehicle(robot)
+
+
             
     def associate_vehicle(self, vehicle):
-        #pos = query_is_on_within_scope(g, vehicle, self.scope)
-        
-        ## check if and which road
-        #print(self.scope)
-        if query_check_on_road(g, vehicle) and query_check_on_road(g, self.robot.uri):
-            
-            road_vehicle = query_road(g, vehicle, self.scope)
-            road_current = query_road(g, self.robot.uri, self.scope)
-            #print(f'road_current: {road_current}')
-            #print(f'road_vehicle: {road_vehicle}')
-            if road_current == URIRef("http://example.com/intersection/road_down"):
-                if road_vehicle == URIRef("http://example.com/intersection/road_right"):
-                    g.add((vehicle, EX.right_of, self.robot.uri))
-            if road_current == URIRef("http://example.com/intersection/road_right"):
-                if road_vehicle == URIRef("http://example.com/intersection/road_up"):
-                    g.add((vehicle, EX.right_of, self.robot.uri))
+        ## nu nog alleen voor de intersection, later generiek maken
 
-            if road_current == URIRef("http://example.com/intersection/road_up"):
-                if road_vehicle == URIRef("http://example.com/intersection/road_left"):
-                    g.add((vehicle, EX.right_of, self.robot.uri))
+        #if query_check_on_road(g, vehicle) and query_check_on_road(g, self.robot.uri):
+        #print(f'{self.robot.name}: {vehicle}')
 
-            if road_current == URIRef("http://example.com/intersection/road_left"):
-                if road_vehicle == URIRef("http://example.com/intersection/road_down"):
-                    g.add((vehicle, EX.right_of, self.robot.uri))
+        road_vehicle = query_road(g, vehicle.uri, self.scope)
+        road_current = query_road(g, self.robot.uri, self.scope)
+        #print(f'road_current: {road_current}')
+        #print(f'road_vehicle: {road_vehicle}')
+        if road_current == URIRef("http://example.com/intersection/road_down"):
+            if road_vehicle == URIRef("http://example.com/intersection/road_right"):
+                g.add((vehicle.uri, EX.right_of, self.robot.uri))
+        if road_current == URIRef("http://example.com/intersection/road_right"):
+            if road_vehicle == URIRef("http://example.com/intersection/road_up"):
+                g.add((vehicle.uri, EX.right_of, self.robot.uri))
+
+        if road_current == URIRef("http://example.com/intersection/road_up"):
+            if road_vehicle == URIRef("http://example.com/intersection/road_left"):
+                g.add((vehicle.uri, EX.right_of, self.robot.uri))
+
+        if road_current == URIRef("http://example.com/intersection/road_left"):
+            if road_vehicle == URIRef("http://example.com/intersection/road_down"):
+                g.add((vehicle.uri, EX.right_of, self.robot.uri))
 
     def current_area(self):
         self.current_areas = {}
@@ -240,30 +303,28 @@ class WorldModel():
         H = 10
         self.horizon = None
 
-        for i in range(self.plan_step, len(self.plan)):
-            step = self.plan[str(i)]
+        for i in range(len(self.plan)-self.plan_step):
+            step = self.plan[str(i+self.plan_step)]
             type_step = query_type(g, step['area'])
-            #print(type_step)
-            #print(step['area'].split('/')[-1])
             if str(type_step) == "http://example.com/lane" and i==0:              
-                phi = step['parameters'][0]
+                phi = step['parameters']['phi']
                 new_horizon = Polygon([(x+0.5*l*math.cos(phi)-lane_width*math.sin(phi), y+0.5*l*math.sin(phi)-lane_width*math.cos(phi)),
                     (x+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
                     (x+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
                     (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(self.map_dict[step['area']]['poly'])
 
-            elif str(type_step) == "http://example.com/lane" and i==2:
-                phi = step['parameters'][0]
+            elif str(type_step) == "http://example.com/lane" and i>0:
+                phi = step['parameters']['phi']
                 #print(self.map_dict[URIRef("http://example.com/intersection/middle")]['poly'].intersection(self.map_dict[step['area']]['poly']).coords[0])
-                intersection_line = self.map_dict[URIRef("http://example.com/intersection/middle")]['poly'].intersection(self.map_dict[step['area']]['poly'])
-                x0 = intersection_line.coords[0][0]
-                y0 = intersection_line.coords[0][1]
-                x1 = intersection_line.coords[1][0]
-                y1 = intersection_line.coords[1][1]
-                x2 = x0+H*math.cos(phi)
-                x3 = x1+H*math.cos(phi)
-                y2 = y0+H*math.sin(phi)
-                y3 = y1+H*math.sin(phi)
+                #intersection_line = self.map_dict[URIRef("http://example.com/intersection/middle")]['poly'].intersection(self.map_dict[step['area']]['poly'])
+                # x0 = intersection_line.coords[0][0]
+                # y0 = intersection_line.coords[0][1]
+                # x1 = intersection_line.coords[1][0]
+                # y1 = intersection_line.coords[1][1]
+                # x2 = x0+H*math.cos(phi)
+                # x3 = x1+H*math.cos(phi)
+                # y2 = y0+H*math.sin(phi)
+                # y3 = y1+H*math.sin(phi)
                 #new_horizon = Polygon([(x0, y0),(x1, y1),(x2, y2),(x3, y3)])
                 if self.robot.task == 'left':
                     new_horizon = Polygon([(40-H,50),(40,50),(40,60),(40-H,60)])
@@ -287,8 +348,11 @@ class WorldModel():
                 #if self.approaching:
                  #   self.horizon = self.horizon.union(self.map_dict[self.plan['1']['area']]['poly'])
 
-            elif str(type_step) == "http://example.com/middle":  
+            elif str(type_step) == "http://example.com/middle" and i>0:  
                 new_horizon = self.map_dict[URIRef("http://example.com/intersection/middle")]['poly']
+
+            else:
+                new_horizon = None
 
 
             if not self.horizon:

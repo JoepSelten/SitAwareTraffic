@@ -32,18 +32,18 @@ class MoveInLane():
         self.condition2.object = self.robot.uri
         self.condition_list.append(self.condition2)
 
-        self.condition3 = Condition('external', negation=True, for_all=True)
+        self.condition3 = Condition('check_rules', negation=True, for_all=True)
         self.condition3.subject = URIRef("http://example.com/vehicle")
-        self.condition3.relation = URIRef("http://example.com/in_front_of")
+        self.condition3.relation = URIRef("http://example.com/approaches")
         self.condition3.object = self.robot.uri
         self.condition_list.append(self.condition3)
 
         ## of hoort dit bij traffic rules?
-        self.condition4 = Condition('check_rules', negation=True)
-        self.condition4.subject = self.robot.uri
-        self.condition4.relation = URIRef("http://example.com/approaches")
-        self.condition4.object = URIRef("http://example.com/intersection/middle")
-        self.condition_list.append(self.condition4)
+        # self.condition4 = Condition('check_rules', negation=True)
+        # self.condition4.subject = self.robot.uri
+        # self.condition4.relation = URIRef("http://example.com/approaches")
+        # self.condition4.object = URIRef("http://example.com/intersection/middle")
+        # self.condition_list.append(self.condition4)
 
 class Turn():
     def __init__(self):

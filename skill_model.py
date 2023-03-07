@@ -29,11 +29,13 @@ class SkillModel():
 
             # nu check ik alle conditions altijd, kan dit slimmer? Miss pas de external dingen checken als er een detectie is
             for condition in skill_obj.condition_list:
+                #print(condition)
                 check = self.check_condition(world, condition)
                 #print(f'{condition.subject}, {condition.object}: {check}')
                 if check == False:
                     world.condition_failed = True
                     world.failed_condition = condition
+                    #print(condition.relation)
                     return
         world.condition_failed = False
 
@@ -57,18 +59,31 @@ class SkillModel():
         
         # #self.select_default_skill(world)
         #     self.config_skill(world)
-        if not world.same_situation:
-            self.select_default_skill(world)
-            
+        self.check_conditions(world)
+        #if not world.same_situation and not world.condition_failed:
+         #   self.select_default_skill(world)
+
+        if world.condition_failed:
+            self.select_skill(world)
+        #print(f'{world.robot.name}: {world.skill}')
         self.execute_skill(world, control)
         
     def select_skill(self, world):
         ## miss moet dit gwn n reasoning functie worden. Dan ga je echt adh van failed conditions iets queryen. 
+        #print(world.failed_condition.type)
         if world.failed_condition.effect:
             self.select_default_skill(world)
         if world.failed_condition.type == 'check_rules':
-            world.check_rules = True
+            self.traffic_rules = 'priority'
+            self.check_traffic_rules(world, self.traffic_rules)
+            #print(world.condition_failed)
+            if world.condition_failed:
+                #world.skill = 'stop'
+                world.plan[str(world.plan_step)]['parameters']['velocity'] = 0
+            
+        world.check_rules = False
         while world.check_rules:
+            ## check rules die bij het overlappende deel horen
             if world.failed_condition.object == URIRef("http://example.com/intersection/middle") and world.failed_condition.relation == URIRef("http://example.com/approaches"):
                 if world.failed_condition.subject == world.robot.uri:
                     self.traffic_rules = 'approaching_middle'
@@ -82,7 +97,7 @@ class SkillModel():
                 world.check_rules == False
                 world.condition_failed = False
                 return
-            self.check_traffic_rules(world, self.traffic_rules)
+            
         world.condition_failed = False
 
     def select_default_skill2(self, world):
@@ -115,8 +130,11 @@ class SkillModel():
                 world.failed_condition = condition
                 #print(f'{condition.subject}, {condition.relation}, {condition.object}: {check}')
                 #input("Press Enter to continue...")
+                world.condition_failed = True
                 return
+        world.condition_failed = False
         world.check_rules = False
+        
 
     def config_skill(self, world):
         world.skill_params = []
@@ -158,7 +176,7 @@ class SkillModel():
     def execute_skill(self, world, control):
         #print(f'omega {world.robot.name}: {world.omega}')
         skill = world.plan[str(world.plan_step)]['skill']
-        print(skill)
+        #print(skill)
         if skill == 'move_in_lane':
             control.move_in_lane(world)
 

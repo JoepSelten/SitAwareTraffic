@@ -32,6 +32,7 @@ AV1_world = WorldModel(simulator.robots['AV1'], simulator.map)
 AV2_world = WorldModel(simulator.robots['AV2'], simulator.map)
 
 
+
 skill_model = SkillModel()
 control = Control()
 
@@ -65,8 +66,8 @@ while True:
     control.actuate(AV1_world, simulator)
     control.actuate(AV2_world, simulator)
 
-    AV1_world.update()
-    AV2_world.update()
+    AV1_world.update(simulator)
+    AV2_world.update(simulator)
 
     plt.pause(dt/10)
     #round(t/dt) % 10

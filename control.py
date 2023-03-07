@@ -19,8 +19,8 @@ class Control():
             self.stop()
 
     def move_in_lane(self, world):
-        phi_des = world.plan[str(world.plan_step)]['parameters'][0]
-        vel_des = world.plan[str(world.plan_step)]['parameters'][1]
+        phi_des = world.plan[str(world.plan_step)]['parameters']['phi']
+        vel_des = world.plan[str(world.plan_step)]['parameters']['velocity']
         # this skill requires the orientation of the lane      
         world.robot.yaw = world.robot.yaw%(2*math.pi)
         phi_des = phi_des%(2*math.pi)
@@ -32,9 +32,9 @@ class Control():
         world.skill_finished = True
 
     def turn(self, world):
-        phi_des = world.plan[str(world.plan_step)]['parameters'][0]
-        vel_des = world.plan[str(world.plan_step)]['parameters'][1]
-        extended_centerline = world.plan[str(world.plan_step)]['parameters'][2]
+        phi_des = world.plan[str(world.plan_step)]['parameters']['phi']
+        vel_des = world.plan[str(world.plan_step)]['parameters']['velocity']
+        extended_centerline = world.plan[str(world.plan_step)]['parameters']['turn_line']
 
         world.velocity = vel_des
         reduced_velocity = False
