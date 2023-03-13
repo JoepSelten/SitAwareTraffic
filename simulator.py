@@ -79,7 +79,7 @@ class Simulator():
         robot.point = Point(robot.pos[0], robot.pos[1])
         
 class Map():
-    def __init__(self, traffic_situation = "two_lane-intersection"):
+    def __init__(self, traffic_situation = "two_lane-intersection2"):
         self.traffic_situation = traffic_situation
         if traffic_situation == "one-lane_intersection" :
             self.map_dict =  {'0': {'type': 'on intersection',
@@ -141,6 +141,46 @@ class Map():
                         '19': {'type': 'centerline', 'location': 'up', 
                             'poly': LineString([(l+0.5*w, l+w), (l+0.5*w, 2*l+w)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1},
                         '20': {'type': 'centerline', 'location': 'left', 
+                            'poly': LineString([(0, l+0.5*w), (l, l+0.5*w)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1}
+            }
+
+        if traffic_situation == "two-lane_intersection2" :
+            self.map_dict =  {'0': {'type': 'middle_dr', 'poly': Polygon([(l+0.5*w, l), (l+w, l), (l+w, l+0.5*w), (l+0.5*w, l+0.5*w)]), 'color': 'darkgray', 'transparency': 1},
+                        '1': {'type': 'middle_ur', 'poly': Polygon([(l+0.5*w, l+0.5*w), (l+w, l+0.5*w), (l+w, l+w), (l+0.5*w, l+w)]), 'color': 'gray', 'transparency': 1},
+                        '2': {'type': 'middle_ul', 'poly': Polygon([(l, l+0.5*w), (l+0.5*w, l+0.5*w), (l+0.5*w, l+w), (l, l+w)]), 'color': 'darkgray', 'transparency': 1},
+                        '3': {'type': 'middle_dl', 'poly': Polygon([(l, l), (l+0.5*w, l), (l+0.5*w, l+0.5*w), (l, l+0.5*w)]), 'color': 'darkgray', 'transparency': 1},
+                        '4': {'type': 'lane', 'location': 'down', 'poly': Polygon([(l+0.5*w, 0), (l+w, 0), (l+w, l), (l+0.5*w, l)]), 'color': 'lightblue', 'transparency': 1},
+                        '5': {'type': 'lane', 'location': 'down', 'poly': Polygon([(l, 0), (l+0.5*w, 0), (l+0.5*w, l), (l, l)]), 'color': 'orange', 'transparency': 1},
+                        '6': {'type': 'lane', 'location': 'right', 'poly': Polygon([(l+w, l+0.5*w), (2*l+w, l+0.5*w), (2*l+w, l+w), (l+w, l+w)]), 'color': 'lightblue', 'transparency': 1},
+                        '7': {'type': 'lane', 'location': 'right', 'poly': Polygon([(l+w, l), (2*l+w, l), (2*l+w, l+0.5*w), (l+w, l+0.5*w)]), 'color': 'orange', 'transparency': 1},
+                        '8': {'type': 'lane', 'location': 'up', 'poly': Polygon([(l, l+w), (l+0.5*w, l+w), (l+0.5*w, 2*l+w), (l, 2*l+w)]), 'color': 'lightblue', 'transparency': 1},
+                        '9': {'type': 'lane', 'location': 'up', 'poly': Polygon([(l+0.5*w, l+w), (l+w, l+w), (l+w, 2*l+w), (l+0.5*w, 2*l+w)]), 'color': 'orange', 'transparency': 1},
+                        '10': {'type': 'lane', 'location': 'left', 'poly': Polygon([(0, l), (l, l), (l, l+0.5*w), (0, l+0.5*w)]), 'color': 'lightblue', 'transparency': 1},
+                        '11': {'type': 'lane', 'location': 'left', 'poly': Polygon([(0, l+0.5*w), (l, l+0.5*w), (l, l+w), (0, l+w)]), 'color': 'orange', 'transparency': 1},
+                        
+                        '12': {'type': 'boundary', 'location': 'down', 
+                            'poly': LineString([(l+w, 0), (l+w, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '13': {'type': 'boundary', 'location': 'down', 
+                            'poly': LineString([(l, 0), (l, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '14': {'type': 'boundary', 'location': 'right', 
+                            'poly': LineString([(2*l+w, l+w), (l+w, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '15': {'type': 'boundary', 'location': 'right', 
+                            'poly': LineString([(2*l+w, l), (l+w, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '16': {'type': 'boundary', 'location': 'up', 
+                            'poly': LineString([(l, 2*l+w), (l, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '17': {'type': 'boundary', 'location': 'up', 
+                            'poly': LineString([(l+w, 2*l+w), (l+w, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '18': {'type': 'boundary', 'location': 'left', 
+                            'poly': LineString([(0, l), (l, l)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '19': {'type': 'boundary', 'location': 'left', 
+                            'poly': LineString([(0, l+w), (l, l+w)]), 'color': 'red', 'linestyle': 'solid', 'transparency': 1},
+                        '20': {'type': 'centerline', 'location': 'down', 
+                            'poly': LineString([(l+0.5*w, 0), (l+0.5*w, l)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1},
+                        '21': {'type': 'centerline', 'location': 'right', 
+                            'poly': LineString([(l+w, l+0.5*w), (2*l+w, l+0.5*w)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1},
+                        '22': {'type': 'centerline', 'location': 'up', 
+                            'poly': LineString([(l+0.5*w, l+w), (l+0.5*w, 2*l+w)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1},
+                        '23': {'type': 'centerline', 'location': 'left', 
                             'poly': LineString([(0, l+0.5*w), (l, l+0.5*w)]), 'color': 'black', 'linestyle': 'dashed', 'transparency': 1}
             }
 

@@ -186,12 +186,14 @@ class SkillModel():
         else:
             world.plan[str(world.plan_step)]['parameters']['velocity'] = world.robot.velocity_max
 
-        #print(skill)
+        print(skill)
         if skill == 'move_in_lane':
-            control.move_in_lane(world)
+            control.drive(world)
 
         if skill == 'turn':
-            control.turn(world)
+            #control.turn(world)
+            control.drive(world)
 
         if skill == 'stop':
             control.stop(world)
+        print(world.omega)
