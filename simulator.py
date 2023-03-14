@@ -17,7 +17,7 @@ class Simulator():
     def __init__(self):
         self.robots = {}
         self.num_robots = 0
-        self.obstacles = []
+        self.obstacles = {}
         #self.input_features = []
 
     def set_map(self, sit):
@@ -28,9 +28,9 @@ class Simulator():
         self.robots[name] = robot
         self.num_robots += 1
 
-    def add_obstacle(self, pos):
-        obstacle = Obstacle(pos)
-        self.obstacles.append(obstacle)
+    def add_obstacle(self, name, pos):
+        obstacle = Obstacle(name, pos)
+        self.obstacles[name] = obstacle
     
     def simulate(self):
         self.map.plot_map()
@@ -38,7 +38,7 @@ class Simulator():
         self.plot_obstacles()
 
     def plot_obstacles(self):
-        for obstacle in self.obstacles:
+        for obstacle in self.obstacles.values():
             obstacle.plot()
 
     def plot_robots(self):
@@ -276,7 +276,9 @@ class Robot():
         self.poly = trans(self.pos, self.yaw, self.length, self.width)
 
 class Obstacle():
-    def __init__(self, pos):
+    def __init__(self, name, pos):
+        self.name = name
+        self.uri = URIRef("http://example.com/" + self.name)
         self.pos = pos
         self.yaw = 0.3
         self.length = 4

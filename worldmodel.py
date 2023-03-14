@@ -15,6 +15,7 @@ class WorldModel():
 
     def reset(self, robot):
         self.robot = robot
+        self.horizon_dict = {}
         g.remove((self.robot.uri, None, None))
         g.add((self.robot.uri, RDF.type, EX.vehicle))
         self.current_pos = None
@@ -232,7 +233,8 @@ class WorldModel():
         
         if not self.robot_is_on:
             self.update_approaching(sim)
-        self.update_vehicles()       
+        self.update_vehicles()
+        self.update_obstacles(sim)
 
     def update_current_pos(self, sim):
         prev_pos = self.current_pos
@@ -365,6 +367,11 @@ class WorldModel():
             for robot in self.robots_approaching:
                 self.associate_vehicle(robot)
 
+    def update_obstacles(self, sim):
+        for obstacle in sim.obstacles.values():
+            if obstacle.poly.intersects(self.robot.horizon):
+                g.add((obstacle.uri, EX.obstructs, self.robot.uri))
+
 
             
     def associate_vehicle(self, vehicle):
@@ -391,7 +398,7 @@ class WorldModel():
         if road_current == URIRef("http://example.com/intersection/road_left"):
             if road_vehicle == URIRef("http://example.com/intersection/road_down"):
                 g.add((vehicle.uri, EX.right_of, self.robot.uri))
-
+ 
     def current_area(self):
         self.current_areas = {}
         total = 0
@@ -438,6 +445,7 @@ class WorldModel():
         H = 10
         self.horizon = None
         n = 0
+        self.horizon_dict = {}
         horizon_list = []
 
         middle_dr = sim.map.polygon_list[0]
@@ -463,7 +471,7 @@ class WorldModel():
                     (x+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
                     (x+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
                     (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(self.right_lane)
-                
+            
             elif n>0 and step['area'] and middle_step:
                 new_horizon = self.map_dict[step['area']]['poly']
 
@@ -491,29 +499,31 @@ class WorldModel():
 
             if new_horizon.geom_type=='Polygon':
                 horizon_list.append(new_horizon)
+                new_horizon_dict = {}
+                new_horizon_dict['area'] = step['area']
+                new_horizon_dict['poly'] = new_horizon
+                self.horizon_dict[str(len(self.horizon_dict))] = new_horizon_dict
 
             if new_horizon.geom_type=='GeometryCollection':
                 for polygon in new_horizon:
                     if polygon.geom_type=='Polygon':
                         #print(new_horizon.geom_type)
-                        horizon_list.append(polygon)      
-
+                        horizon_list.append(new_horizon)
+                        new_horizon_dict = {}
+                        new_horizon_dict['area'] = step['area']
+                        new_horizon_dict['poly'] = polygon
+                        self.horizon_dict[str(len(self.horizon_dict))] = new_horizon_dict
+    
  
             horizon_intersections = self.get_intersections(new_horizon)
             #print(horizon_intersections)
             if step['area'] in horizon_intersections:
                 if horizon_intersections[step['area']] > 95 and not middle_step:
                     break
-
             n+=1    
 
         self.robot.horizon = unary_union(horizon_list)
-        
-
-
-
-
-        
+         
         
 
             

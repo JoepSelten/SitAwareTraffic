@@ -23,6 +23,15 @@ class SkillModel():
     def check_conditions(self, world):
         ## het initializeren moet eigenlijk niet iedere keer opnieuw gebeuren. later beter mengen met configuration enzo
         skill = world.plan[str(world.plan_step)]['skill']
+        area = world.plan[str(world.plan_step)]['area']
+        affordances = query_affordances(g, area)
+        if EX.driveable in affordances:
+            print(affordances)
+        if world.horizon_dict:
+            print(world.horizon_dict[str(len(world.horizon_dict)-1)])
+        #print(world.horizon_dict[str(len(world.horizon_dict)+1)])
+        
+        
         skill_obj = self.skill_dict.get(skill)
         if skill_obj:
             skill_obj.config_skill(world)

@@ -1,5 +1,24 @@
 from rdflib import URIRef
 
+
+class Driving():
+    def __init__(self):
+        pass
+
+    def config_skill(self, world):
+        self.robot = world.robot
+        self.lane = world.current_pos
+        self.condition_list = []
+        self.init_conditions()
+
+    def init_conditions(self):
+        self.condition1 = Condition('positional')
+        self.condition1.subject = self.robot.uri
+        self.condition1.relation = URIRef("http://example.com/is_on")
+        self.condition1.object = self.lane
+        self.condition_list.append(self.condition1)
+
+
 class MoveInLane():
     def __init__(self):
         pass

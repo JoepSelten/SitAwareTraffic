@@ -40,9 +40,8 @@ road_lane_left = add_has_a(g, EX.road, EX.lane_left)
 road_side_right = add_has_a(g, EX.road, EX.side_right)
 road_side_left = add_has_a(g, EX.road, EX.side_left)
 road_centerline = add_has_a(g, EX.road, EX.centerline)
-g.add((road_lane_right, RDF.type, EX.lane))
-g.add((road_lane_right, EX.affordance, EX.waiting))
-g.add((road_lane_left, RDF.type, EX.lane))
+g.add((road_lane_right, RDF.type, EX.lane_right))
+g.add((road_lane_left, RDF.type, EX.lane_left))
 g.add((road_side_right, RDF.type, EX.side))
 g.add((road_side_left, RDF.type, EX.side))
 g.add((road_centerline, RDF.type, EX.centerline))
@@ -80,8 +79,13 @@ g.add((EX.line, RDF.type, EX.geometry))
 # g.add((polygon_line3, RDF.type, EX.line))
 # g.add((polygon_line4, RDF.type, EX.line))
 
-# ## Affordances
-#g.add((EX.lane, EX.affordance, EX.driveable))
+## Affordances
+g.add((EX.lane_right, EX.affordance, EX.driveable))
+g.add((EX.lane_left, EX.affordance, EX.driveable))
+g.add((EX.middle, EX.affordance, EX.driveable))
+g.add((EX.lane_right, EX.affordance, EX.waiting))
+
+
 #g.add((EX.side, EX.affordance, EX.perceivable))
 
 DeductiveClosure(Semantics).expand(g)

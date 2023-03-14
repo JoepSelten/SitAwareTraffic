@@ -189,6 +189,20 @@ def query_if_affordance(g, subject, affordance):
             answer = r
     return answer
 
+def query_affordances(g, subject):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?object
+        WHERE {
+            ?subject ex:affordance ?object .
+        }
+        """
+    answer = []
+    for r in g.query(query, initBindings={'subject': subject}):
+            answer.append(r[0])
+    return answer
+
 def uri_from_label(label):
     query = """
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
