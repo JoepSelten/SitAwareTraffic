@@ -1,7 +1,7 @@
 {
     "dt": 0.1,
-    "av_velocity": 10,
-    "av_omega": 2,
+    "av_velocity": 15,
+    "av_omega": 0.1,
     "av_length": 6,
     "av_width": 4,
     "prediction_horizon": 10,

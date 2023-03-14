@@ -28,6 +28,8 @@ simulator.set_map(map)
 simulator.add_robot('AV1', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='left')
 #simulator.add_robot('AV2', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='up', color='purple')
 
+simulator.add_obstacle(np.array([55, 20]))
+
 AV1_world = WorldModel(simulator.robots['AV1'], simulator.map)
 #AV2_world = WorldModel(simulator.robots['AV2'], simulator.map)
 

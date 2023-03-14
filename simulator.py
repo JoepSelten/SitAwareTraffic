@@ -17,6 +17,7 @@ class Simulator():
     def __init__(self):
         self.robots = {}
         self.num_robots = 0
+        self.obstacles = []
         #self.input_features = []
 
     def set_map(self, sit):
@@ -27,13 +28,22 @@ class Simulator():
         self.robots[name] = robot
         self.num_robots += 1
 
+    def add_obstacle(self, pos):
+        obstacle = Obstacle(pos)
+        self.obstacles.append(obstacle)
+    
     def simulate(self):
         self.map.plot_map()
         self.plot_robots()
+        self.plot_obstacles()
+
+    def plot_obstacles(self):
+        for obstacle in self.obstacles:
+            obstacle.plot()
 
     def plot_robots(self):
         for robot in self.robots.values():
-            robot.plot_robot()
+            robot.plot()
             if not robot.name == 'AV1':
                 break
             
@@ -146,7 +156,7 @@ class Map():
 
         if traffic_situation == "two-lane_intersection2" :
             self.map_dict =  {'0': {'type': 'middle_dr', 'poly': Polygon([(l+0.5*w, l), (l+w, l), (l+w, l+0.5*w), (l+0.5*w, l+0.5*w)]), 'color': 'darkgray', 'transparency': 1},
-                        '1': {'type': 'middle_ur', 'poly': Polygon([(l+0.5*w, l+0.5*w), (l+w, l+0.5*w), (l+w, l+w), (l+0.5*w, l+w)]), 'color': 'gray', 'transparency': 1},
+                        '1': {'type': 'middle_ur', 'poly': Polygon([(l+0.5*w, l+0.5*w), (l+w, l+0.5*w), (l+w, l+w), (l+0.5*w, l+w)]), 'color': 'darkgray', 'transparency': 1},
                         '2': {'type': 'middle_ul', 'poly': Polygon([(l, l+0.5*w), (l+0.5*w, l+0.5*w), (l+0.5*w, l+w), (l, l+w)]), 'color': 'darkgray', 'transparency': 1},
                         '3': {'type': 'middle_dl', 'poly': Polygon([(l, l), (l+0.5*w, l), (l+0.5*w, l+0.5*w), (l, l+0.5*w)]), 'color': 'darkgray', 'transparency': 1},
                         '4': {'type': 'lane', 'location': 'down', 'poly': Polygon([(l+0.5*w, 0), (l+w, 0), (l+w, l), (l+0.5*w, l)]), 'color': 'lightblue', 'transparency': 1},
@@ -239,7 +249,7 @@ class Robot():
         self.obstructed_area = None
         
 
-    def plot_robot(self):
+    def plot(self):
         self.poly = trans(self.pos, self.yaw, self.length, self.width)
         plt.fill(*self.poly.exterior.xy, color=self.color)
 
@@ -264,3 +274,15 @@ class Robot():
             self.pos = np.array([2*l+w-self.length/2,l+0.75*w])
             self.yaw = math.pi
         self.poly = trans(self.pos, self.yaw, self.length, self.width)
+
+class Obstacle():
+    def __init__(self, pos):
+        self.pos = pos
+        self.yaw = 0.3
+        self.length = 4
+        self.width = 4
+        self.poly = trans(self.pos, self.yaw, self.length, self.width)
+    
+    def plot(self):
+        #self.poly = trans(self.pos, self.yaw, self.length, self.width)
+        plt.fill(*self.poly.exterior.xy, edgecolor='black', hatch='//', fill=False)

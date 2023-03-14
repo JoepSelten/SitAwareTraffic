@@ -28,7 +28,7 @@ class Control():
         if abs(yaw_error) > math.pi:
             yaw_error -= np.sign(yaw_error)*2*math.pi
         world.velocity = vel_des
-        print(f'yaw_error: {yaw_error}')
+        #print(f'yaw_error: {yaw_error}')
         world.omega = -5*yaw_error
         world.skill_finished = True
 

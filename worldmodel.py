@@ -447,13 +447,12 @@ class WorldModel():
         #print(f'current pos: {self.current_pos}')
 
         while True:
-            #for i in range(len(self.plan)-self.plan_step):
             #print(f'n: {n}')
             #print(f'plan step: {self.plan_step}')
+            if str(n+self.plan_step) not in self.plan:
+                break    
             step = self.plan[str(n+self.plan_step)]
-            #type_step = query_type(g, step['area'])
-            #print(f"area: {step['area']}")
-            #print(f'area type: {type_step}')
+            robot_intersections = self.get_intersections(self.robot.poly)
             middle_step = False
             if step['area'] in [URIRef("http://example.com/intersection/middle_dr"), URIRef("http://example.com/intersection/middle_ur"), URIRef("http://example.com/intersection/middle_ul"), URIRef("http://example.com/intersection/middle_dl")]:
                 middle_step = True
@@ -464,12 +463,17 @@ class WorldModel():
                     (x+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
                     (x+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
                     (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(self.right_lane)
-
-                #print(phi)
-                #print(f'new horizon area: {new_horizon.area}')
                 
             elif n>0 and step['area'] and middle_step:
                 new_horizon = self.map_dict[step['area']]['poly']
+
+            elif n>0 and step['area'] and not middle_step and step['area'] in robot_intersections:
+                phi = step['parameters']['phi']
+                new_horizon = Polygon([(x+0.5*l*math.cos(phi)-lane_width*math.sin(phi), y+0.5*l*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
+                    (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(self.right_lane)
+
 
             elif n>0 and step['area'] and not middle_step:
                 if self.robot.task == 'left':
@@ -484,9 +488,15 @@ class WorldModel():
             else:
                 n+=1
                 continue
-                   
-            if new_horizon:
-                horizon_list.append(new_horizon)      
+
+            if new_horizon.geom_type=='Polygon':
+                horizon_list.append(new_horizon)
+
+            if new_horizon.geom_type=='GeometryCollection':
+                for polygon in new_horizon:
+                    if polygon.geom_type=='Polygon':
+                        #print(new_horizon.geom_type)
+                        horizon_list.append(polygon)      
 
  
             horizon_intersections = self.get_intersections(new_horizon)
@@ -498,7 +508,6 @@ class WorldModel():
             n+=1    
 
         self.robot.horizon = unary_union(horizon_list)
-
         
 
 
