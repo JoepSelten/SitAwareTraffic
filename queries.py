@@ -1,5 +1,5 @@
 from rdflib import Graph, URIRef, Literal, BNode, Namespace, RDF, RDFS
-from global_variables import g, EX, GEO
+from global_variables import EX, GEO
 from closure_graph import Semantics
 from owlrl import DeductiveClosure
 
@@ -200,6 +200,20 @@ def query_affordances(g, subject):
         """
     answer = []
     for r in g.query(query, initBindings={'subject': subject}):
+            answer.append(r[0])
+    return answer
+
+def query_approaches(g, robot):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?object
+        WHERE {
+            ?robot ex:approaches ?object .
+        }
+        """
+    answer = []
+    for r in g.query(query, initBindings={'robot': robot}):
             answer.append(r[0])
     return answer
 

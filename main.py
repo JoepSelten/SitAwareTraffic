@@ -17,21 +17,22 @@ from global_variables import g, dt, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, 
 from queries import *      
 import time
 from skills import *
+from sys import argv
 
 ## Situation to test
-map = 'two-lane_intersection2'
+map = 'two-lane_intersection'
 
 ## initialize objects
 simulator = Simulator()
 simulator.set_map(map)
 
 simulator.add_robot('AV1', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='left')
-#simulator.add_robot('AV2', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='up', color='purple')
+simulator.add_robot('AV2', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='up', color='purple')
 
-simulator.add_obstacle('obstacle1', np.array([55, 20]))
+#simulator.add_obstacle('obstacle1', np.array([55, 20]))
 
-AV1_world = WorldModel(simulator.robots['AV1'], simulator.map)
-#AV2_world = WorldModel(simulator.robots['AV2'], simulator.map)
+AV1_world = WorldModel(g, simulator.robots['AV1'], simulator.map)
+AV2_world = WorldModel(g, simulator.robots['AV2'], simulator.map)
 
 
 
@@ -49,6 +50,7 @@ move_figure(fig, 1100, 150)
 
 t = 0
 waiting = True
+
 while True:
     plt.figure(1)   
     plt.cla()
@@ -70,20 +72,20 @@ while True:
     #print(query_current_pos(world.kg, world.AV_uri))
     
     skill_model.monitor_skills(AV1_world, control)
-    #skill_model.monitor_skills(AV2_world, control) 
+    skill_model.monitor_skills(AV2_world, control) 
 
     #control.execute_skill(world)
     control.actuate(AV1_world, simulator)
-    #control.actuate(AV2_world, simulator)
+    control.actuate(AV2_world, simulator)
 
     AV1_world.update(simulator)
-    #AV2_world.update(simulator)
+    AV2_world.update(simulator)
 
     plt.pause(dt/10)
     #round(t/dt) % 10
     t += dt
 
-
     if waiting:
         plt.waitforbuttonpress()
-        waiting = False
+        if 'wait' not in argv:
+            waiting = False

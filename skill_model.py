@@ -23,15 +23,32 @@ class SkillModel():
     def check_conditions(self, world):
         ## het initializeren moet eigenlijk niet iedere keer opnieuw gebeuren. later beter mengen met configuration enzo
         skill = world.plan[str(world.plan_step)]['skill']
-        area = world.plan[str(world.plan_step)]['area']
-        affordances = query_affordances(g, area)
-        if EX.driveable in affordances:
-            print(affordances)
-        if world.horizon_dict:
-            print(world.horizon_dict[str(len(world.horizon_dict)-1)])
-        #print(world.horizon_dict[str(len(world.horizon_dict)+1)])
+        #area_uri = world.plan[str(world.plan_step)]['uri']
+        area_uri = query_is_on(world.g, world.robot.uri)
+        #print(area_uri)
+        affordances = query_affordances(world.g, area_uri)
+        #print(affordances)
+        approaches_list = query_approaches(world.g, world.robot.uri)
+        #print(approaches_list)
+
+        if approaches_list:
+            #print(approaches_area[-1])
+            #while True:
+            next_affordances = query_affordances(world.g, approaches_list[-1])
+            #print(next_affordances)
+            if not next_affordances:
+                print('NO SKILL POSSIBLE')
+                self.replan()
+                #print(next_affordances)
+            if not EX.waiting in next_affordances:   
+                world.horizon_length += 1
+                #world.horizon_uri.append(approaches_area[-1])
+
+             #   if EX.waiting in next_affordances:
+              #      break
         
-        
+        ## check approaching area
+       
         skill_obj = self.skill_dict.get(skill)
         if skill_obj:
             skill_obj.config_skill(world)
@@ -49,12 +66,15 @@ class SkillModel():
         world.condition_failed = False
         world.wait = False
 
+    def replan(self):
+        pass
+
     
     def check_condition(self, world, condition):
         if not condition.for_all:
-            check = query_check(g, condition.subject, condition.relation, condition.object)
+            check = query_check(world.g, condition.subject, condition.relation, condition.object)
         elif condition.for_all:
-            check = query_check_for_all(g, condition.subject, condition.relation, condition.object)
+            check = query_check_for_all(world.g, condition.subject, condition.relation, condition.object)
        
         if condition.effect is not condition.negation:
             return not check
@@ -113,8 +133,8 @@ class SkillModel():
 
     def select_default_skill2(self, world):
         ## ipv queryen kun je ook gwn de context meenemen, bijv als de move in lane succesvol is dan weet je waar het nu is
-        world.robot_pos = query_is_on(g, world.robot.uri)
-        type_pos = query_type(g, world.robot_pos)
+        world.robot_pos = query_is_on(world.g, world.robot.uri)
+        type_pos = query_type(world.g, world.robot_pos)
      
         if str(type_pos) == "http://example.com/lane":
             world.skill = 'move_in_lane'
