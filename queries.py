@@ -161,7 +161,24 @@ def query_vehicles(g, scope):
     
     return answer
 
-def query_road(g, robot, scope):
+
+def query_road(g, robot):
+    query = """
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX ex: <http://example.com/>
+    SELECT ?road
+    WHERE {
+        ?robot ex:is_on ?pos .
+        ?road ex:has_a ?pos .
+        ?road rdf:type ex:road
+    }
+    """
+    answer = []
+    for r in g.query(query, initBindings={'robot': robot}):
+        answer = r[0]
+    return answer
+
+def query_road2(g, robot, scope):
     query = """
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX ex: <http://example.com/>
@@ -210,6 +227,48 @@ def query_approaches(g, robot):
         SELECT ?object
         WHERE {
             ?robot ex:approaches ?object .
+        }
+        """
+    answer = []
+    for r in g.query(query, initBindings={'robot': robot}):
+            answer.append(r[0])
+    return answer
+
+def query_passes(g, robot):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?other_robot
+        WHERE {
+            ?other_robot ex:passes ?robot .
+        }
+        """
+    answer = []
+    for r in g.query(query, initBindings={'robot': robot}):
+            answer.append(r[0])
+    return answer
+
+def query_conflict(g, robot):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?other_robot
+        WHERE {
+            ?other_robot ex:conflict ?robot .
+        }
+        """
+    answer = []
+    for r in g.query(query, initBindings={'robot': robot}):
+            answer.append(r[0])
+    return answer
+
+def query_right_of(g, robot):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?other_robot
+        WHERE {
+            ?other_robot ex:right_of ?robot .
         }
         """
     answer = []

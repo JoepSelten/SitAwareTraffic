@@ -63,19 +63,13 @@ while True:
     plt.text(0.05, 22, "AV1: ", fontsize = 16)
     plt.text(0.05, 18, AV1_world.robot.task, fontsize = 16)
     plt.text(0.05, 12, "AV2: ", fontsize = 16)
-    #plt.text(0.05, 8, AV2_world.robot.task, fontsize = 16)
-
-    #plt.figure(2)
-    #plt.fill(*AV1_world.right_lane.exterior.xy, color='red')
-    
-    
-    #print(query_current_pos(world.kg, world.AV_uri))
+    plt.text(0.05, 8, AV2_world.robot.task, fontsize = 16)
     
     skill_model.monitor_skills(AV1_world, control)
     skill_model.monitor_skills(AV2_world, control) 
 
-    #control.execute_skill(world)
-    control.actuate(AV1_world, simulator)
+    if t > 0.3:
+        control.actuate(AV1_world, simulator)
     control.actuate(AV2_world, simulator)
 
     AV1_world.update(simulator)

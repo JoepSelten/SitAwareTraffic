@@ -5,7 +5,6 @@ import json
 ## set configs
 with open('conf.json') as f:
     config = json.load(f)
-    f.close
 
 AV_LENGTH = config['av_length']
 AV_WIDTH = config['av_width']

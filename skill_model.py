@@ -21,55 +21,52 @@ class SkillModel():
         self.traffic_rules = None
 
     def check_conditions(self, world):
-        ## het initializeren moet eigenlijk niet iedere keer opnieuw gebeuren. later beter mengen met configuration enzo
+        ## Get current skill (here I assume skill is known and position needs to be queried from KG)
         skill = world.plan[str(world.plan_step)]['skill']
-        #area_uri = world.plan[str(world.plan_step)]['uri']
-        area_uri = query_is_on(world.g, world.robot.uri)
-        #print(area_uri)
-        affordances = query_affordances(world.g, area_uri)
-        #print(affordances)
-        approaches_list = query_approaches(world.g, world.robot.uri)
-        #print(approaches_list)
 
-        if approaches_list:
-            #print(approaches_area[-1])
-            #while True:
-            next_affordances = query_affordances(world.g, approaches_list[-1])
-            #print(next_affordances)
-            if not next_affordances:
-                print('NO SKILL POSSIBLE')
-                self.replan()
-                #print(next_affordances)
-            if not EX.waiting in next_affordances:   
-                world.horizon_length += 1
-                #world.horizon_uri.append(approaches_area[-1])
-
-             #   if EX.waiting in next_affordances:
-              #      break
+        ## Check conditions:
+        # todo: check the conditions of the skill, for I know I just preprogram it 
         
-        ## check approaching area
-       
-        skill_obj = self.skill_dict.get(skill)
-        if skill_obj:
-            skill_obj.config_skill(world)
-
-            # nu check ik alle conditions altijd, kan dit slimmer? Miss pas de external dingen checken als er een detectie is
-            for condition in skill_obj.condition_list:
-                #print(condition)
-                check = self.check_condition(world, condition)
-                #print(f'{condition.subject}, {condition.object}: {check}')
-                if check == False:
-                    world.condition_failed = True
-                    world.failed_condition = condition
-                    #print(condition.relation)
-                    return
-        world.condition_failed = False
-        world.wait = False
-
-    def replan(self):
-        pass
-
+ 
+        ## First condition is being on an area that is driveable
+        area_uri = query_is_on(world.g, world.robot.uri)
+        affordances_current = query_affordances(world.g, area_uri)
+        
+        ## Second condition is that also the next/approaching area is driveable
+        approaches_list = query_approaches(world.g, world.robot.uri)
+        
+        if approaches_list:
+            next_affordances = query_affordances(world.g, approaches_list[-1])
+           
+            if not next_affordances:
+                self.condition_failed = True
+                print('NO SKILL POSSIBLE')
     
+            ## Due to the rule that there always should be a skill available, when you cannot wait on the next position,
+            ## requires also the next position to be driveable, which in turn requires looking further by increasing the horizon
+            elif not EX.waiting in next_affordances:   
+                world.horizon_length += 1
+
+        ## later integrate the above with vehicles and obstacles that inhibit driveability.
+        ## however for convenience first do this separetely to get things working
+
+        passing_robot = query_passes(world.g, world.robot.uri)
+        conflict_robot = query_conflict(world.g, world.robot.uri)
+
+        if passing_robot:
+            ## stop in first area of horizon list.
+            #if world.robot.name == 'AV1':
+            #print(f'{world.robot.name}: passing')
+            world.skill = 'wait'
+
+        elif conflict_robot:
+            #print(f'{world.robot.name}: conflict')
+            world.skill = 'check_priority'
+
+        else:
+            world.skill = 'drive'
+            world.wait_pos = None
+
     def check_condition(self, world, condition):
         if not condition.for_all:
             check = query_check(world.g, condition.subject, condition.relation, condition.object)
@@ -81,24 +78,15 @@ class SkillModel():
         return check
 
     def monitor_skills(self, world, control):
-        # self.check_conditions(world)
-        # #self.select_skill(world) 
-        # while world.condition_failed:
-        #     self.select_skill(world)
-        #     self.check_conditions(world)        
-        
-        # #self.select_default_skill(world)
-        #     self.config_skill(world)
         self.check_conditions(world)
-        #if not world.same_situation and not world.condition_failed:
-         #   self.select_default_skill(world)
-
-        if world.condition_failed:
-            self.select_skill(world)
-        #print(f'{world.robot.name}: {world.skill}')
+        self.config_skill(world)
         self.execute_skill(world, control)
+
+
+    def select_skill2(self, world):
+        world.skill = 'drive'
         
-    def select_skill(self, world):
+    def select_skill3(self, world):
         ## miss moet dit gwn n reasoning functie worden. Dan ga je echt adh van failed conditions iets queryen. 
         #print(world.failed_condition.type)
         if world.failed_condition.effect:
@@ -168,6 +156,22 @@ class SkillModel():
         
 
     def config_skill(self, world):
+        if world.skill == 'drive':
+            pass
+        elif world.skill == 'wait':
+            if not world.wait_pos:
+                world.wait_pos = world.horizon_list[0]
+        elif world.skill == 'check_priority':
+            priority_vehicles = query_right_of(world.g, world.robot.uri)
+            if priority_vehicles:
+                world.skill = 'wait'
+                if not world.wait_pos:
+                    world.wait_pos = world.horizon_list[0]
+            else:
+                world.skill = 'drive'
+
+
+    def config_skill2(self, world):
         world.skill_params = []
         if world.skill == 'move_in_lane':
             phi = world.map_dict[world.current_pos].get('orientation')
@@ -205,6 +209,18 @@ class SkillModel():
             pass
 
     def execute_skill(self, world, control):
+        #print(f'{world.robot.name}: {world.skill}: {world.plan_step}')
+        if world.skill == 'drive':
+            control.drive(world)
+        elif world.skill == 'wait':
+            if world.robot.poly.intersects(world.wait_pos) and world.robot.poly.intersection(world.wait_pos).area > 0.95 * world.robot.poly.area:
+                control.stop(world)
+            else:
+                control.drive(world)
+
+
+
+    def execute_skill2(self, world, control):
         #print(f'omega {world.robot.name}: {world.omega}')
         skill = world.plan[str(world.plan_step)]['skill']
 
@@ -226,3 +242,5 @@ class SkillModel():
         if skill == 'stop':
             control.stop(world)
         #print(world.omega)
+
+    

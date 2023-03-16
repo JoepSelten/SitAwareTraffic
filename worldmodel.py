@@ -34,7 +34,8 @@ class WorldModel():
         self.horizon = None
         self.omega = 0
         self.velocity = 0
-        self.skill = 'move_in_lane'
+        self.skill = 'drive'
+        self.wait_pos = None
         if self.robot.start == 'down':
             self.start = URIRef("http://example.com/intersection/road_down/lane_right")
         elif self.robot.start == 'right':
@@ -214,18 +215,12 @@ class WorldModel():
         
     def update(self, sim):
         self.update_current_pos(sim)
-        #print(f'{self.robot.name}: {self.current_pos}')
-        self.prediction_horizon(sim)
 
-        #self.robot.horizon = None
-        self.robot.approaching_horizon = None
-        self.robot.obstructed_area = None
-        self.update_is_on(sim)
+        self.update_horizon(sim)
+
+        #Associate the things that are in the robots horizon
+        self.associate(sim)
         
-        #if not self.robot_is_on:
-        self.update_approaching()
-        self.update_vehicles()
-        self.update_obstacles(sim)
 
     def update_current_pos(self, sim):
         prev_pos = self.current_pos
@@ -233,11 +228,13 @@ class WorldModel():
         self.pos_list = self.get_intersections(self.robot.poly)
 
         if self.current_pos == None:
-            DeductiveClosure(Semantics).expand(self.g)
-            self.g.serialize(format="json-ld", destination=self.robot.name + ".json")
-            exit(0)
-            self.robot.random_reset()
-            self.reset(self.robot)
+            if self.robot.name == 'AV1':
+                DeductiveClosure(Semantics).expand(self.g)
+                self.g.serialize(format="json-ld", destination=self.robot.name + ".json")
+                exit(0)
+            else:
+                self.robot.random_reset()
+                self.reset(self.g, self.robot)
             return
 
         if self.current_pos == prev_pos:
@@ -247,6 +244,124 @@ class WorldModel():
             self.plan_step += 1
             self.update_av_is_on()
             self.horizon_length -= 1
+
+    def update_horizon(self, sim):
+        ## de eerste grid waar je kunt wachten
+        x = self.robot.pos[0]
+        y = self.robot.pos[1]
+        lane_width = 10
+        l = self.robot.length
+        H = 10
+        self.horizon_list = []        
+
+        for i in range(self.horizon_length):
+            type_area = query_type(self.g, self.plan[str(i+self.plan_step)]['uri'])
+            if i == 0 and type_area == EX.lane:
+                phi = self.plan[str(i+self.plan_step)]['parameters']['phi']
+                cn_pos = unary_union(self.right_lane_list[i+self.plan_step:i+self.plan_step+2])
+
+                new_horizon = Polygon([(x+0.5*l*math.cos(phi)-lane_width*math.sin(phi), y+0.5*l*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
+                    (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
+
+            elif i == 0 and type_area == EX.middle:
+                continue
+
+            elif type_area == EX.middle:
+                new_horizon = self.map_dict[self.plan[str(i+self.plan_step)]['uri']]['poly']
+
+            elif type_area == EX.lane:
+                if self.robot.task == 'left':
+                    new_horizon = Polygon([(40-H,50),(40,50),(40,60),(40-H,60)])
+                elif self.robot.task == 'up':
+                    new_horizon = Polygon([(50,60),(60,60),(60,60+H),(50,60+H)])
+                elif self.robot.task == 'right':
+                    new_horizon = Polygon([(60,40),(60+H,40),(60+H,50),(60,50)])
+                elif self.robot.task == 'down':
+                    new_horizon = Polygon([(40,40-H),(50,40-H),(50,40),(40,40)])
+
+            
+            if new_horizon.geom_type=='Polygon':
+                self.horizon_list.append(new_horizon)
+            
+            if new_horizon.geom_type=='GeometryCollection':
+                for polygon in new_horizon:
+                    if polygon.geom_type=='Polygon':
+                        self.horizon_list.append(new_horizon)     
+     
+        self.robot.horizon = unary_union(self.horizon_list)
+
+
+    def associate(self, sim):
+        self.associate_obstacles(sim)
+        self.associate_vehicles(sim)
+        self.associate_approaching_vehicles(sim)
+        self.associate_approaching()
+
+    def associate_obstacles(self, sim):
+        self.g.remove((None, EX.obstructs, self.robot.uri))
+        self.robot.obstructed_area = None
+        for obstacle in sim.obstacles.values():
+            if self.robot.horizon.intersects(obstacle.poly):
+                intersection = self.robot.horizon.intersection(obstacle.poly)
+                self.robot.obstructed_area = intersection
+                self.g.add((obstacle.uri, EX.obstructs, self.robot.uri))
+                #self.g.add((self.robot.uri, EX.approaches, obstacle.uri))
+
+    
+    def associate_vehicles(self, sim):
+        self.g.remove((None, EX.passes, self.robot.uri))
+        self.robot.vehicle_area = None
+        for robot in sim.robots.values():
+            if self.robot.horizon.intersects(robot.poly) and self.robot.uri != robot.uri:
+                intersection = self.robot.horizon.intersection(robot.poly)
+                self.robot.vehicle_area = intersection
+                self.g.add((robot.uri, EX.passes, self.robot.uri))
+                #self.g.add((self.robot.uri, EX.approaches, robot.uri))
+
+
+    def associate_approaching_vehicles(self, sim):
+        self.g.remove((None, EX.conflict, self.robot.uri))
+        self.robot.approaching_vehicle_area = None
+        for robot in sim.robots.values():
+            if self.robot.uri != robot.uri and self.robot.horizon and robot.horizon:
+                #print(self.robot.horizon.intersection(robot.horizon).area)
+                if  self.robot.horizon.intersects(robot.horizon) and self.robot.horizon.intersection(robot.horizon).area>20:
+                    intersection = self.robot.horizon.intersection(robot.horizon)
+                    self.robot.approaching_vehicle_area = intersection
+                    self.g.add((robot.uri, EX.conflict, self.robot.uri))
+                    self.associate_direction(robot)
+                    #self.g.add((self.robot.uri, EX.approaches, robot.uri))
+
+    def associate_approaching(self):
+        self.robot.approaching_horizon = None
+        approaching_areas = self.get_intersections(self.robot.horizon)
+        for uri, area in approaching_areas.items():
+            if area>5:
+                self.g.add((self.robot.uri, EX.approaches, uri))
+
+    def associate_direction(self, vehicle):
+        ## later generieker doen met regels die je declaratief aan een road of intersection kunt plaatsen
+
+        road_vehicle = query_road(self.g, vehicle.uri)
+        road_current = query_road(self.g, self.robot.uri)
+        #print(f'road_current: {road_current}')
+        #print(f'road_vehicle: {road_vehicle}')
+        if road_current == URIRef("http://example.com/intersection/road_down"):
+            if road_vehicle == URIRef("http://example.com/intersection/road_right"):
+                self.g.add((vehicle.uri, EX.right_of, self.robot.uri))
+        if road_current == URIRef("http://example.com/intersection/road_right"):
+            if road_vehicle == URIRef("http://example.com/intersection/road_up"):
+                self.g.add((vehicle.uri, EX.right_of, self.robot.uri))
+
+        if road_current == URIRef("http://example.com/intersection/road_up"):
+            if road_vehicle == URIRef("http://example.com/intersection/road_left"):
+                self.g.add((vehicle.uri, EX.right_of, self.robot.uri))
+
+        if road_current == URIRef("http://example.com/intersection/road_left"):
+            if road_vehicle == URIRef("http://example.com/intersection/road_down"):
+                self.g.add((vehicle.uri, EX.right_of, self.robot.uri))
 
 
     def update_av_is_on(self):
@@ -284,26 +399,6 @@ class WorldModel():
                     new_key = key
         return new_key
 
-    def update_approaching(self):
-        approaching_areas = self.get_intersections(self.robot.horizon)
-        for uri, area in approaching_areas.items():
-            if area>5:
-                self.g.add((self.robot.uri, EX.approaches, uri))       
-
-    def update_vehicles(self):
-        #print(f'{self.robot.name}: {self.approaching}')
-        if self.approaching:
-            for robot in self.robots_approaching:
-                self.associate_vehicle(robot)
-
-
-    def update_obstacles(self, sim):
-        for obstacle in sim.obstacles.values():
-            if obstacle.poly.intersects(self.robot.horizon):
-                #self.g.add((obstacle.uri, EX.obstructs, self.robot.uri))
-                self.g.add((self.robot.uri, EX.approaches, obstacle.uri))
-
-
     def current_area(self):
         self.current_areas = {}
         total = 0
@@ -331,51 +426,6 @@ class WorldModel():
         intersections = self.get_intersections(area) 
         return max(intersections, key=intersections.get)
 
-    def prediction_horizon(self, sim):
-        ## de eerste grid waar je kunt wachten
-        x = self.robot.pos[0]
-        y = self.robot.pos[1]
-        lane_width = 10
-        l = self.robot.length
-        H = 10
-        horizon_list = []        
 
-        for i in range(self.horizon_length):
-            type_area = query_type(self.g, self.plan[str(i+self.plan_step)]['uri'])
-            if i == 0 and type_area == EX.lane:
-                phi = self.plan[str(i+self.plan_step)]['parameters']['phi']
-                cn_pos = unary_union(self.right_lane_list[i+self.plan_step:i+self.plan_step+2])
-
-                new_horizon = Polygon([(x+0.5*l*math.cos(phi)-lane_width*math.sin(phi), y+0.5*l*math.sin(phi)-lane_width*math.cos(phi)),
-                    (x+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
-                    (x+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
-                    (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
-
-            elif i == 0 and type_area == EX.middle:
-                continue
-
-            elif type_area == EX.middle:
-                new_horizon = self.map_dict[self.plan[str(i+self.plan_step)]['uri']]['poly']
-
-            elif type_area == EX.lane:
-                if self.robot.task == 'left':
-                    new_horizon = Polygon([(40-H,50),(40,50),(40,60),(40-H,60)])
-                elif self.robot.task == 'up':
-                    new_horizon = Polygon([(50,60),(60,60),(60,60+H),(50,60+H)])
-                elif self.robot.task == 'right':
-                    new_horizon = Polygon([(60,40),(60+H,40),(60+H,50),(60,50)])
-                elif self.robot.task == 'down':
-                    new_horizon = Polygon([(40,40-H),(50,40-H),(50,40),(40,40)])
-
-            
-            if new_horizon.geom_type=='Polygon':
-                horizon_list.append(new_horizon)
-            
-            if new_horizon.geom_type=='GeometryCollection':
-                for polygon in new_horizon:
-                    if polygon.geom_type=='Polygon':
-                        horizon_list.append(new_horizon)     
-     
-        self.robot.horizon = unary_union(horizon_list)
 
  

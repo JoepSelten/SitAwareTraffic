@@ -46,34 +46,15 @@ class Simulator():
             robot.plot()
             #if not robot.name == 'AV1':
              #   break
-            
-            #free_horizon = robot.horizon
-            #if robot.approaching_horizon:
-            #   free_horizon.symmetric_difference(robot.horizon)
                 
             if robot.horizon and robot.horizon.geom_type=='Polygon':
                 plt.fill(*robot.horizon.exterior.xy, color='green', alpha=0.3)
-            if robot.approaching_horizon and robot.approaching_horizon.geom_type=='Polygon':
-                plt.fill(*robot.approaching_horizon.exterior.xy, color='yellow', alpha=0.7)
+            if robot.vehicle_area and robot.vehicle_area.geom_type=='Polygon':
+                plt.fill(*robot.vehicle_area.exterior.xy, color='red', alpha=0.7)
             if robot.obstructed_area and robot.obstructed_area.geom_type=='Polygon':
                 plt.fill(*robot.obstructed_area.exterior.xy, color='red', alpha=0.7)
-
-
-    def perceived_features(self):   # gives all features inside a certain radius, maybe later use a part of the circle
-        robot = self.robots[0]
-        perception_radius = PERCEPTION_RADIUS
-        p = Point(robot.pos)
-        perception_area = p.buffer(perception_radius)
-        self.input_features = []
-        
-        #map_features = MultiPolygon(self.map.polygon_list)
-        for polygon in self.map.polygon_list:
-            #if polygon.geom_type=='LineString':
-            overlap = polygon.intersection(perception_area)
-            if overlap:
-                overlap_rel = coordinate_transform_abs_to_rel(robot, overlap)
-                self.input_features.append(overlap_rel)            
-        return self.input_features
+            if robot.approaching_vehicle_area and robot.approaching_vehicle_area.geom_type=='Polygon':
+                plt.fill(*robot.approaching_vehicle_area.exterior.xy, color='yellow', alpha=0.7)
 
     def plot_input_features(self):
         for feature in self.input_features:
@@ -245,8 +226,11 @@ class Robot():
         self.point = Point(self.pos[0], self.pos[1])
         self.uri = URIRef("http://example.com/" + self.name)
         self.horizon = None
-        self.approaching_horizon = None
+        #self.approaching_horizon = None
         self.obstructed_area = None
+        self.vehicle_area = None
+        self.approaching_vehicle_area = None
+        
         
 
     def plot(self):
