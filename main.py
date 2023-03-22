@@ -26,15 +26,18 @@ map = 'two-lane_intersection'
 simulator = Simulator()
 simulator.set_map(map)
 
-simulator.add_robot('AV1', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='left')
-simulator.add_robot('AV2', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='up', color='purple')
-
-#simulator.add_obstacle('obstacle1', np.array([55, 20]))
-
-AV1_world = WorldModel(g, simulator.robots['AV1'], simulator.map)
-AV2_world = WorldModel(g, simulator.robots['AV2'], simulator.map)
 
 
+simulator.add_robot(EX.AV1, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='left', delay=0)
+#simulator.add_robot('AV2', AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='up', color='purple')
+
+#simulator.add_obstacle(EX.obstacle1, np.array([55, 20]))
+#simulator.add_obstacle(EX.obstacle2, np.array([55, 26]))
+#simulator.add_obstacle(EX.obstacle3, np.array([55, 35]))
+#simulator.add_obstacle(EX.obstacle4, np.array([35, 55]))
+
+AV1_world = WorldModel(g, simulator.robots[EX.AV1], simulator.map)
+#AV2_world = WorldModel(g, simulator.robots['AV2'], simulator.map)
 
 skill_model = SkillModel()
 control = Control()
@@ -63,17 +66,19 @@ while True:
     plt.text(0.05, 22, "AV1: ", fontsize = 16)
     plt.text(0.05, 18, AV1_world.robot.task, fontsize = 16)
     plt.text(0.05, 12, "AV2: ", fontsize = 16)
-    plt.text(0.05, 8, AV2_world.robot.task, fontsize = 16)
+    #plt.text(0.05, 8, AV2_world.robot.task, fontsize = 16)
     
     skill_model.monitor_skills(AV1_world, control)
-    skill_model.monitor_skills(AV2_world, control) 
+    #skill_model.monitor_skills(AV2_world, control) 
 
-    if t > 0.3:
-        control.actuate(AV1_world, simulator)
-    control.actuate(AV2_world, simulator)
+    #if t > 0.3:
+    control.actuate(AV1_world, simulator, t)
+    #control.actuate(AV2_world, simulator, t)
 
     AV1_world.update(simulator)
-    AV2_world.update(simulator)
+    #AV2_world.update(simulator)
+    #print(AV1_world.plan_step)
+    #print(AV1_world.plan[str(AV1_world.plan_step)])
 
     plt.pause(dt/10)
     #round(t/dt) % 10

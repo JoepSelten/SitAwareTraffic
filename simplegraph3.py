@@ -61,6 +61,7 @@ g.add((intersection_middle, EX.connects, intersection_road_left))
 ## lower level
 g.add((EX.lane, RDF.type, EX.polygon))
 g.add((EX.middle, RDF.type, EX.polygon))
+g.add((EX.obstacle, RDF.type, EX.polygon))
 g.add((EX.side, RDF.type, EX.line))
 g.add((EX.centerline, RDF.type, EX.line))
 

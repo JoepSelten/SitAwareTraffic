@@ -23,14 +23,14 @@ class Simulator():
     def set_map(self, sit):
         self.map = Map(sit)
         
-    def add_robot(self, name, l, w, vel, omega_max, start='down', task='left', color='blue'):
-        robot = Robot(name, l, w, vel, omega_max, start, task, color)
-        self.robots[name] = robot
+    def add_robot(self, uri, l, w, vel, omega_max, start='down', task='left', color='blue', delay=0):
+        robot = Robot(uri, l, w, vel, omega_max, start, task, color, delay)
+        self.robots[uri] = robot
         self.num_robots += 1
 
-    def add_obstacle(self, name, pos):
-        obstacle = Obstacle(name, pos)
-        self.obstacles[name] = obstacle
+    def add_obstacle(self, uri, pos):
+        obstacle = Obstacle(uri, pos)
+        self.obstacles[uri] = obstacle
     
     def simulate(self):
         self.map.plot_map()
@@ -56,6 +56,11 @@ class Simulator():
             if robot.approaching_vehicle_area and robot.approaching_vehicle_area.geom_type=='Polygon':
                 plt.fill(*robot.approaching_vehicle_area.exterior.xy, color='yellow', alpha=0.7)
 
+            for horizon in robot.horizon_dict.values():
+                if horizon['poly'].geom_type=='Polygon':
+                    plt.fill(*horizon['poly'].exterior.xy, color=horizon['color'], alpha=0.3)
+            
+
     def plot_input_features(self):
         for feature in self.input_features:
             if feature.geom_type=='Polygon':
@@ -70,7 +75,7 @@ class Simulator():
         robot.point = Point(robot.pos[0], robot.pos[1])
         
 class Map():
-    def __init__(self, traffic_situation = "two_lane-intersection2"):
+    def __init__(self, traffic_situation = "two_lane-intersection"):
         self.traffic_situation = traffic_situation
         if traffic_situation == "one-lane_intersection" :
             self.map_dict =  {'0': {'type': 'on intersection',
@@ -215,21 +220,25 @@ class Map():
     
 
 class Robot():
-    def __init__(self, name, length, width, velocity_max, omega_max, start, task, color):
-        self.name = name
+    def __init__(self, uri, length, width, velocity_max, omega_max, start, task, color, delay):
+        #self.name = name
         self.length = length
         self.width = width
         self.velocity_max = velocity_max
         self.color = color
         self.omega_max = omega_max
+        self.delay = delay
         self.reset(start, task)
         self.point = Point(self.pos[0], self.pos[1])
-        self.uri = URIRef("http://example.com/" + self.name)
+        #self.uri = URIRef("http://example.com/" + self.name)
+        self.uri = uri
         self.horizon = None
         #self.approaching_horizon = None
         self.obstructed_area = None
         self.vehicle_area = None
         self.approaching_vehicle_area = None
+        self.horizon_dict = {}
+    
         
         
 
@@ -342,11 +351,12 @@ class Robot():
         return self.plan
 
 class Obstacle():
-    def __init__(self, name, pos):
-        self.name = name
-        self.uri = URIRef("http://example.com/" + self.name)
+    def __init__(self, uri, pos):
+        #self.name = name
+        #self.uri = URIRef("http://example.com/" + self.name)
+        self.uri = uri
         self.pos = pos
-        self.yaw = 0.3
+        self.yaw = 0
         self.length = 4
         self.width = 4
         self.poly = trans(self.pos, self.yaw, self.length, self.width)

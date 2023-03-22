@@ -19,12 +19,15 @@ class Control():
             self.stop()
 
     def drive(self, world):
-        phi_des = world.plan[str(world.plan_step)]['parameters']['phi']
-        vel_des = world.plan[str(world.plan_step)]['parameters']['velocity']
+        #print(world.current_pos)
+        phi_des = world.plan[world.current_pos]['phi']
+        vel_des = world.plan[world.current_pos]['velocity']
+        #print(phi_des)
         # this skill requires the orientation of the lane      
         world.robot.yaw = world.robot.yaw%(2*math.pi)
         phi_des = phi_des%(2*math.pi)
         yaw_error = world.robot.yaw - phi_des
+        #print(yaw_error)
         if abs(yaw_error) > math.pi:
             yaw_error -= np.sign(yaw_error)*2*math.pi
         world.velocity = vel_des
@@ -86,9 +89,10 @@ class Control():
         world.skill_finished = True
 
 
-    def actuate(self, world, simulator):
-        AV = simulator.robots[world.robot.name]
-        simulator.move_robot(AV, world.velocity, world.omega)
+    def actuate(self, world, simulator, t):
+        if t > world.robot.delay:
+            AV = simulator.robots[world.robot.uri]
+            simulator.move_robot(AV, world.velocity, world.omega)
  
 
 

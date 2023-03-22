@@ -597,6 +597,96 @@ class WorldModel():
 
         self.robot.horizon = unary_union(horizon_list)
          
-        
+    def update_horizon2(self, sim):
+        ## de eerste grid waar je kunt wachten
+        x = self.robot.pos[0]
+        y = self.robot.pos[1]
+        lane_width = 20
+        l = self.robot.length
+        H = 10
+        self.horizon_list = []        
+        next_pos = self.current_pos
+        #print(f'robot pos: {self.robot.pos}')
+        #print(f'prev pos: {self.prev_pos}')
+        print(self.horizon_length)
+        for i in range(self.horizon_length):
+            #print(next_pos)
+            type_area = query_type(self.g, next_pos)
+            #print(type_area)
+            if i==0 and self.skill=='switch_lane':
+                new_pos = self.plan[next_pos]['next_pos']
+                next_pos = new_pos
+                continue
+            #     new_horizon = self.turn_area
+            
+            if self.skill=='switch_lane':
+                phi = self.plan[next_pos]['phi']
+                cn_pos = self.map_dict[next_pos]['poly']
+                #x_turn = self.prev_pos[0]
+                #y_turn = self.prev_pos[1]
+                x_turn = self.turn_pos[0]
+                y_turn = self.turn_pos[1]
+                new_horizon = Polygon([(x_turn+0.5*l*math.cos(phi)-lane_width*math.sin(phi), y_turn+0.5*l*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x_turn+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y_turn+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x_turn+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y_turn+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
+                    (x_turn+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y_turn+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
+
+            #type_area = query_type(self.g, self.plan[str(i+self.plan_step)]['uri'])
+            elif type_area == EX.lane:
+                #phi = self.plan[str(i+self.plan_step)]['parameters']['phi']
+                phi = self.plan[next_pos]['phi']
+                #cn_pos = unary_union(self.right_lane_list[i+self.plan_step:i+self.plan_step+2])
+                if self.plan[next_pos]['next_pos']:
+                    cn_pos = unary_union([self.map_dict[next_pos]['poly'], self.map_dict[self.plan[next_pos]['next_pos']]['poly']])
+                else:
+                    cn_pos = self.map_dict[next_pos]['poly']
+
+                new_horizon = Polygon([(x+0.5*l*math.cos(phi)-lane_width*math.sin(phi), y+0.5*l*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(0.5*l+H)*math.cos(phi)-lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(0.5*l+H)*math.cos(phi)+lane_width*math.sin(phi), y+(0.5*l+H)*math.sin(phi)+lane_width*math.cos(phi)),
+                    (x+0.5*l*math.cos(phi)+lane_width*math.sin(phi), y+0.5*l*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
+
+            elif i == 0 and type_area == EX.middle:
+                new_pos = self.plan[next_pos]['next_pos']
+                next_pos = new_pos
+                continue
+
+            elif type_area == EX.middle:
+                #new_horizon = self.map_dict[self.plan[str(i+self.plan_step)]['uri']]['poly']
+                new_horizon = self.map_dict[next_pos]['poly']
+
+            elif type_area == EX.lane and self.turn_area:
+                pass
+
+            # elif type_area == EX.lane:
+            #     if self.robot.task == 'left':
+            #         new_horizon = Polygon([(40-H,50),(40,50),(40,60),(40-H,60)])
+            #     elif self.robot.task == 'up':
+            #         new_horizon = Polygon([(50,60),(60,60),(60,60+H),(50,60+H)])
+            #     elif self.robot.task == 'right':
+            #         new_horizon = Polygon([(60,40),(60+H,40),(60+H,50),(60,50)])
+            #     elif self.robot.task == 'down':
+            #         new_horizon = Polygon([(40,40-H),(50,40-H),(50,40),(40,40)])
+
+            
+            if new_horizon.geom_type=='Polygon':
+                self.horizon_list.append(new_horizon)
+            
+            if new_horizon.geom_type=='GeometryCollection':
+                for polygon in new_horizon:
+                    if polygon.geom_type=='Polygon':
+                        self.horizon_list.append(new_horizon)
+
+            new_pos = self.plan[next_pos]['next_pos']
+
+            if new_pos and new_horizon.intersects(self.map_dict[new_pos]['poly']):
+                next_pos = new_pos
+            else:
+                extended_H = H
+                H += extended_H
+                print(H)
+
+        self.robot.horizon = unary_union(self.horizon_list)
+        self.prev_pos = copy.copy(self.robot.pos)
 
             

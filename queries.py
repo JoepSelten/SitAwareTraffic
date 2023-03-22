@@ -262,6 +262,20 @@ def query_conflict(g, robot):
             answer.append(r[0])
     return answer
 
+def query_obstructs(g, robot):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        SELECT ?obstacle
+        WHERE {
+            ?obstacle ex:obstructs ?robot .
+        }
+        """
+    answer = []
+    for r in g.query(query, initBindings={'robot': robot}):
+            answer.append(r[0])
+    return answer
+
 def query_right_of(g, robot):
     query = """
         PREFIX ex: <http://example.com/>

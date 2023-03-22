@@ -17,6 +17,10 @@ ex:lane_right a rdfs:Resource ;
     ex:affordance ex:driveable,
         ex:waiting .
 
+ex:obstacle a ex:geometry,
+        ex:polygon,
+        rdfs:Resource .
+
 ex:affordance a rdf:Property,
         rdfs:Resource ;
     rdfs:subPropertyOf ex:affordance .
