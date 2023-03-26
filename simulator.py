@@ -62,11 +62,11 @@ class Simulator():
 
             for horizon in robot.horizon_dict.values():
                 if horizon['polygon'].geom_type=='Polygon':
-                    if horizon['type']=='wait_pos':
-                        plt.fill(*horizon['polygon'].exterior.xy, color=horizon['color'], alpha=1)
-                    else:
-                        plt.fill(*horizon['polygon'].exterior.xy, color=horizon['color'], alpha=0.3)
-            
+                    plt.fill(*horizon['polygon'].exterior.xy, color=horizon['color'], alpha=0.3)
+
+            # for position in robot.position_dict.values():
+            #     if position['polygon'].geom_type=='Polygon':
+            #         plt.fill(*position['polygon'].exterior.xy, color=position['color'], alpha=1)
 
     def plot_input_features(self):
         for feature in self.input_features:
@@ -248,6 +248,7 @@ class Robot():
         self.vehicle_area = None
         self.approaching_vehicle_area = None
         self.horizon_dict = {}
+        self.position_dict = {}
     
         
         

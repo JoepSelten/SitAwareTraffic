@@ -36,13 +36,6 @@ class SkillModel():
         ## Second condition is that also the next/approaching area is driveable
         approaches_list = query_approaches(world.g, world.robot.uri)
 
-        # if world.horizon_dict:
-        #     #print(world.horizon_dict)
-        #     for value in world.horizon_dict.values():
-        #         print(value)
-        #         print(query_affordances(world.g, value['uri']))
-        #     return
-        #print(f'approaches_list: {approaches_list}')
         if approaches_list:
         #if world.horizon_dict:
             #last_area = world.horizon_dict[str(len(world.horizon_dict)-1)]['uri']
@@ -52,23 +45,8 @@ class SkillModel():
             #print(approaches_list)
             for area in approaches_list:
                 next_affordances = query_affordances(world.g, area)
-            #last_area = approaches_list[-1]
-            #print(last_area)
-                #print(area)
-                #print(next_affordances)
-            
-            #if not next_affordances:
-                #self.condition_failed = True
-                #print('NO SKILL POSSIBLE')
-                #world.skill = 'switch'
 
-            ## Due to the rule that there always should be a skill available, when you cannot wait on the next position,
-            ## requires also the next position to be driveable, which in turn requires looking further by increasing the horizon
-            #print(f'approaches: {approaches_list}')
-            #print(f'affordances: {next_affordances}')
-        
-                #if not EX.drivable in next_affordances:
-                #    world.set_current_turn_pos = True
+                #print(f'area: {area}, next_affordances: {next_affordances}')
 
                 if EX.waiting in next_affordances:
                     waiting_number+=1             
@@ -93,40 +71,27 @@ class SkillModel():
                 if not EX.waiting in next_affordances or not EX.driveable in next_affordances:
                     world.extend_horizon.append(area)
 
-                
-
-                #     if not world.extend_horizon or world.extend_horizon[-1] != last_area:
-                #         #world.horizon_uris.append(approaches_list[-1])
-                #         world.extend_horizon.append(last_area)
-                        
-                #         #print(world.extend_horizon)
-                #     #world.horizon_length += 1
-                #     #print(f'uris: {world.horizon_uris}')
-                #     return
-                # else:
-                #     world.found_waiting_area = True
-                
-
         ## later integrate the above with vehicles and obstacles that inhibit driveability.
         ## however for convenience first do this separetely to get things working
-        return
-        passing_robot = query_passes(world.g, world.robot.uri)
-        conflict_robot = query_conflict(world.g, world.robot.uri)
-        obstruct_robot = query_obstructs(world.g, world.robot.uri)
-        #print(obstruct_robot)
+        
+        # passing_robot = query_passes(world.g, world.robot.uri)
+        # conflict_robot = query_conflict(world.g, world.robot.uri)
+        # obstruct_robot = query_obstructs(world.g, world.robot.uri)
 
-        if passing_robot:
-            ## stop in first area of horizon list.
-            #if world.robot.name == 'AV1':
-            #print(f'{world.robot.name}: passing')
+        if world.set_current_wait_pos and not world.set_next_wait_pos:
             world.skill = 'wait'
 
-        elif conflict_robot:
-            #print(f'{world.robot.name}: conflict')
-            world.skill = 'check_priority'
+        elif world.set_current_turn_pos and not world.set_next_turn_pos:
+            world.skill = 'wait'
 
-        elif obstruct_robot:
+        elif world.set_current_turn_pos and world.set_next_turn_pos:
             world.skill = 'switch_lane'
+            #world.skill = 'drive'
+
+        # elif conflict_robot:
+        #     #print(f'{world.robot.name}: conflict')
+        #     world.skill = 'check_priority'
+
 
         else:
             world.skill = 'drive'
@@ -171,8 +136,12 @@ class SkillModel():
             world.wait_pos = None
             world.turn_area = None
         elif world.skill == 'wait':
-            if not world.wait_pos:
-                world.wait_pos = world.horizon_list[0]
+            # if not world.wait_pos:
+            #     world.wait_pos = world.horizon_list[0]
+            if world.current_wait_pos:
+                world.wait_pos = world.current_wait_pos['polygon']
+            else:
+                world.skill = 'drive'
         elif world.skill == 'check_priority':
             priority_vehicles = query_right_of(world.g, world.robot.uri)
             if priority_vehicles:
@@ -182,32 +151,41 @@ class SkillModel():
             else:
                 world.skill = 'drive'
         elif world.skill == 'switch_lane':
-            if not world.turn_area:
-                world.turn_area = world.current_turn_pos
-                world.turn_pos = copy.copy(world.robot.pos)
-                #world.turn_pos_left_lane = 
+            if world.plan_configured:
+                world.skill = 'drive'
+            elif not world.wait_pos:
+                world.skill = 'wait'
+                world.wait_pos = world.current_turn_pos['polygon']
+            else:
+                world.skill = 'wait'
+                
+            if not world.switch_lane_configured:
                 world.plan[world.current_pos]['next_pos'] = URIRef("http://example.com/intersection/road_down/lane_left")
                 
-            if world.current_pos == URIRef("http://example.com/intersection/road_down/lane_left"):
-                obstacles = query_obstructs(world.g, world.robot.uri)
-                for obstacle in obstacles:
-                    world.g.remove((obstacle, EX.obstructs, world.robot.uri))
+                #world.plan[world.current_pos]['phi'] += 0.5*math.pi
+                world.switch_lane_configured = True
+                
+            # if world.current_pos == URIRef("http://example.com/intersection/road_down/lane_left"):
+            #     obstacles = query_obstructs(world.g, world.robot.uri)
+            #     for obstacle in obstacles:
+            #         world.g.remove((obstacle, EX.obstructs, world.robot.uri))
            
             #world.plan, world.plan_left_lane = world.plan_left_lane, world.plan
             #world.right_lane, world.left_lane = world.left_lane, world.right_lane
 
     def execute_skill(self, world, control):
-        #print(world.skill)
+        print(f'Skill: {world.skill}')
         if world.skill == 'drive':
             control.drive(world)
         elif world.skill == 'wait':
+            #print(world.robot.polygon.intersects(world.wait_pos))
             if world.robot.polygon.intersects(world.wait_pos) and world.robot.polygon.intersection(world.wait_pos).area > 0.95 * world.robot.polygon.area:
                 control.stop(world)
             else:
                 control.drive(world)
         elif world.skill == 'switch_lane':
             if not world.switch_phi:
-                world.plan[world.current_pos]['phi'] += 0.5*math.pi
+                #world.plan[world.current_pos]['phi'] += 0.5*math.pi
                 world.switch_phi = True
-            if world.robot.polygon.intersects(world.turn_area) and world.robot.polygon.intersection(world.turn_area).area > 0.5 * world.robot.polygon.area:
+            if world.robot.polygon.intersects(world.current_turn_pos['polygon']) and world.robot.polygon.intersection(world.current_turn_pos['polygon']).area > 0.5 * world.robot.polygon.area:
                 control.drive(world)

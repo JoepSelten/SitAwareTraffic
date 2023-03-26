@@ -21,6 +21,7 @@ class WorldModel():
         self.g = g
         self.robot = robot
         self.horizon_dict = {}
+        self.position_dict = {}
         #g.remove((self.robot.uri, None, None))
         self.g.add((self.robot.uri, RDF.type, EX.vehicle))
         self.current_pos = None
@@ -36,11 +37,15 @@ class WorldModel():
         self.omega = 0
         self.velocity = 0
         self.skill = 'drive'
+        self.plan_configured = False
+        self.replan = False
+        self.switch_lane_configured = False
 
         self.turn_area = None
         self.switch_phi = False
         self.turn_pos = None
         self.prev_pos = None
+        self.prev_area = None
         self.horizon_uris = []
         self.found_waiting_area = False
         self.waiting_area = []
@@ -51,6 +56,7 @@ class WorldModel():
         self.set_next_wait_pos = False
 
         self.current_turn_pos = {}
+        self.switch_lane_pos = {}
         self.next_turn_pos = {}
         self.set_current_turn_pos = False
         self.set_next_turn_pos = False
@@ -165,6 +171,18 @@ class WorldModel():
             URIRef("http://example.com/intersection/road_left/lane_right"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_pos': None},
             URIRef("http://example.com/intersection/road_left/lane_left"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_pos': None}
             }
+
+        if start == 'down' and task == 'right':
+            plan = {URIRef("http://example.com/intersection/road_down/lane_right"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_pos': URIRef("http://example.com/intersection/middle_dr")},
+            URIRef("http://example.com/intersection/road_down/lane_left"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_pos': URIRef("http://example.com/intersection/middle_dl")},
+            URIRef("http://example.com/intersection/middle_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_pos': URIRef("http://example.com/intersection/road_right/lane_left")},
+            URIRef("http://example.com/intersection/middle_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_pos': URIRef("http://example.com/intersection/road_right/lane_right")},
+            URIRef("http://example.com/intersection/middle_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_pos': URIRef("http://example.com/intersection/middle_ur")},
+            URIRef("http://example.com/intersection/middle_dl"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_pos': URIRef("http://example.com/intersection/middle_ul")},
+            URIRef("http://example.com/intersection/road_right/lane_right"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_pos': None},
+            URIRef("http://example.com/intersection/road_right/lane_left"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_pos': None}
+            }
+
         return plan        
         
     def update(self, sim):
@@ -199,41 +217,27 @@ class WorldModel():
 
 
     def update_horizon(self, sim):
-        if self.set_current_wait_pos and not self.current_wait_pos:
-            self.current_wait_pos['polygon'] = self.prev_pos
-            #self.current_wait_pos['polygon'] = self.horizon_dict[str(len(self.horizon_dict)-1)]['polygon']
-            self.current_wait_pos['color'] = 'black'
-            self.current_wait_pos['type'] = 'wait_pos'
-            self.horizon_dict[str(len(self.horizon_dict))] = self.current_wait_pos
-            
-        if self.set_next_wait_pos and not self.next_wait_pos:
-            self.next_wait_pos['polygon'] = self.horizon_dict[str(len(self.horizon_dict)-1)]['polygon']
-            self.next_wait_pos['color'] = 'red'
-            self.next_wait_pos['type'] = 'wait_pos'
-            self.horizon_dict[str(len(self.horizon_dict))] = self.next_wait_pos
-            
-        if self.set_current_turn_pos and not self.current_turn_pos:
-            self.current_turn_pos['polygon'] = self.prev_pos
-            #self.current_turn_pos['polygon'] = self.horizon_dict[str(len(self.horizon_dict)-1)]['polygon']
-            self.current_turn_pos['color'] = 'yellow'
-            self.current_turn_pos['type'] = 'wait_pos'
-            self.horizon_dict[str(len(self.horizon_dict))] = self.current_turn_pos
+        if self.replan:
+            # new_horizon_dict = copy.deepcopy(self.horizon_dict)
+            # new_horizon_dict = {}
+            # for key, horizon in self.horizon_dict.items():
+            #     if horizon['type']=='obstacle':
+            #         continue
+            #     else:
+            #         new_horizon_dict[str(len(new_horizon_dict))] = horizon
+            self.horizon_dict = {}
+            self.horizon_dict = copy.deepcopy(self.horizon_before_turn)
+            self.horizon_dict[str(len(self.horizon_dict))] = self.switch_lane_pos
 
-        if self.set_next_turn_pos and not self.next_turn_pos:
-            ## dit zal later fout gaan, ipv -2 doe iets anders wat ook werkt als er geen turn pos bij is gekomen
-            if self.horizon_dict[str(len(self.horizon_dict)-1)]['type'] == 'wait_pos':
-                self.next_turn_pos['polygon'] = self.get_turn_pos(self.horizon_dict[str(len(self.horizon_dict)-2)])
-            else:
-                self.next_turn_pos['polygon'] = self.get_turn_pos(self.horizon_dict[str(len(self.horizon_dict)-1)])
-            #self.next_turn_pos['polygon'] = self.horizon_dict[str(len(self.horizon_dict)-2)]['polygon']
-            self.next_turn_pos['color'] = 'orange'
-            self.next_turn_pos['type'] = 'wait_pos'
-            self.horizon_dict[str(len(self.horizon_dict))] = self.next_turn_pos
+            ## if statement voor extended horizon op true te zetten
+            ## de current horizon moet alleen samenvoegen met de switch lane pos.
+            ## deze pos is dus wel echt de next pos, en niet de hele left lane. 
+            ## of ik maak een polygon entiteit in t plan, of n nieuwe label
 
-        if self.horizon_dict:
-            self.prev_pos = self.horizon_dict[str(len(self.horizon_dict)-1)]['polygon']           
-
+        self.update_positions(sim)
+        
         self.update_current_horizon(sim)
+
         if self.extend_horizon:
             self.update_extended_horizon(sim)
 
@@ -243,8 +247,56 @@ class WorldModel():
         self.robot.horizon = unary_union(self.horizon_list)
         self.robot.horizon_dict = self.horizon_dict
 
+    
+    def update_positions(self, sim):
+        if self.set_current_wait_pos and not self.current_wait_pos:
+            self.current_wait_pos['polygon'] = self.prev_area
+            self.current_wait_pos['position'] = self.prev_pos
+            self.current_wait_pos['color'] = 'black'
+            self.current_wait_pos['type'] = 'wait_pos'
+            self.position_dict[str(len(self.position_dict))] = self.current_wait_pos
+            
+        if self.set_next_wait_pos and not self.next_wait_pos:
+            self.next_wait_pos['polygon'] = self.horizon_dict[str(len(self.horizon_dict)-1)]['polygon']
+            self.next_wait_pos['position'] = self.horizon_dict[str(len(self.horizon_dict)-1)]['position']
+            self.next_wait_pos['color'] = 'red'
+            self.next_wait_pos['type'] = 'next_wait_pos'
+            self.position_dict[str(len(self.position_dict))] = self.next_wait_pos
+
+
+        if self.set_current_turn_pos and not self.current_turn_pos:
+            self.current_turn_pos['polygon'] = self.prev_area
+            self.current_turn_pos['position'] = self.prev_pos
+            self.current_turn_pos['color'] = 'yellow'
+            self.current_turn_pos['type'] = 'current_turn_pos'
+            self.position_dict[str(len(self.position_dict))] = self.current_turn_pos
+            self.horizon_before_turn = copy.deepcopy(self.horizon_dict)
+            #self.horizon_before_turn.pop(str(len(self.horizon_dict)-1), None)
+            #self.horizon_before_turn.pop(str(len(self.horizon_dict)-2), None)
+
+            self.switch_lane_pos['polygon'], self.switch_lane_pos['position'] = self.get_turn_pos(self.current_turn_pos)
+            self.switch_lane_pos['color'] = 'brown'
+            self.switch_lane_pos['type'] = 'switch_lane_pos'
+            self.position_dict[str(len(self.position_dict))] = self.switch_lane_pos
+
+        if self.set_next_turn_pos and not self.next_turn_pos:
+            self.next_turn_pos['polygon'], self.next_turn_pos['position'] = self.get_turn_pos(self.horizon_dict[str(len(self.horizon_dict)-1)])
+            self.next_turn_pos['color'] = 'orange'
+            self.next_turn_pos['type'] = 'next_turn_pos'
+            self.position_dict[str(len(self.position_dict))] = self.next_turn_pos
+            self.replan = True
+
+        self.robot.position_dict = self.position_dict
+
+
+        if self.horizon_dict:
+            self.prev_area = self.horizon_dict[str(len(self.horizon_dict)-1)]['polygon']
+            self.prev_pos = self.horizon_dict[str(len(self.horizon_dict)-1)]['position']
+
+    
+    
     def get_turn_pos(self, next_driveable_pos):
-        print(f'next_driveable_pos: {next_driveable_pos}')
+        #print(f'next_driveable_pos: {next_driveable_pos}')
         max_intersect = self.get_max_intersection(self.map_dict, next_driveable_pos['polygon'])
         phi = self.plan[max_intersect]['phi']
         x = next_driveable_pos['position'][0]
@@ -262,7 +314,11 @@ class WorldModel():
             (x+(offset+H)*math.cos(relative_phi)+lane_width*math.sin(relative_phi), y+(offset+H)*math.sin(relative_phi)+lane_width*math.cos(relative_phi)),
             (x+offset*math.cos(relative_phi)+lane_width*math.sin(relative_phi), y+offset*math.sin(relative_phi)+lane_width*math.cos(relative_phi))])
 
-        return horizon_polygon
+        pos_x = x + (offset+0.5*H)*math.cos(relative_phi)
+        pos_y = y + (offset+0.5*H)*math.sin(relative_phi)
+        horizon_pos = [pos_x, pos_y]
+
+        return horizon_polygon, horizon_pos
     
     def update_current_horizon(self, sim):
         x = self.robot.pos[0]
@@ -283,13 +339,17 @@ class WorldModel():
             (x+(offset+H)*math.cos(phi)+lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)+lane_width*math.cos(phi)),
             (x+offset*math.cos(phi)+lane_width*math.sin(phi), y+offset*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
 
-
+        pos_x = x + (0.5*self.robot.length+0.5*H)*math.cos(phi)
+        pos_y = y + (0.5*self.robot.length+0.5*H)*math.sin(phi)
+        horizon_pos = [pos_x, pos_y]
 
         if horizon_polygon.geom_type=='Polygon':
             self.horizon_list.append(horizon_polygon)
             current_horizon_dict = {}
             current_horizon_dict['uri'] = self.current_pos
             current_horizon_dict['polygon'] = horizon_polygon
+            current_horizon_dict['length'] = H
+            current_horizon_dict['position'] = horizon_pos
             current_horizon_dict['type'] = 'current'
             current_horizon_dict['color'] = 'blue'
             self.horizon_dict['0'] = current_horizon_dict
@@ -301,21 +361,17 @@ class WorldModel():
                     current_horizon_dict['uri'] = self.current_pos
                     current_horizon_dict['polygon'] = horizon_polygon
                     current_horizon_dict['length'] = H
-                    #current_horizon_dict['position'] = 
+                    current_horizon_dict['position'] = horizon_pos
                     current_horizon_dict['type'] = 'current'
                     current_horizon_dict['color'] = 'blue'
                     self.horizon_dict['0'] = current_horizon_dict
 
 
     def update_extended_horizon(self, sim):
-        #print(f'extended horizon: {self.extend_horizon}')
-        #for horizon in self.extend_horizon:
         horizon = self.extend_horizon[-1]
         horizon_type = query_type(self.g, horizon)
-        #print(horizon_type)
+
         if horizon_type == EX.obstacle:
-            #print(self.current_pos)
-            ## dit zou ook relative distance kunnen zijn
             obstacle = sim.obstacles[horizon]
             semantic_pos = self.get_max_intersection(self.map_dict, obstacle.polygon)
             x = obstacle.pos[0]
@@ -384,8 +440,6 @@ class WorldModel():
             pos_x = x + (0.5*previous_horizon_dict['length']+0.5*H)*math.cos(phi)
             pos_y = y + (0.5*previous_horizon_dict['length']+0.5*H)*math.sin(phi)
             horizon_pos = [pos_x, pos_y]
-
-
 
 
             if horizon_polygon.geom_type=='Polygon':
@@ -496,6 +550,10 @@ class WorldModel():
                         current_horizon_dict['type'] = 'middle'
                         self.horizon_dict[str(len(self.horizon_dict))] = current_horizon_dict
 
+
+        elif horizon_type==EX.lane:
+            pass
+
         # if current_horizon_dict['polygon'].intersects(self.horizon_dict[str(len(self.horizon_dict)-2)]['polygon']):
         #     horizon_difference = self.horizon_dict[str(len(self.horizon_dict)-2)]['polygon'].difference(current_horizon_dict['polygon'])
         #     self.horizon_dict[str(len(self.horizon_dict)-2)]['polygon'] = horizon_difference
@@ -510,32 +568,12 @@ class WorldModel():
         new_horizon_dict = copy.deepcopy(self.horizon_dict)
         new_horizon_dict = {}
         for key, horizon in self.horizon_dict.items():
-            if horizon['type'] != 'wait_pos' and self.robot.polygon.intersects(horizon['polygon']) and self.robot.polygon.intersection(horizon['polygon']).area > 2:
+            if self.robot.polygon.intersects(horizon['polygon']) and self.robot.polygon.intersection(horizon['polygon']).area > 2:
                 continue
             else:
                 new_horizon_dict[str(len(new_horizon_dict))] = horizon
 
         self.horizon_dict = new_horizon_dict
-
-        # n = 0
-        # for key, horizon in self.horizon_dict.items():
-        #     if not n:
-        #         horizon_prev = horizon
-        #         continue
-        #     horizon['polygon']
-        #     if horizon['polygon'].intersects(horizon_prev['polygon']):
-        #         horizon_difference = horizon_prev['polygon'].difference(horizon['polygon'])
-        #         horizon_prev['polygon'] = horizon_difference
-        #         #self.horizon_dict[str(n-1)] = horizon_prev 
-        #         new_dict = {}
-        #         new_dict['polygon'] = horizon_difference
-        #         new_dict['color'] = 'yellow'
-        #         self.horizon_dict[str(len(self.horizon_dict))] = new_dict
-
-        #     horizon_prev = horizon
-        #     n+=1
-
-
 
     def associate(self, sim):
         self.associate_obstacles(sim)
@@ -611,21 +649,6 @@ class WorldModel():
                 #     self.wait_pos['polygon'] = self.prev_pos
                 #     self.wait_pos['color'] = 'black'
                     #self.robot.horizon_dict[str(len(self.robot.horizon_dict))] = self.wait_pos
-
-    def associate_approaching2(self):
-        self.robot.approaching_horizon = None
-        approaching_areas = self.get_intersections(self.robot.horizon)
-        for uri, area in approaching_areas.items():
-            if area>5:
-                print(f'approaching area: {uri}')
-                self.g.add((self.robot.uri, EX.approaches, uri))
-                #self.approaching_dict[uri] = area
-                # if not self.wait_pos and self.prev_pos:
-                #     self.wait_pos = {}
-                #     self.wait_pos['polygon'] = self.prev_pos
-                #     self.wait_pos['color'] = 'black'
-                    #self.robot.horizon_dict[str(len(self.robot.horizon_dict))] = self.wait_pos
-
 
 
     def associate_direction(self, vehicle):

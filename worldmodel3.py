@@ -502,7 +502,22 @@ class WorldModel():
                         self.g.add((robot.uri, EX.approaches, self.robot.uri))
                         self.g.add((self.robot.uri, EX.approaches, label))
                         self.approaching = True
-                        
+
+                
+    def associate_approaching2(self):
+        self.robot.approaching_horizon = None
+        approaching_areas = self.get_intersections(self.robot.horizon)
+        for uri, area in approaching_areas.items():
+            if area>5:
+                print(f'approaching area: {uri}')
+                self.g.add((self.robot.uri, EX.approaches, uri))
+                #self.approaching_dict[uri] = area
+                # if not self.wait_pos and self.prev_pos:
+                #     self.wait_pos = {}
+                #     self.wait_pos['polygon'] = self.prev_pos
+                #     self.wait_pos['color'] = 'black'
+                    #self.robot.horizon_dict[str(len(self.robot.horizon_dict))] = self.wait_pos
+                 
 
 
     def get_label(self, geom):
