@@ -71,7 +71,8 @@ class SkillModel():
 
                 if not EX.waiting in next_affordances or not EX.driveable in next_affordances:
                     world.extend_horizon.append(area)
-                    #print(world.extend_horizon)
+
+                    #print(f'extend horizon: {world.extend_horizon}')
 
         ## later integrate the above with vehicles and obstacles that inhibit driveability.
         ## however for convenience first do this separetely to get things working
@@ -84,6 +85,7 @@ class SkillModel():
             world.skill = 'wait'
 
         elif world.set_current_turn_pos and not world.set_next_turn_pos:
+            #world.plan_configured = False
             world.skill = 'wait'
 
         elif world.set_current_turn_pos and world.set_next_turn_pos:
@@ -156,21 +158,23 @@ class SkillModel():
             else:
                 world.skill = 'drive'
         elif world.skill == 'replan':
+            #print(f'is the plan configured: {world.plan_configured}')
             if world.plan_configured:
-                if not world.switch_phi_current:
+                if not world.switch_phi:
                     #print(f"current turn pos: {world.before_obstacle_rl['uri']}")
                     #print(f"next turn pos: {world.after_obstacle_ll['uri']}")
                     #print(f"phi before: {world.plan[world.before_obstacle_rl['uri']]['phi']}")
-                    world.switch_phi_current = True
-                    #world.plan[world.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
-                if not world.switch_phi_next:
-                    if world.robot.polygon.intersects(world.after_obstacle_ll['polygon']) and world.robot.polygon.intersection(world.after_obstacle_ll['polygon']).area > 0.95 * world.robot.polygon.area:
-                        #world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
-                        world.switch_phi_next = True
+                    world.switch_phi = True
+                    world.plan[world.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
+                    world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
+                # if not world.switch_phi_next:
+                #     if world.robot.polygon.intersects(world.after_obstacle_ll['polygon']) and world.robot.polygon.intersection(world.after_obstacle_ll['polygon']).area > 0.95 * world.robot.polygon.area:
+                #         world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
+                #         world.switch_phi_next = True
                 
                     #print(f"phi after: {world.plan[world.before_obstacle_rl['uri']]['phi']}")
                 world.skill = 'drive'
-            if not world.wait_pos:
+            elif not world.wait_pos:
                 world.skill = 'wait'
                 world.wait_pos = world.before_obstacle_rl['polygon']
                 self.replan(world)
@@ -180,7 +184,7 @@ class SkillModel():
                 self.replan(world)
                 
     def replan(self, world):
-        print(world.current_pos)
+        pass
 
         # if world.positions_configured:
         #     if self.init_replan:

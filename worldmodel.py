@@ -272,6 +272,7 @@ class WorldModel():
         
         self.update_current_horizon(sim)
 
+        #print(f'extend horizon: {self.extend_horizon}')
         if self.extend_horizon:
             self.update_extended_horizon(sim)
 
@@ -406,7 +407,7 @@ class WorldModel():
 
             self.positions_configured = True
             #DeductiveClosure(Semantics).expand(self.g)
-            print(self.plan)
+            #print(self.plan)
 
         self.robot.position_dict = self.position_dict
 
@@ -744,6 +745,7 @@ class WorldModel():
                         self.horizon_dict[str(len(self.horizon_dict))] = current_horizon_dict
 
             horizon_polygon = self.map_dict[self.plan[horizon]['next_position']]['polygon']
+            self.plan_configured = True
 
             if horizon_polygon.geom_type=='Polygon':
                 self.horizon_list.append(horizon_polygon)
@@ -774,7 +776,7 @@ class WorldModel():
         #     horizon_difference = self.horizon_dict[str(len(self.horizon_dict)-2)]['polygon'].difference(current_horizon_dict['polygon'])
         #     self.horizon_dict[str(len(self.horizon_dict)-2)]['polygon'] = horizon_difference
 
-        self.extend_horizon.pop()
+        self.extend_horizon = []
 
 
     def delete_extended_horizon(self, sim):
