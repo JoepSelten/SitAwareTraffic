@@ -51,8 +51,8 @@ class Simulator():
             #if not robot.name == 'AV1':
              #   break
                 
-            if robot.horizon and robot.horizon.geom_type=='Polygon':
-                plt.fill(*robot.horizon.exterior.xy, color='green', alpha=0.3)
+            # if robot.horizon and robot.horizon.geom_type=='Polygon':
+            #     plt.fill(*robot.horizon.exterior.xy, color='green', alpha=0.3)
             if robot.vehicle_area and robot.vehicle_area.geom_type=='Polygon':
                 plt.fill(*robot.vehicle_area.exterior.xy, color='k', alpha=0.7)
             if robot.obstructed_area and robot.obstructed_area.geom_type=='Polygon':
@@ -65,8 +65,11 @@ class Simulator():
                     plt.fill(*horizon['polygon'].exterior.xy, color=horizon['color'], alpha=0.3)
 
             # for position in robot.position_dict.values():
+            #     if position['color']=='orange':
+            #        continue
             #     if position['polygon'].geom_type=='Polygon':
             #         plt.fill(*position['polygon'].exterior.xy, color=position['color'], alpha=1)
+            #         plt.text(position['position'][0]-5, position['position'][1], position['type'])
 
     def plot_input_features(self):
         for feature in self.input_features:

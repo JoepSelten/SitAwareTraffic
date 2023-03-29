@@ -44,7 +44,7 @@ def query_type(g, subject):
 
         SELECT ?object
         WHERE {
-            ?subject rdf:type ?object .
+            ?subject rdf:type* ?object .
             ?object rdf:type ex:geometry .
             ?object rdf:type ex:polygon .
         }

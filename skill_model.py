@@ -20,6 +20,7 @@ class SkillModel():
         }
         self.condition_failed = False
         self.traffic_rules = None
+        self.init_replan = True
 
     def check_conditions(self, world):
         ## Get current skill (here I assume skill is known and position needs to be queried from KG)
@@ -46,7 +47,7 @@ class SkillModel():
             for area in approaches_list:
                 next_affordances = query_affordances(world.g, area)
 
-                #print(f'area: {area}, next_affordances: {next_affordances}')
+                print(f'area: {area}, next_affordances: {next_affordances}')
 
                 if EX.waiting in next_affordances:
                     waiting_number+=1             
@@ -64,12 +65,13 @@ class SkillModel():
                 elif not EX.driveable in next_affordances:
                     world.set_current_turn_pos = True
                     
-
+                
                 if world.set_current_turn_pos and driveable_number==len(approaches_list):
                     world.set_next_turn_pos = True
 
                 if not EX.waiting in next_affordances or not EX.driveable in next_affordances:
                     world.extend_horizon.append(area)
+                    #print(world.extend_horizon)
 
         ## later integrate the above with vehicles and obstacles that inhibit driveability.
         ## however for convenience first do this separetely to get things working
@@ -85,7 +87,7 @@ class SkillModel():
             world.skill = 'wait'
 
         elif world.set_current_turn_pos and world.set_next_turn_pos:
-            world.skill = 'switch_lane'
+            world.skill = 'replan'
             #world.skill = 'drive'
 
         # elif conflict_robot:
@@ -96,6 +98,8 @@ class SkillModel():
         else:
             world.skill = 'drive'
             world.wait_pos = None
+
+        #print(f'skill before config: {world.skill}')
 
     def check_condition(self, world, condition):
         if not condition.for_all:
@@ -136,6 +140,7 @@ class SkillModel():
             world.wait_pos = None
             world.turn_area = None
         elif world.skill == 'wait':
+            
             # if not world.wait_pos:
             #     world.wait_pos = world.horizon_list[0]
             if world.current_wait_pos:
@@ -150,28 +155,48 @@ class SkillModel():
                     world.wait_pos = world.horizon_list[0]
             else:
                 world.skill = 'drive'
-        elif world.skill == 'switch_lane':
+        elif world.skill == 'replan':
             if world.plan_configured:
+                if not world.switch_phi_current:
+                    #print(f"current turn pos: {world.before_obstacle_rl['uri']}")
+                    #print(f"next turn pos: {world.after_obstacle_ll['uri']}")
+                    #print(f"phi before: {world.plan[world.before_obstacle_rl['uri']]['phi']}")
+                    world.switch_phi_current = True
+                    #world.plan[world.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
+                if not world.switch_phi_next:
+                    if world.robot.polygon.intersects(world.after_obstacle_ll['polygon']) and world.robot.polygon.intersection(world.after_obstacle_ll['polygon']).area > 0.95 * world.robot.polygon.area:
+                        #world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
+                        world.switch_phi_next = True
+                
+                    #print(f"phi after: {world.plan[world.before_obstacle_rl['uri']]['phi']}")
                 world.skill = 'drive'
-            elif not world.wait_pos:
+            if not world.wait_pos:
                 world.skill = 'wait'
-                world.wait_pos = world.current_turn_pos['polygon']
+                world.wait_pos = world.before_obstacle_rl['polygon']
+                self.replan(world)
+            
             else:
                 world.skill = 'wait'
+                self.replan(world)
                 
-            if not world.switch_lane_configured:
-                world.plan[world.current_pos]['next_pos'] = URIRef("http://example.com/intersection/road_down/lane_left")
-                
-                #world.plan[world.current_pos]['phi'] += 0.5*math.pi
-                world.switch_lane_configured = True
-                
-            # if world.current_pos == URIRef("http://example.com/intersection/road_down/lane_left"):
-            #     obstacles = query_obstructs(world.g, world.robot.uri)
-            #     for obstacle in obstacles:
-            #         world.g.remove((obstacle, EX.obstructs, world.robot.uri))
-           
-            #world.plan, world.plan_left_lane = world.plan_left_lane, world.plan
-            #world.right_lane, world.left_lane = world.left_lane, world.right_lane
+    def replan(self, world):
+        print(world.current_pos)
+
+        # if world.positions_configured:
+        #     if self.init_replan:
+        #         world.horizon_dict = {}
+        #         world.horizon_dict = copy.deepcopy(world.horizon_before_turn)
+        #         world.horizon_dict[str(len(world.horizon_dict))] = world.before_obstacle_ll
+        #         self.init_replan = False
+            #print(world.horizon_dict)
+                #input('asdf')
+
+                # if world.horizon_dict[str(len(world.horizon_dict)-1)]['polygon'].intersects(world.after_obstacle_ll['polygon']):
+                #         world.horizon_dict[str(len(world.horizon_dict))] = world.after_obstacle_ll
+                #         world.horizon_dict[str(len(world.horizon_dict))] = world.next_wait_pos
+                #         #world.on_left_lane = False
+                #         world.extend_horizon.pop()
+                #         #world.plan_configured = True
 
     def execute_skill(self, world, control):
         print(f'Skill: {world.skill}')
@@ -183,9 +208,9 @@ class SkillModel():
                 control.stop(world)
             else:
                 control.drive(world)
-        elif world.skill == 'switch_lane':
-            if not world.switch_phi:
-                #world.plan[world.current_pos]['phi'] += 0.5*math.pi
-                world.switch_phi = True
-            if world.robot.polygon.intersects(world.current_turn_pos['polygon']) and world.robot.polygon.intersection(world.current_turn_pos['polygon']).area > 0.5 * world.robot.polygon.area:
-                control.drive(world)
+        # elif world.skill == 'switch_lane':
+        #     if not world.switch_phi:
+        #         #world.plan[world.current_pos]['phi'] += 0.5*math.pi
+        #         world.switch_phi = True
+        #     if world.robot.polygon.intersects(world.before_obstacle_rl['polygon']) and world.robot.polygon.intersection(world.before_obstacle_rl['polygon']).area > 0.5 * world.robot.polygon.area:
+        #         control.drive(world)

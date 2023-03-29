@@ -22,12 +22,12 @@ class Control():
         #print(world.current_pos)
         phi_des = world.plan[world.current_pos]['phi']
         vel_des = world.plan[world.current_pos]['velocity']
-        #print(phi_des)
+        #print(f'phi des: {phi_des}')
         # this skill requires the orientation of the lane      
         world.robot.yaw = world.robot.yaw%(2*math.pi)
         phi_des = phi_des%(2*math.pi)
         yaw_error = world.robot.yaw - phi_des
-        #print(yaw_error)
+        #print(f'yaw error: {yaw_error}')
         if abs(yaw_error) > math.pi:
             yaw_error -= np.sign(yaw_error)*2*math.pi
         world.velocity = vel_des
