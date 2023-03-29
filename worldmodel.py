@@ -123,30 +123,30 @@ class WorldModel():
         if map.traffic_situation == "two-lane_intersection":
             self.map_dict = {
                 #URIRef("http://example.com/intersection/middle"): {'polygon': map.polygon_list[0].union(map.polygon_list[1]).union(map.polygon_list[2]).union(map.polygon_list[3])},
-                URIRef("http://example.com/intersection/middle_dr"): {'polygon': map.polygon_list[0], 'position': [55, 45]},
-                URIRef("http://example.com/intersection/middle_ur"): {'polygon': map.polygon_list[1], 'position': [55, 55]},
-                URIRef("http://example.com/intersection/middle_ul"): {'polygon': map.polygon_list[2], 'position': [45, 55]},
-                URIRef("http://example.com/intersection/middle_dl"): {'polygon': map.polygon_list[3], 'position': [45, 45]},
-                URIRef("http://example.com/intersection/road_down/lane_right"): {'polygon': map.polygon_list[4], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_down/lane_left"): {'polygon': map.polygon_list[5], 'orientation': -0.5*math.pi},
-                URIRef("http://example.com/intersection/road_right/lane_right"): {'polygon': map.polygon_list[6], 'orientation': math.pi},
-                URIRef("http://example.com/intersection/road_right/lane_left"): {'polygon': map.polygon_list[7], 'orientation': 0},
-                URIRef("http://example.com/intersection/road_up/lane_right"): {'polygon': map.polygon_list[8], 'orientation': -0.5*math.pi},
-                URIRef("http://example.com/intersection/road_up/lane_left"): {'polygon': map.polygon_list[9], 'orientation': 0.5*math.pi}, 
-                URIRef("http://example.com/intersection/road_left/lane_right"): {'polygon': map.polygon_list[10], 'orientation': 0},
-                URIRef("http://example.com/intersection/road_left/lane_left"): {'polygon': map.polygon_list[11], 'orientation': math.pi},
-                URIRef("http://example.com/intersection/road_down/side_right"): {'polygon': map.polygon_list[12], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_down/side_left"): {'polygon': map.polygon_list[13], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_right/side_right"): {'polygon': map.polygon_list[14], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_right/side_left"): {'polygon': map.polygon_list[15], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_up/side_right"): {'polygon': map.polygon_list[16], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_up/side_left"): {'polygon': map.polygon_list[17], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_left/side_right"): {'polygon': map.polygon_list[18], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_left/side_left"): {'polygon': map.polygon_list[19], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_down/centerline"): {'polygon': map.polygon_list[20], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_right/centerline"): {'polygon': map.polygon_list[21], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_up/centerline"): {'polygon': map.polygon_list[22], 'orientation': 0.5*math.pi},
-                URIRef("http://example.com/intersection/road_left/centerline"): {'polygon': map.polygon_list[23], 'orientation': 0.5*math.pi}
+                URIRef("http://example.com/intersection/middle_dr"): {'polygon': map.polygon_list[0], 'position': [55, 45], 'weight': 0},
+                URIRef("http://example.com/intersection/middle_ur"): {'polygon': map.polygon_list[1], 'position': [55, 55], 'weight': 0},
+                URIRef("http://example.com/intersection/middle_ul"): {'polygon': map.polygon_list[2], 'position': [45, 55], 'weight': 0},
+                URIRef("http://example.com/intersection/middle_dl"): {'polygon': map.polygon_list[3], 'position': [45, 45], 'weight': 0},
+                URIRef("http://example.com/intersection/road_down/lane_right"): {'polygon': map.polygon_list[4], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_down/lane_left"): {'polygon': map.polygon_list[5], 'orientation': -0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_right/lane_right"): {'polygon': map.polygon_list[6], 'orientation': math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_right/lane_left"): {'polygon': map.polygon_list[7], 'orientation': 0, 'weight': 0},
+                URIRef("http://example.com/intersection/road_up/lane_right"): {'polygon': map.polygon_list[8], 'orientation': -0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_up/lane_left"): {'polygon': map.polygon_list[9], 'orientation': 0.5*math.pi, 'weight': 0}, 
+                URIRef("http://example.com/intersection/road_left/lane_right"): {'polygon': map.polygon_list[10], 'orientation': 0, 'weight': 0},
+                URIRef("http://example.com/intersection/road_left/lane_left"): {'polygon': map.polygon_list[11], 'orientation': math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_down/side_right"): {'polygon': map.polygon_list[12], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_down/side_left"): {'polygon': map.polygon_list[13], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_right/side_right"): {'polygon': map.polygon_list[14], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_right/side_left"): {'polygon': map.polygon_list[15], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_up/side_right"): {'polygon': map.polygon_list[16], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_up/side_left"): {'polygon': map.polygon_list[17], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_left/side_right"): {'polygon': map.polygon_list[18], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_left/side_left"): {'polygon': map.polygon_list[19], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_down/centerline"): {'polygon': map.polygon_list[20], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_right/centerline"): {'polygon': map.polygon_list[21], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_up/centerline"): {'polygon': map.polygon_list[22], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_left/centerline"): {'polygon': map.polygon_list[23], 'orientation': 0.5*math.pi, 'weight': 0}
             }
 
         else:
@@ -224,8 +224,14 @@ class WorldModel():
 
     def update_current_pos(self, sim):
         prev_pos = self.current_pos
-        self.current_pos = self.current_area()
-        self.pos_list = self.get_intersections(self.map_dict, self.robot.polygon)        
+        #self.current_pos = self.current_area()
+        self.intersect_dict = self.get_intersections(self.map_dict, self.robot.polygon)
+        self.weight_dict = {}
+        for uri, intersection in self.intersect_dict.items():
+            if intersection > 0.3*self.robot.polygon.area:
+                self.weight_dict[uri] = self.map_dict[uri]['weight']
+        self.current_pos = max(self.weight_dict, key=self.weight_dict.get)
+            
 
         if self.current_pos == None:
             if self.robot.uri == EX.AV1:
@@ -331,6 +337,7 @@ class WorldModel():
             new_map = {}
             new_map['polygon'] = self.before_obstacle_rl['polygon']
             new_map['position'] = self.before_obstacle_rl['position']
+            new_map['weight'] = 1
             self.map_dict[self.before_obstacle_rl['uri']] = new_map
             
             ## de lane uri is nu nog max intersection
@@ -351,7 +358,9 @@ class WorldModel():
             new_map = {}
             new_map['polygon'] = self.before_obstacle_ll['polygon']
             new_map['position'] = self.before_obstacle_ll['position']
+            new_map['weight'] = 1
             self.map_dict[self.before_obstacle_ll['uri']] = new_map
+            
 
             self.g.add((self.before_obstacle_rl['uri'], EX.connects, self.before_obstacle_ll['uri']))
             #DeductiveClosure(Semantics).expand(self.g)
@@ -379,6 +388,7 @@ class WorldModel():
             new_map = {}
             new_map['polygon'] = self.after_obstacle_rl['polygon']
             new_map['position'] = self.after_obstacle_rl['position']
+            new_map['weight'] = 1
             self.map_dict[self.after_obstacle_rl['uri']] = new_map
 
             self.after_obstacle_ll['polygon'], self.after_obstacle_ll['position'], lane_uri = self.get_left_lane(self.after_obstacle_rl)
@@ -402,6 +412,7 @@ class WorldModel():
             new_map = {}
             new_map['polygon'] = self.after_obstacle_ll['polygon']
             new_map['position'] = self.after_obstacle_ll['position']
+            new_map['weight'] = 1
             self.map_dict[EX.after_obstacle_ll] = new_map
             self.g.add((EX.after_obstacle_ll, EX.connects, EX.after_obstacle_rl))
 
@@ -942,7 +953,7 @@ class WorldModel():
                 self.current_areas[key] = intersect_area
                 total += intersect_area
         if total > 0.98*self.robot.polygon.area:
-            #print(f'current_areas, {self.robot.name}: {self.current_areas}')
+            #print(f'current_areas: {self.current_areas}')
             return max(self.current_areas, key=self.current_areas.get)
 
 
@@ -952,7 +963,7 @@ class WorldModel():
             if area.intersects(value['polygon']):
                 intersect_area = area.intersection(value['polygon']).area
                 intersection_dict[key] = intersect_area
-                #print(f'current_areas, {self.robot.name}: {self.current_areas}')
+                #print(f'current_areas: {self.current_areas}')
         return intersection_dict
 
 
