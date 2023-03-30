@@ -33,10 +33,11 @@ simulator.add_robot(EX.AV1, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='d
 
 #simulator.add_obstacle(EX.obstacle1, np.array([55, 20]))
 #simulator.add_obstacle(EX.obstacle2, np.array([55, 26]))
-simulator.add_obstacle(EX.obstacle3, np.array([55, 35]))
-#simulator.add_obstacle(EX.obstacle4, np.array([55, 45]))
+#simulator.add_obstacle(EX.obstacle3, np.array([55, 35]))
+simulator.add_obstacle(EX.obstacle4, np.array([55, 45]))
 #simulator.add_obstacle(EX.obstacle5, np.array([55, 55]))
 #simulator.add_obstacle(EX.obstacle6, np.array([35, 55]))
+#simulator.add_obstacle(EX.obstacle7, np.array([65, 45]))
 
 AV1_world = WorldModel(g, simulator.robots[EX.AV1], simulator.map)
 #AV2_world = WorldModel(g, simulator.robots['AV2'], simulator.map)

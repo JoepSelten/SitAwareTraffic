@@ -64,6 +64,7 @@ class SkillModel():
 
                 elif not EX.drivable in next_affordances:
                     world.set_current_turn_pos = True
+                    world.plan_configured = False
                     
                 
                 if world.set_current_turn_pos and drivable_number==len(approaches_list):
@@ -87,7 +88,6 @@ class SkillModel():
             world.skill = 'wait'
 
         elif world.set_current_turn_pos and not world.set_next_turn_pos:
-            #world.plan_configured = False
             world.skill = 'wait'
 
         elif world.set_current_turn_pos and world.set_next_turn_pos:
@@ -165,6 +165,7 @@ class SkillModel():
                 if not world.switch_phi:
                     world.plan[world.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
                     world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
+                    world.switch_phi = True
                 world.skill = 'drive'
             elif not world.wait_pos:
                 world.skill = 'wait'

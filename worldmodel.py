@@ -37,7 +37,7 @@ class WorldModel():
         self.omega = 0
         self.velocity = 0
         self.skill = 'drive'
-        self.plan_configured = False
+        self.plan_configured = True
         self.replan = False
         self.switch_lane_configured = False
         self.switch_phi_current = False
@@ -217,7 +217,8 @@ class WorldModel():
     def update(self, sim):
         if self.horizon_dict:
             #print(f"last uri in dict: {self.horizon_dict[str(len(self.horizon_dict)-1)]['uri']}")
-            print(f"last horizon pos: {self.horizon_dict[str(len(self.horizon_dict)-1)]['position']}")
+            #print(f"last horizon pos: {self.horizon_dict[str(len(self.horizon_dict)-1)]['position']}")
+            pass
         
         self.update_current_pos(sim)
 
@@ -308,9 +309,9 @@ class WorldModel():
 
                     
         if self.set_next_wait_pos and not self.next_wait_pos:
-            self.next_wait_pos['polygon'] = self.horizon_dict[str(len(self.horizon_dict)-1)]['polygon']
-            self.next_wait_pos['position'] = self.horizon_dict[str(len(self.horizon_dict)-1)]['position']
-            self.next_wait_pos['uri'] = self.horizon_dict[str(len(self.horizon_dict)-1)]['uri']
+            self.next_wait_pos['polygon'] = self.current_dict['polygon']
+            self.next_wait_pos['position'] = self.current_dict['position']
+            self.next_wait_pos['uri'] = self.current_dict['uri']
             self.next_wait_pos['color'] = 'orange'
             self.next_wait_pos['type'] = 'next_wait_pos'
             self.position_dict[str(len(self.position_dict))] = self.next_wait_pos
@@ -332,19 +333,8 @@ class WorldModel():
             for affordance in lane_affordances:
                 self.g.add((self.before_obstacle_rl['uri'], EX.affordance, affordance))
 
-            #self.g.add((self.prev_dict['uri']))
-            # self.plan[self.prev_dict['uri']]['next_position'] = self.before_obstacle_rl['uri']
-            
-            # plan_step = copy.deepcopy(self.plan[self.prev_dict['uri']])
             self.before_obstacle_ll['uri'] = EX.before_obstacle_ll
-            # plan_step['next_position'] = self.before_obstacle_ll['uri']
-            # self.plan[self.before_obstacle_rl['uri']] = plan_step
-            # new_map = {}
-            # new_map['polygon'] = self.before_obstacle_rl['polygon']
-            # new_map['position'] = self.before_obstacle_rl['position']
-            # new_map['weight'] = 1
-            # self.map_dict[self.before_obstacle_rl['uri']] = new_map
-            
+
             ## de lane uri is nu nog max intersection
             self.before_obstacle_ll['polygon'], self.before_obstacle_ll['position'], lane_uri = self.get_left_lane(self.before_obstacle_rl)
             self.before_obstacle_ll['color'] = 'grey'
@@ -357,15 +347,7 @@ class WorldModel():
             for affordance in lane_affordances:
                 self.g.add((self.before_obstacle_ll['uri'], EX.affordance, affordance))
 
-            # plan_step = copy.deepcopy(self.plan[lane_uri])
-            # plan_step['next_position'] = lane_uri
-            # self.plan[self.before_obstacle_ll['uri']] = plan_step
-            # new_map = {}
-            # new_map['polygon'] = self.before_obstacle_ll['polygon']
-            # new_map['position'] = self.before_obstacle_ll['position']
-            # new_map['weight'] = 1
-            # self.map_dict[self.before_obstacle_ll['uri']] = new_map
-            
+
 
             self.g.add((self.before_obstacle_rl['uri'], EX.connects, self.before_obstacle_ll['uri']))
             #DeductiveClosure(Semantics).expand(self.g)
@@ -397,7 +379,7 @@ class WorldModel():
 
             self.after_obstacle_rl['polygon'] = self.current_dict['polygon']
             self.after_obstacle_rl['position'] = self.current_dict['position']
-            print(f"last horizon pos: {self.horizon_dict[str(len(self.horizon_dict)-1)]['position']}")
+            #print(f"last horizon pos: {self.horizon_dict[str(len(self.horizon_dict)-1)]['position']}")
             #input('hoi')
             self.after_obstacle_rl['uri'] = EX.after_obstacle_rl
             self.after_obstacle_rl['color'] = 'yellow'
@@ -518,6 +500,7 @@ class WorldModel():
         horizon_type = query_type(self.g, horizon)
         print(f'horizon: {horizon}, horizon type: {horizon_type}')
         #print(f'intersections horizon: {self.get_intersections(self.map_dict, horizon)}')
+        print(f'plan configured: {self.plan_configured}')
         if horizon_type == EX.obstacle:
             obstacle = sim.obstacles[horizon]
             semantic_pos = self.get_max_intersection(self.map_dict, obstacle.polygon)
@@ -575,8 +558,8 @@ class WorldModel():
             horizon_pos = [pos_x, pos_y]
 
             self.add_horizon(semantic_pos, horizon_polygon, horizon_pos, H, 'next_horizon')
-
-        elif horizon_type == EX.middle:
+        
+        elif horizon_type == EX.middle and self.plan_configured:
             horizon_polygon = self.map_dict[horizon]['polygon']
             horizon_pos = self.map_dict[horizon]['position']
             self.add_horizon(horizon, horizon_polygon, horizon_pos, 10, 'middle')
@@ -675,18 +658,6 @@ class WorldModel():
             else:
                 self.horizon_dict[str(len(self.horizon_dict))] = current_horizon_dict
         
-        # if polygon.geom_type=='GeometryCollection':
-        #     for polygon in polygon:
-        #         if polygon.geom_type=='Polygon':
-        #             current_horizon_dict['uri'] = uri
-        #             current_horizon_dict['polygon'] = polygon
-        #             current_horizon_dict['semantic_position'] = self.get_intersections(polygon)
-        #             current_horizon_dict['position'] = position
-        #             current_horizon_dict['length'] = length
-        #             current_horizon_dict['color'] = color
-        #             current_horizon_dict['type'] = type
-                    
-        #             self.horizon_dict[str(len(self.horizon_dict))] = current_horizon_dict
 
     def delete_extended_horizon(self, sim):
         new_horizon_dict = copy.deepcopy(self.horizon_dict)
