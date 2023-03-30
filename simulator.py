@@ -64,12 +64,12 @@ class Simulator():
                 if horizon['polygon'].geom_type=='Polygon':
                     plt.fill(*horizon['polygon'].exterior.xy, color=horizon['color'], alpha=0.3)
 
-            # for position in robot.position_dict.values():
-            #     if position['color']=='orange':
-            #        continue
-            #     if position['polygon'].geom_type=='Polygon':
-            #         plt.fill(*position['polygon'].exterior.xy, color=position['color'], alpha=1)
-            #         plt.text(position['position'][0]-5, position['position'][1], position['type'])
+            for position in robot.position_dict.values():
+                if position['color']=='orange':
+                   continue
+                if position['polygon'].geom_type=='Polygon':
+                    plt.fill(*position['polygon'].exterior.xy, color=position['color'], alpha=1)
+                    plt.text(position['position'][0]-5, position['position'][1], position['type'])
 
     def plot_input_features(self):
         for feature in self.input_features:

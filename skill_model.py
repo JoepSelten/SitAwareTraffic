@@ -30,11 +30,11 @@ class SkillModel():
         # todo: check the conditions of the skill, for I know I just preprogram it 
         
  
-        ## First condition is being on an area that is driveable
+        ## First condition is being on an area that is drivable
         area_uri = query_is_on(world.g, world.robot.uri)
         affordances_current = query_affordances(world.g, area_uri)
         
-        ## Second condition is that also the next/approaching area is driveable
+        ## Second condition is that also the next/approaching area is drivable
         approaches_list = query_approaches(world.g, world.robot.uri)
 
         if approaches_list:
@@ -42,7 +42,7 @@ class SkillModel():
             #last_area = world.horizon_dict[str(len(world.horizon_dict)-1)]['uri']
 
             waiting_number = 0
-            driveable_number = 0
+            drivable_number = 0
             #print(approaches_list)
             for area in approaches_list:
                 next_affordances = query_affordances(world.g, area)
@@ -59,17 +59,19 @@ class SkillModel():
                     world.set_next_wait_pos = True
 
 
-                if EX.driveable in next_affordances:
-                    driveable_number+=1
+                if EX.drivable in next_affordances:
+                    drivable_number+=1
 
-                elif not EX.driveable in next_affordances:
+                elif not EX.drivable in next_affordances:
                     world.set_current_turn_pos = True
                     
                 
-                if world.set_current_turn_pos and driveable_number==len(approaches_list):
+                if world.set_current_turn_pos and drivable_number==len(approaches_list):
+                    print('next drivable pos found')
                     world.set_next_turn_pos = True
+                    
 
-                if not EX.waiting in next_affordances or not EX.driveable in next_affordances:
+                if not EX.waiting in next_affordances or not EX.drivable in next_affordances:
                     world.extend_horizon.append(area)
 
                     #print(f'extend horizon: {world.extend_horizon}')
@@ -161,46 +163,17 @@ class SkillModel():
             #print(f'is the plan configured: {world.plan_configured}')
             if world.plan_configured:
                 if not world.switch_phi:
-                    #print(f"current turn pos: {world.before_obstacle_rl['uri']}")
-                    #print(f"next turn pos: {world.after_obstacle_ll['uri']}")
-                    #print(f"phi before: {world.plan[world.before_obstacle_rl['uri']]['phi']}")
-                    world.switch_phi = True
                     world.plan[world.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
                     world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
-                # if not world.switch_phi_next:
-                #     if world.robot.polygon.intersects(world.after_obstacle_ll['polygon']) and world.robot.polygon.intersection(world.after_obstacle_ll['polygon']).area > 0.95 * world.robot.polygon.area:
-                #         world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
-                #         world.switch_phi_next = True
-                
-                    #print(f"phi after: {world.plan[world.before_obstacle_rl['uri']]['phi']}")
                 world.skill = 'drive'
             elif not world.wait_pos:
                 world.skill = 'wait'
                 world.wait_pos = world.before_obstacle_rl['polygon']
-                self.replan(world)
             
             else:
                 world.skill = 'wait'
-                self.replan(world)
                 
-    def replan(self, world):
-        pass
 
-        # if world.positions_configured:
-        #     if self.init_replan:
-        #         world.horizon_dict = {}
-        #         world.horizon_dict = copy.deepcopy(world.horizon_before_turn)
-        #         world.horizon_dict[str(len(world.horizon_dict))] = world.before_obstacle_ll
-        #         self.init_replan = False
-            #print(world.horizon_dict)
-                #input('asdf')
-
-                # if world.horizon_dict[str(len(world.horizon_dict)-1)]['polygon'].intersects(world.after_obstacle_ll['polygon']):
-                #         world.horizon_dict[str(len(world.horizon_dict))] = world.after_obstacle_ll
-                #         world.horizon_dict[str(len(world.horizon_dict))] = world.next_wait_pos
-                #         #world.on_left_lane = False
-                #         world.extend_horizon.pop()
-                #         #world.plan_configured = True
 
     def execute_skill(self, world, control):
         print(f'Skill: {world.skill}')
