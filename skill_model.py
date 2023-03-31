@@ -73,6 +73,7 @@ class SkillModel():
                     
 
                 if not EX.waiting in next_affordances or not EX.drivable in next_affordances:
+                    #if world.plan_configured
                     world.extend_horizon.append(area)
 
                     #print(f'extend horizon: {world.extend_horizon}')
