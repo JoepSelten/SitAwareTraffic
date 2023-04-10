@@ -160,14 +160,22 @@ class Semantics(Core):
             for Z, Y, xxx in self.graph.triples((o, EX.has_a, None)):
                 new_uri = URIRef(xxx.replace(o,s))
                 self.store_triple((s, EX.has_a, new_uri))
+                #print(xxx)
                 xxx_type = self.query_type(xxx)
-                self.store_triple((new_uri, RDF.type, xxx_type))
+                if xxx_type:
+                    self.store_triple((new_uri, RDF.type, xxx_type))
+                for W, V, uuu in self.graph.triples((xxx, EX.connects, None)):
+                    new_uri2 = URIRef(uuu.replace(o,s))
+                    self.store_triple((new_uri, EX.connects, new_uri2))
+                    #xxx_type = self.query_type(xxx)
+                    #self.store_triple((new_uri, RDF.type, xxx_type))
 
             for Z, Y, xxx in self.graph.triples((o, EX.connects, None)):
                 new_uri = URIRef(xxx.replace(o,s))
                 self.store_triple((s, EX.connects, new_uri))
                 xxx_type = self.query_type(xxx)
-                self.store_triple((new_uri, RDF.type, xxx_type))
+                if xxx_type:
+                    self.store_triple((new_uri, RDF.type, xxx_type))
 
             for Z, Y, xxx in self.graph.triples((o, EX.affordance, None)):
                 #new_uri = URIRef(xxx.replace(o,s))
@@ -216,4 +224,7 @@ class Semantics(Core):
         answer = []
         for r in self.graph.query(query, initBindings={'subject': URIRef(subject)}):
                 answer.append(r[0])
-        return answer[0]
+        if answer:
+            return answer[0]
+        else:
+            return None

@@ -44,9 +44,8 @@ def query_type(g, subject):
 
         SELECT ?object
         WHERE {
-            ?subject rdf:type* ?object .
+            ?subject rdf:type ?object .
             ?object rdf:type ex:geometry .
-            ?object rdf:type ex:polygon .
         }
         """
     answer = 0
@@ -169,7 +168,7 @@ def query_road(g, robot):
     SELECT ?road
     WHERE {
         ?robot ex:is_on ?pos .
-        ?road ex:has_a ?pos .
+        ?road ex:has_a* ?pos .
         ?road rdf:type ex:road
     }
     """

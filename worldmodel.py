@@ -13,12 +13,12 @@ from sys import exit
 import copy
 
 class WorldModel():
-    def __init__(self, g, robot, map):
+    def __init__(self, robot, map):
         self.init_geometric_map(map)
-        self.reset(g, robot)
+        self.reset(robot)
 
-    def reset(self, g, robot):
-        self.g = g
+    def reset(self, robot):
+        self.g = copy.deepcopy(g)
         self.robot = robot
         self.horizon_dict = {}
         self.position_dict = {}
@@ -43,6 +43,7 @@ class WorldModel():
         self.switch_phi_current = False
         self.switch_phi_next = False
         self.positions_configured = False
+        self.after_obstacle_configured = False
 
         self.turn_area = None
         self.switch_phi = False
@@ -67,10 +68,20 @@ class WorldModel():
         self.set_next_turn_pos = False
         self.add_next_horizon = False
 
+        self.obstacle_on_crossing = False
+
         self.extend_horizon = []
         self.obstacles = []
+
         if self.robot.start == 'down':
-            self.start = URIRef("http://example.com/intersection/road_down/lane_right")
+            self.start = URIRef("http://example.com/intersection/road_down/lane1")
+
+            #tmp = self.map_dict[URIRef("http://example.com/intersection/road_down/lane2")]
+            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane2")] = self.map_dict[URIRef("http://example.com/intersection/road_down/lane1")]
+            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane1")] = tmp
+            #input(self.map_dict)
+            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane_left")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane2"))
+
         elif self.robot.start == 'right':
             self.start = URIRef("http://example.com/intersection/road_right/lane_right")
         elif self.robot.start == 'up':
@@ -91,8 +102,10 @@ class WorldModel():
             self.side_uri = URIRef("http://example.com/intersection/road_up/side_left")
 
         if self.robot.task == 'left':
-            self.goal = URIRef("http://example.com/intersection/road_left/lane_left")
-            self.side_uri = URIRef("http://example.com/intersection/road_left/side_left")
+            self.goal = URIRef("http://example.com/intersection/road_left/lane2")
+            #self.map_dict[URIRef("http://example.com/intersection/road_left/lane_right")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_left/lane2"))
+            #self.map_dict[URIRef("http://example.com/intersection/road_left/lane_left")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_left/lane1"))
+            
 
         self.phi_before = self.map_dict[self.start].get('orientation')
         self.phi_after = self.map_dict[self.goal].get('orientation')
@@ -103,22 +116,30 @@ class WorldModel():
         self.horizon_uri = []
         self.horizon_length = 1
 
+        #self.g.remove((self.start, RDF.type, None))
+        #self.g.remove((self.goal, RDF.type, None))
         self.g.add((self.start, RDF.type, EX.lane_right))
         self.g.add((self.goal, RDF.type, EX.lane_right))
+        start_type = query_type(self.g, self.start)
+        goal_type = query_type(self.g, self.goal)
+        # print(f"start: {self.start}, start type: {start_type}")
+        # print(f"goal: {self.goal}, goal type: {goal_type}")
+        # input('wait')
         lane_right_affordances = query_affordances(self.g, EX.lane_right)
+        #input(lane_right_affordances)
         for affordance in lane_right_affordances:
             self.g.add((self.start, EX.affordance, affordance))
             self.g.add((self.goal, EX.affordance, affordance))
         ## deze moeten miss ook type lane_right en lane_left
-        self.g.add((URIRef("http://example.com/intersection/middle_dr"), RDF.type, EX.middle))
-        self.g.add((URIRef("http://example.com/intersection/middle_ur"), RDF.type, EX.middle))
-        self.g.add((URIRef("http://example.com/intersection/middle_ul"), RDF.type, EX.middle))
-        self.g.add((URIRef("http://example.com/intersection/middle_dl"), RDF.type, EX.middle))
+        self.g.add((URIRef("http://example.com/intersection/crossing_dr"), RDF.type, EX.crossing))
+        self.g.add((URIRef("http://example.com/intersection/crossing_ur"), RDF.type, EX.crossing))
+        self.g.add((URIRef("http://example.com/intersection/crossing_ul"), RDF.type, EX.crossing))
+        self.g.add((URIRef("http://example.com/intersection/crossing_dl"), RDF.type, EX.crossing))
 
-        self.g.add((URIRef("http://example.com/intersection/middle_dr"), EX.affordance, EX.drivable))
-        self.g.add((URIRef("http://example.com/intersection/middle_ur"), EX.affordance, EX.drivable))
-        self.g.add((URIRef("http://example.com/intersection/middle_ul"), EX.affordance, EX.drivable))
-        self.g.add((URIRef("http://example.com/intersection/middle_dl"), EX.affordance, EX.drivable))
+        self.g.add((URIRef("http://example.com/intersection/crossing_dr"), EX.affordance, EX.drivable))
+        self.g.add((URIRef("http://example.com/intersection/crossing_ur"), EX.affordance, EX.drivable))
+        self.g.add((URIRef("http://example.com/intersection/crossing_ul"), EX.affordance, EX.drivable))
+        self.g.add((URIRef("http://example.com/intersection/crossing_dl"), EX.affordance, EX.drivable))
         
         self.init_plan()
         #DeductiveClosure(Semantics).expand(self.g)
@@ -128,31 +149,19 @@ class WorldModel():
     def init_geometric_map(self, map):
         if map.traffic_situation == "two-lane_intersection":
             self.map_dict = {
-                #URIRef("http://example.com/intersection/middle"): {'polygon': map.polygon_list[0].union(map.polygon_list[1]).union(map.polygon_list[2]).union(map.polygon_list[3])},
-                URIRef("http://example.com/intersection/middle_dr"): {'polygon': map.polygon_list[0], 'position': [55, 45], 'weight': 0},
-                URIRef("http://example.com/intersection/middle_ur"): {'polygon': map.polygon_list[1], 'position': [55, 55], 'weight': 0},
-                URIRef("http://example.com/intersection/middle_ul"): {'polygon': map.polygon_list[2], 'position': [45, 55], 'weight': 0},
-                URIRef("http://example.com/intersection/middle_dl"): {'polygon': map.polygon_list[3], 'position': [45, 45], 'weight': 0},
-                URIRef("http://example.com/intersection/road_down/lane_right"): {'polygon': map.polygon_list[4], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_down/lane_left"): {'polygon': map.polygon_list[5], 'orientation': -0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_right/lane_right"): {'polygon': map.polygon_list[6], 'orientation': math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_right/lane_left"): {'polygon': map.polygon_list[7], 'orientation': 0, 'weight': 0},
-                URIRef("http://example.com/intersection/road_up/lane_right"): {'polygon': map.polygon_list[8], 'orientation': -0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_up/lane_left"): {'polygon': map.polygon_list[9], 'orientation': 0.5*math.pi, 'weight': 0}, 
-                URIRef("http://example.com/intersection/road_left/lane_right"): {'polygon': map.polygon_list[10], 'orientation': 0, 'weight': 0},
-                URIRef("http://example.com/intersection/road_left/lane_left"): {'polygon': map.polygon_list[11], 'orientation': math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_down/side_right"): {'polygon': map.polygon_list[12], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_down/side_left"): {'polygon': map.polygon_list[13], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_right/side_right"): {'polygon': map.polygon_list[14], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_right/side_left"): {'polygon': map.polygon_list[15], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_up/side_right"): {'polygon': map.polygon_list[16], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_up/side_left"): {'polygon': map.polygon_list[17], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_left/side_right"): {'polygon': map.polygon_list[18], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_left/side_left"): {'polygon': map.polygon_list[19], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_down/centerline"): {'polygon': map.polygon_list[20], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_right/centerline"): {'polygon': map.polygon_list[21], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_up/centerline"): {'polygon': map.polygon_list[22], 'orientation': 0.5*math.pi, 'weight': 0},
-                URIRef("http://example.com/intersection/road_left/centerline"): {'polygon': map.polygon_list[23], 'orientation': 0.5*math.pi, 'weight': 0}
+                #URIRef("http://example.com/intersection/crossing"): {'polygon': map.polygon_list[0].union(map.polygon_list[1]).union(map.polygon_list[2]).union(map.polygon_list[3])},
+                URIRef("http://example.com/intersection/crossing_dr"): {'polygon': map.polygon_list[0], 'position': [55, 45], 'weight': 0},
+                URIRef("http://example.com/intersection/crossing_ur"): {'polygon': map.polygon_list[1], 'position': [55, 55], 'weight': 0},
+                URIRef("http://example.com/intersection/crossing_ul"): {'polygon': map.polygon_list[2], 'position': [45, 55], 'weight': 0},
+                URIRef("http://example.com/intersection/crossing_dl"): {'polygon': map.polygon_list[3], 'position': [45, 45], 'weight': 0},
+                URIRef("http://example.com/intersection/road_down/lane1"): {'polygon': map.polygon_list[4], 'orientation': 0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_down/lane2"): {'polygon': map.polygon_list[5], 'orientation': -0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_right/lane1"): {'polygon': map.polygon_list[6], 'orientation': math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_right/lane2"): {'polygon': map.polygon_list[7], 'orientation': 0, 'weight': 0},
+                URIRef("http://example.com/intersection/road_up/lane1"): {'polygon': map.polygon_list[8], 'orientation': -0.5*math.pi, 'weight': 0},
+                URIRef("http://example.com/intersection/road_up/lane2"): {'polygon': map.polygon_list[9], 'orientation': 0.5*math.pi, 'weight': 0}, 
+                URIRef("http://example.com/intersection/road_left/lane1"): {'polygon': map.polygon_list[10], 'orientation': 0, 'weight': 0},
+                URIRef("http://example.com/intersection/road_left/lane2"): {'polygon': map.polygon_list[11], 'orientation': math.pi, 'weight': 0}
             }
 
         else:
@@ -176,33 +185,46 @@ class WorldModel():
 
 
     def get_plan(self, start, task):
+        ## dit configureert gelijk wat de right en left lane is
         plan = {}
         lane_left_affordances = query_affordances(self.g, EX.lane_left)
+        #input(lane_left_affordances)
+        # if self.robot.uri == EX.AV1:
+        #     input(lane_left_affordances)
         if start == 'down' and task == 'left':
-            plan = {URIRef("http://example.com/intersection/road_down/lane_right"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/middle_dr")},
-            URIRef("http://example.com/intersection/road_down/lane_left"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/middle_dl")},
-            URIRef("http://example.com/intersection/middle_dr"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/middle_ur")},
-            URIRef("http://example.com/intersection/middle_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/middle_ul")},
-            URIRef("http://example.com/intersection/middle_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane_left")},
-            URIRef("http://example.com/intersection/middle_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane_right")},
-            URIRef("http://example.com/intersection/road_left/lane_right"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
-            URIRef("http://example.com/intersection/road_left/lane_left"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane_right")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane1"))
+            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane_left")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane2"))
+            #self.map_dict[URIRef("http://example.com/intersection/road_left/lane_right")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane2"))
+            #self.map_dict[URIRef("http://example.com/intersection/road_left/lane_left")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane1"))
+
+
+            plan = {URIRef("http://example.com/intersection/road_down/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/road_down/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane2")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane1")},
+            URIRef("http://example.com/intersection/road_left/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_left/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
             }
             ## miss later queryen?
-            self.g.add((URIRef("http://example.com/intersection/road_down/lane_left"), RDF.type, EX.lane_left))
-            self.g.add((URIRef("http://example.com/intersection/road_left/lane_right"), RDF.type, EX.lane_left))
+            #self.g.remove((URIRef("http://example.com/intersection/road_down/lane_left"), RDF.type, None))
+            #self.g.remove((URIRef("http://example.com/intersection/road_left/lane_left"), RDF.type, None))
+            self.g.add((URIRef("http://example.com/intersection/road_down/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_left/lane1"), RDF.type, EX.lane_left))
             
             for affordance in lane_left_affordances:
-                self.g.add((URIRef("http://example.com/intersection/road_down/lane_left"), EX.affordance, affordance))
-                self.g.add((URIRef("http://example.com/intersection/road_left/lane_right"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_down/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_left/lane1"), EX.affordance, affordance))
 
         if start == 'down' and task == 'right':
-            plan = {URIRef("http://example.com/intersection/road_down/lane_right"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/middle_dr")},
-            URIRef("http://example.com/intersection/road_down/lane_left"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/middle_dl")},
-            URIRef("http://example.com/intersection/middle_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane_left")},
-            URIRef("http://example.com/intersection/middle_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane_right")},
-            URIRef("http://example.com/intersection/middle_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/middle_ur")},
-            URIRef("http://example.com/intersection/middle_dl"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/middle_ul")},
+            
+            plan = {URIRef("http://example.com/intersection/road_down/lane_right"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/road_down/lane_left"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane_left")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane_right")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
             URIRef("http://example.com/intersection/road_right/lane_right"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
             URIRef("http://example.com/intersection/road_right/lane_left"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
             }
@@ -213,9 +235,27 @@ class WorldModel():
                 self.g.add((URIRef("http://example.com/intersection/road_down/lane_left"), EX.affordance, affordance))
                 self.g.add((URIRef("http://example.com/intersection/road_right/lane_right"), EX.affordance, affordance))
 
+        if start == 'right' and task == 'left':
+            plan = {URIRef("http://example.com/intersection/road_right/lane_right"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/road_right/lane_left"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane_left")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane_right")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/road_left/lane_right"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_left/lane_left"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_right/lane_left"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_left/lane_right"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_right/lane_left"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_left/lane_right"), EX.affordance, affordance))
+
         return plan        
         
     def update(self, sim):
+        #input(query_type(self.g, URIRef("http://example.com/intersection/road_right/lane_right")))
         if self.horizon_dict:
             #print(f"last uri in dict: {self.horizon_dict[str(len(self.horizon_dict)-1)]['uri']}")
             #print(f"last horizon pos: {self.horizon_dict[str(len(self.horizon_dict)-1)]['position']}")
@@ -246,6 +286,8 @@ class WorldModel():
             self.current_pos = max(self.weight_dict, key=self.weight_dict.get)
         else:
             self.current_pos = None
+
+        #print(f'Current position: {self.current_pos}')
             
 
         if self.current_pos == None:
@@ -253,9 +295,12 @@ class WorldModel():
                 DeductiveClosure(Semantics).expand(self.g)
                 self.g.serialize(format="json-ld", destination='AV1' + ".json")
                 exit(0)
+            elif self.robot.uri == EX.AV2:
+                self.robot.reset('down', 'right')
+                self.reset(self.robot)
             else:
                 self.robot.random_reset()
-                self.reset(self.g, self.robot)
+                self.reset(self.robot)
             return
 
         if self.current_pos == prev_pos:
@@ -295,11 +340,17 @@ class WorldModel():
     def associate_positions(self):
         ## ga weer n abstractie hoger?
         if self.after_obstacle_rl and self.current_pos==self.after_obstacle_rl['uri']:
-            self.plan[URIRef("http://example.com/intersection/road_down/lane_right")]['next_position'] = URIRef("http://example.com/intersection/middle_dr")
+            self.plan[URIRef("http://example.com/intersection/road_down/lane1")]['next_position'] = URIRef("http://example.com/intersection/crossing_dr")
             self.map_dict[self.after_obstacle_rl['uri']]['weight'] = -1
+            self.set_current_wait_pos = False
+            self.current_wait_pos = {}
+            self.next_wait_pos = {}
+            self.set_current_turn_pos = False
+            self.set_next_wait_pos = False 
+            self.set_next_turn_pos = False          
             #query_part_of()
 
-        if self.set_next_wait_pos and self.plan_configured and self.after_obstacle_rl['uri'] not in self.intersect_dict:
+        if self.set_next_wait_pos and self.plan_configured and self.after_obstacle_rl and self.after_obstacle_rl['uri'] not in self.intersect_dict:
             self.map_dict[self.after_obstacle_rl['uri']]['weight'] = 1
 
         if self.horizon_dict:
@@ -330,6 +381,10 @@ class WorldModel():
             self.before_obstacle_rl['position'] = self.prev_dict['position']
             self.before_obstacle_rl['semantic_position'] = self.get_intersections(self.map_dict, self.before_obstacle_rl['polygon'])
             self.before_obstacle_rl['uri'] =  EX.before_obstacle_rl
+            #print(self.before_obstacle_rl['semantic_position'])
+            for key, value in self.before_obstacle_rl['semantic_position'].items():
+                if value > 60:
+                    self.g.add((key, EX.has_a, self.before_obstacle_rl['uri']))
             self.before_obstacle_rl['color'] = 'red'
             self.before_obstacle_rl['type'] = 'before_right'
             self.position_dict[str(len(self.position_dict))] = self.before_obstacle_rl
@@ -338,7 +393,7 @@ class WorldModel():
             self.horizon_before_turn = copy.deepcopy(self.horizon_dict)
             #print(self.current_dict['type'])
             
-            if self.current_dict['type'] == 'middle':
+            if self.current_dict['type'] == 'crossing':
                 self.horizon_before_turn.pop(str(len(self.horizon_dict)-1))
             #print(self.horizon_before_turn)
            
@@ -362,6 +417,7 @@ class WorldModel():
             self.g.add((self.before_obstacle_ll['uri'], RDF.type, lane_type))
             for affordance in lane_affordances:
                 self.g.add((self.before_obstacle_ll['uri'], EX.affordance, affordance))
+                
 
 
 
@@ -371,9 +427,9 @@ class WorldModel():
             
 
         if self.set_next_turn_pos and not self.after_obstacle_rl:
-            self.plan[URIRef("http://example.com/intersection/road_down/lane_right")]['next_position'] = self.before_obstacle_rl['uri']
+            self.plan[URIRef("http://example.com/intersection/road_down/lane1")]['next_position'] = self.before_obstacle_rl['uri']
             
-            plan_step = copy.deepcopy(self.plan[URIRef("http://example.com/intersection/road_down/lane_right")])
+            plan_step = copy.deepcopy(self.plan[URIRef("http://example.com/intersection/road_down/lane1")])
             plan_step['next_position'] = self.before_obstacle_ll['uri']
             self.plan[self.before_obstacle_rl['uri']] = plan_step
             new_map = {}
@@ -383,8 +439,8 @@ class WorldModel():
             self.map_dict[self.before_obstacle_rl['uri']] = new_map
 
 
-            plan_step = copy.deepcopy(self.plan[URIRef("http://example.com/intersection/road_down/lane_left")])
-            plan_step['next_position'] = URIRef("http://example.com/intersection/road_down/lane_left")
+            plan_step = copy.deepcopy(self.plan[URIRef("http://example.com/intersection/road_down/lane2")])
+            plan_step['next_position'] = URIRef("http://example.com/intersection/road_down/lane2")
             self.plan[self.before_obstacle_ll['uri']] = plan_step
             new_map = {}
             new_map['polygon'] = self.before_obstacle_ll['polygon']
@@ -437,7 +493,10 @@ class WorldModel():
             self.g.add((self.after_obstacle_ll['uri'], RDF.type, lane_type))
             for affordance in lane_affordances:
                 self.g.add((self.after_obstacle_ll['uri'], EX.affordance, affordance))
+      
 
+            #print(lane_uri)
+            #input('hoi')
             plan_step = copy.deepcopy(self.plan[lane_uri])
             plan_step['next_position'] = EX.after_obstacle_rl
             self.plan[EX.after_obstacle_ll] = plan_step
@@ -519,7 +578,7 @@ class WorldModel():
         #horizon = self.extend_horizon[-1]
         #print(self.current_dict)
         #semantic_pos_dict = self.current_dict['semantic_position']
-        max_weight = -2
+        max_weight = -5
         for ext_horizon in self.extend_horizon:
             weight = self.map_dict[ext_horizon]['weight']
             #intersection = semantic_pos_dict.get(ext_horizon, 0)
@@ -528,10 +587,10 @@ class WorldModel():
                 horizon = ext_horizon
 
         horizon_type = query_type(self.g, horizon)
-        print(f'horizon: {horizon}, horizon type: {horizon_type}')
+        #print(f'horizon: {horizon}, horizon type: {horizon_type}')
         #print(f'intersections horizon: {self.get_intersections(self.map_dict, horizon)}')
-        print(f'plan configured: {self.plan_configured}')
-        print(f'Add next horizon {self.add_next_horizon}')
+        #print(f'plan configured: {self.plan_configured}')
+        #print(f'Add next horizon {self.add_next_horizon}')
         previous_horizon_dict = self.horizon_dict[str(len(self.horizon_dict)-1)]
         if horizon_type == EX.obstacle:
             obstacle = sim.obstacles[horizon]
@@ -551,78 +610,122 @@ class WorldModel():
             horizon_pos = [x, y]
             self.add_horizon(semantic_pos, horizon_polygon, horizon_pos, obstacle.length, 'obstacle')
 
-        #elif horizon.type == EX.lane:
-            previous_horizon_dict = self.horizon_dict[str(len(self.horizon_dict)-1)]
-            #x = self.obstacles[0].pos[0]
-            #y = self.obstacles[0].pos[1]
-            x = previous_horizon_dict['position'][0]
-            y = previous_horizon_dict['position'][1]
-            lane_width = 20
-            phi = self.plan[semantic_pos]['phi']
-            offset = 0.5*previous_horizon_dict['length']
-            H = 10
+            type_semantic_pos = query_type(self.g, semantic_pos)
 
-            # if self.plan[semantic_pos]['next_position']:
-            #     cn_pos = unary_union([self.map_dict[semantic_pos]['polygon'], self.map_dict[self.plan[semantic_pos]['next_position']]['polygon']])
-            # else:
-            #     cn_pos = self.map_dict[semantic_pos]['polygon']
+            if type_semantic_pos == EX.lane_right or type_semantic_pos == EX.lane_left:
+                previous_horizon_dict = self.horizon_dict[str(len(self.horizon_dict)-1)]
+                #x = self.obstacles[0].pos[0]
+                #y = self.obstacles[0].pos[1]
+                x = previous_horizon_dict['position'][0]
+                y = previous_horizon_dict['position'][1]
+                lane_width = 20
+                phi = self.plan[semantic_pos]['phi']
+                offset = 0.5*previous_horizon_dict['length']
+                H = 10
+
+                # if self.plan[semantic_pos]['next_position']:
+                #     cn_pos = unary_union([self.map_dict[semantic_pos]['polygon'], self.map_dict[self.plan[semantic_pos]['next_position']]['polygon']])
+                # else:
+                #     cn_pos = self.map_dict[semantic_pos]['polygon']
 
 
-            current_plan = []
-            current_plan.append(self.map_dict[semantic_pos]['polygon'])
-            pos = semantic_pos
-            #print(self.plan[pos]['next_position'])
-            #input('hoi')
-            while self.plan[pos]['next_position']:
-                current_plan.append(self.map_dict[self.plan[pos]['next_position']]['polygon'])
-                if len(current_plan)>1:
-                    break
-                pos = self.plan[pos]['next_position']
-            cn_pos = unary_union(current_plan)
+                current_plan = []
+                current_plan.append(self.map_dict[semantic_pos]['polygon'])
+                pos = semantic_pos
+                #print(self.plan[pos]['next_position'])
+                #input('hoi')
+                while self.plan[pos]['next_position']:
+                    current_plan.append(self.map_dict[self.plan[pos]['next_position']]['polygon'])
+                    if len(current_plan)>1:
+                        break
+                    pos = self.plan[pos]['next_position']
+                cn_pos = unary_union(current_plan)
 
-            horizon_polygon = Polygon([(x+offset*math.cos(phi)-lane_width*math.sin(phi), y+offset*math.sin(phi)-lane_width*math.cos(phi)),
-                (x+(offset+H)*math.cos(phi)-lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)-lane_width*math.cos(phi)),
-                (x+(offset+H)*math.cos(phi)+lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)+lane_width*math.cos(phi)),
-                (x+offset*math.cos(phi)+lane_width*math.sin(phi), y+offset*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
+                horizon_polygon = Polygon([(x+offset*math.cos(phi)-lane_width*math.sin(phi), y+offset*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(offset+H)*math.cos(phi)-lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)-lane_width*math.cos(phi)),
+                    (x+(offset+H)*math.cos(phi)+lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)+lane_width*math.cos(phi)),
+                    (x+offset*math.cos(phi)+lane_width*math.sin(phi), y+offset*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
 
-            pos_x = x + (0.5*previous_horizon_dict['length']+0.5*H)*math.cos(phi)
-            pos_y = y + (0.5*previous_horizon_dict['length']+0.5*H)*math.sin(phi)
-            horizon_pos = [pos_x, pos_y]
+                pos_x = x + (0.5*previous_horizon_dict['length']+0.5*H)*math.cos(phi)
+                pos_y = y + (0.5*previous_horizon_dict['length']+0.5*H)*math.sin(phi)
+                horizon_pos = [pos_x, pos_y]
 
+                
+            elif type_semantic_pos == EX.crossing:
+                self.obstacle_on_crossing = True
+                next_horizon = self.plan[semantic_pos]['next_position']
+                next_horizon_type = query_type(self.g, next_horizon)
+                
+                if next_horizon_type == EX.crossing:
+                    horizon_polygon = self.map_dict[next_horizon]['polygon']
+                    
+                    horizon_pos = self.map_dict[next_horizon]['position']
+                    horizon_length = 10
+                elif next_horizon_type == EX.lane_left or next_horizon_type == EX.lane_right:
+                    #self.add_next_horizon = False
+                    x, y = self.map_dict[semantic_pos]['position']
+                    lane_width = 20
+                    phi = self.plan[semantic_pos]['phi']
+                    offset = 5
+                    H = 10
+                    if self.plan_configured:
+                        self.add_next_horizon = False
+                    
+
+                    if self.plan[semantic_pos]['next_position']:
+                        cn_pos = unary_union([self.map_dict[semantic_pos]['polygon'], self.map_dict[self.plan[semantic_pos]['next_position']]['polygon']])
+                    else:
+                        cn_pos = self.map_dict[semantic_pos]['polygon']
+
+                    horizon_polygon = Polygon([(x+offset*math.cos(phi)-lane_width*math.sin(phi), y+offset*math.sin(phi)-lane_width*math.cos(phi)),
+                        (x+(offset+H)*math.cos(phi)-lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)-lane_width*math.cos(phi)),
+                        (x+(offset+H)*math.cos(phi)+lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)+lane_width*math.cos(phi)),
+                        (x+offset*math.cos(phi)+lane_width*math.sin(phi), y+offset*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
+
+                    pos_x = x + (0.5*previous_horizon_dict['length']+0.5*H)*math.cos(phi)
+                    pos_y = y + (0.5*previous_horizon_dict['length']+0.5*H)*math.sin(phi)
+                    horizon_pos = [pos_x, pos_y]
+                    horizon_length = H
+                #horizon_polygon = self.map_dict[self.plan[semantic_pos]['next_position']]['polygon']
             self.add_horizon(semantic_pos, horizon_polygon, horizon_pos, H, 'next_horizon')
-        
-       #elif horizon_type == EX.middle and self.plan_configured and not self.add_next_horizon:
-        elif horizon_type == EX.middle and self.plan_configured:
+
+            
+       #elif horizon_type == EX.crossing and self.plan_configured and not self.add_next_horizon:
+        elif horizon_type == EX.crossing and (self.plan_configured or self.obstacle_on_crossing):
             #max_intersection = max(previous_horizon_dict['semantic_position'], key=previous_horizon_dict['semantic_position'].get)
             #print(previous_horizon_dict)
-            middle_intersect = previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/middle_dr"), 0) + \
-                previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/middle_ur"), 0) + \
-                    previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/middle_dl"), 0) + \
-                    previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/middle_ul"), 0)
-            #print(middle_intersect)
-            if middle_intersect < 95:
+            crossing_intersect = previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/crossing_dr"), 0) + \
+                previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/crossing_ur"), 0) + \
+                    previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/crossing_dl"), 0) + \
+                    previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/crossing_ul"), 0)
+            #print(crossing_intersect)
+            #input('qwerr')
+            if crossing_intersect < 95:
 
             # print(previous_horizon_dict['semantic_position'])
             # print(horizon)
-            # print(middle_intersect)
+            # print(crossing_intersect)
             # input('asd')
                 if horizon == EX.after_obstacle_rl:
                     #uri = self.plan[horizon]['next_position']
-                    horizon = URIRef("http://example.com/intersection/middle_dr")
+                    horizon = URIRef("http://example.com/intersection/crossing_dr")
                     #print(horizon)
 
                 horizon_polygon = self.map_dict[horizon]['polygon']
                 horizon_pos = self.map_dict[horizon]['position']
-                self.add_horizon(horizon, horizon_polygon, horizon_pos, 10, 'middle')
+                horizon_length = 10
+                #self.add_horizon(horizon, horizon_polygon, horizon_pos, 10, 'crossing')
                 self.add_next_horizon = True
             
         
-            #elif horizon_type == EX.middle and self.add_next_horizon:
+            #elif horizon_type == EX.crossing and self.add_next_horizon:
             else:
                 previous_horizon_dict = self.horizon_dict[str(len(self.horizon_dict)-1)]
                 next_horizon_type = query_type(self.g, self.plan[horizon]['next_position'])
-                #print(f"next horizon type: {self.plan[horizon]['next_position']}")
-                if next_horizon_type == EX.middle:
+                #print(self.plan[horizon]['next_position'])
+                #input('asdf')
+                #print(f"next horizon: {self.plan[horizon]['next_position']}, next horizon type: {next_horizon_type}")
+                if next_horizon_type == EX.crossing:
                     horizon_polygon = self.map_dict[self.plan[horizon]['next_position']]['polygon']
                     horizon_pos = self.map_dict[self.plan[horizon]['next_position']]['position']
                     horizon_length = 10
@@ -631,6 +734,7 @@ class WorldModel():
                     x, y = self.map_dict[horizon]['position']
                     lane_width = 20
                     phi = self.plan[horizon]['phi']
+                    #input(phi)
                     offset = 5
                     H = 10
                     if self.plan_configured:
@@ -651,9 +755,15 @@ class WorldModel():
                     pos_y = y + (0.5*previous_horizon_dict['length']+0.5*H)*math.sin(phi)
                     horizon_pos = [pos_x, pos_y]
                     horizon_length = H
-                self.add_horizon(horizon, horizon_polygon, horizon_pos, horizon_length, 'middle')
+
+            # if previous_horizon_dict['type'] == 'before_obstacle_ll':
+            #     new_horizon_polygon = horizon_polygon.difference(self.before_obstacle_ll['polygon'])
+            #     horizon_polygon = new_horizon_polygon
+            #     input('apgjn')
+            self.add_horizon(horizon, horizon_polygon, horizon_pos, horizon_length, 'crossing')
                     #self.add_next_horizon = True
-                    #self.middle_approaching = True
+                    #self.crossing_approaching = True
+
                 
 
         elif horizon_type==EX.lane_left and not horizon == EX.after_obstacle_ll:
@@ -686,13 +796,21 @@ class WorldModel():
                 (x+(offset+H)*math.cos(phi)-lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)-lane_width*math.cos(phi)),
                 (x+(offset+H)*math.cos(phi)+lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)+lane_width*math.cos(phi)),
                 (x+offset*math.cos(phi)+lane_width*math.sin(phi), y+offset*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
+                
+            if horizon == EX.before_obstacle_ll:
+                self.map_dict[horizon]['weight'] = -2
+            # else:
+            #     horizon_type = 'left_lane'
+            #     new_horizon_polygon = horizon_polygon.difference(self.before_obstacle_ll['polygon'])
+            #     horizon_polygon = new_horizon_polygon
 
             pos_x = x + (0.5*H+0.5*H)*math.cos(phi)
             pos_y = y + (0.5*H+0.5*H)*math.sin(phi)
             horizon_pos = [pos_x, pos_y]
             horizon_length = H
+            horizon_type = 'left_lane'
 
-            self.add_horizon(horizon, horizon_polygon, horizon_pos, horizon_length, 'left_lane')
+            self.add_horizon(horizon, horizon_polygon, horizon_pos, horizon_length, horizon_type)
 
         elif horizon == EX.after_obstacle_ll:
             horizon_polygon = self.map_dict[horizon]['polygon']
@@ -712,6 +830,9 @@ class WorldModel():
             self.add_horizon(next_horizon, horizon_polygon, horizon_pos, 10, 'after_obstacle')
             self.map_dict[next_horizon]['weight'] = -1
             self.plan_configured = True
+            self.after_obstacle_configured =  True
+            self.plan[self.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
+            self.plan[self.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
 
         self.extend_horizon = []
 
@@ -783,6 +904,7 @@ class WorldModel():
                 #print(obstacle_pos)
                 self.g.add((uri, EX.obstructs, self.robot.uri))
                 self.g.add((uri, RDF.type, EX.obstacle))
+                self.plan_configured = False
                 #print(f"uri: {uri}, type: {query_type(self.g, uri)}")
                 #input('wait')
                 #self.g.add((uri, RDF.type, EX.polygon))
@@ -843,6 +965,7 @@ class WorldModel():
 
         road_vehicle = query_road(self.g, vehicle.uri)
         road_current = query_road(self.g, self.robot.uri)
+        #print(f'road current: {road_current}, road vehicle: {road_vehicle}')
         #print(f'road_current: {road_current}')
         #print(f'road_vehicle: {road_vehicle}')
         if road_current == URIRef("http://example.com/intersection/road_down"):

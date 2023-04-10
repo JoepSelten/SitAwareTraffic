@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from global_variables import w
 from basic_functions import shift_line, extend_line
 from skills import MoveInLane, Turn, SlowDownAndStop
-from traffic_rules import ApproachingMiddle, Priority
+from traffic_rules import ApproachingCrossing, Priority
 import copy
 
 class SkillModel():
@@ -15,7 +15,7 @@ class SkillModel():
                             'turn': Turn(),
                             'slow_down_and_stop:': SlowDownAndStop()
         }
-        self.rule_dict = {'approaching_middle': ApproachingMiddle(),
+        self.rule_dict = {'approaching_crossing': ApproachingCrossing(),
                             'priority': Priority()
         }
         self.condition_failed = False
@@ -47,7 +47,7 @@ class SkillModel():
             for area in approaches_list:
                 next_affordances = query_affordances(world.g, area)
 
-                print(f'area: {area}, next_affordances: {next_affordances}')
+                #print(f'area: {area}, next_affordances: {next_affordances}')
 
                 if EX.waiting in next_affordances:
                     waiting_number+=1             
@@ -68,7 +68,7 @@ class SkillModel():
                     
                 
                 if world.set_current_turn_pos and drivable_number==len(approaches_list):
-                    print('next drivable pos found')
+                    #print('next drivable pos found')
                     world.set_next_turn_pos = True
                     
 
@@ -81,28 +81,48 @@ class SkillModel():
         ## later integrate the above with vehicles and obstacles that inhibit driveability.
         ## however for convenience first do this separetely to get things working
         
-        # passing_robot = query_passes(world.g, world.robot.uri)
-        # conflict_robot = query_conflict(world.g, world.robot.uri)
-        # obstruct_robot = query_obstructs(world.g, world.robot.uri)
+        passing_robot = query_passes(world.g, world.robot.uri)
+        conflict_robot = query_conflict(world.g, world.robot.uri)
+        obstruct_robot = query_obstructs(world.g, world.robot.uri)
+        #print(f'is the plan configured: {world.plan_configured}')
 
-        if world.set_current_wait_pos and not world.set_next_wait_pos:
-            world.skill = 'wait'
 
-        elif world.set_current_turn_pos and not world.set_next_turn_pos:
-            world.skill = 'wait'
 
-        elif world.set_current_turn_pos and world.set_next_turn_pos:
-            world.skill = 'replan'
-            #world.skill = 'drive'
+        # if world.set_current_wait_pos and not world.set_next_wait_pos:
+        #     world.skill = 'wait'
+
+        # elif world.set_current_turn_pos and not world.set_next_turn_pos:
+        #     world.skill = 'wait'
+
+        
+        # elif world.set_current_turn_pos and world.set_next_turn_pos:
+        #     world.skill = 'replan'
+        #     #world.skill = 'drive'
 
         # elif conflict_robot:
         #     #print(f'{world.robot.name}: conflict')
         #     world.skill = 'check_priority'
 
+        if obstruct_robot or not world.plan_configured:
+            world.skill = 'replan'
+
+        elif passing_robot:
+            world.skill = 'wait'
+
+        elif conflict_robot:
+            right_of = query_right_of(world.g, world.robot.uri)
+            #input(right_of)
+            if right_of:
+                world.skill = 'wait'
+
+        elif not world.set_next_wait_pos:
+            world.skill = 'wait'
 
         else:
             world.skill = 'drive'
             world.wait_pos = None
+
+        #print(f'{world.robot.uri}, Skill after check: {world.skill}')
 
         #print(f'skill before config: {world.skill}')
 
@@ -123,7 +143,7 @@ class SkillModel():
 
     def check_traffic_rules(self, world, traffic_rules):
         #input("Press Enter to continue...")
-        ## check what to do when robot approaching middle
+        ## check what to do when robot approaching crossing
         #print(traffic_rules)
         rule_obj = self.rule_dict[traffic_rules]
         rule_obj.config_rules(world)
@@ -162,28 +182,36 @@ class SkillModel():
                 world.skill = 'drive'
         elif world.skill == 'replan':
             #print(f'is the plan configured: {world.plan_configured}')
-            if world.plan_configured:
-                if not world.switch_phi:
-                    world.plan[world.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
-                    world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
-                    world.switch_phi = True
-                world.skill = 'drive'
-            elif not world.wait_pos:
+            #if world.plan_configured:
+            if world.after_obstacle_configured and not world.switch_phi:
+                world.plan[world.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
+                world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
+                world.switch_phi = True
+
+            #    world.skill = 'drive'
+            #elif not world.wait_pos:
+            if world.current_wait_pos:
+                world.wait_pos = world.current_wait_pos['polygon']
                 world.skill = 'wait'
-                world.wait_pos = world.before_obstacle_rl['polygon']
-            
             else:
-                world.skill = 'wait'
+                world.skill = 'drive'
+            
+            #world.skill = 'drive'
+            #    world.wait_pos = world.before_obstacle_rl['polygon']
+            
+            #else:
+            #    world.skill = 'wait'
                 
 
 
     def execute_skill(self, world, control):
-        print(f'Skill: {world.skill}')
+        #print(f'Skill: {world.skill}')
         if world.skill == 'drive':
             control.drive(world)
         elif world.skill == 'wait':
             #print(world.robot.polygon.intersects(world.wait_pos))
-            if world.robot.polygon.intersects(world.wait_pos) and world.robot.polygon.intersection(world.wait_pos).area > 0.95 * world.robot.polygon.area:
+            #print(world.robot.polygon.intersection(world.wait_pos).area)
+            if world.robot.polygon.intersects(world.wait_pos) and world.robot.polygon.intersection(world.wait_pos).area > 0.75 * world.robot.polygon.area:
                 control.stop(world)
             else:
                 control.drive(world)

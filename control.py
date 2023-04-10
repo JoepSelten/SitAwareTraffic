@@ -23,7 +23,7 @@ class Control():
         phi_des = world.plan[world.current_pos]['phi']
         vel_des = world.plan[world.current_pos]['velocity']
         #print(world.current_pos)
-        #print(f'phi des: {phi_des}')
+        #print(f'{world.robot.uri}, phi des: {phi_des}')
         # this skill requires the orientation of the lane      
         world.robot.yaw = world.robot.yaw%(2*math.pi)
         phi_des = phi_des%(2*math.pi)

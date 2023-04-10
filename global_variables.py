@@ -27,7 +27,7 @@ APPROACH_DISTANCE = 20
 ## load property graph , later miss met externe server doen oid
 #g = Graph(store="Oxigraph")
 g = Graph()
-g.parse("kg4.json", format="json-ld")
+g.parse("kg14.json", format="json-ld")
 EX = Namespace("http://example.com/") 
 GEO = Namespace("http://www.opengis.net/ont/geosparql#")
 g.bind('ex', EX)
