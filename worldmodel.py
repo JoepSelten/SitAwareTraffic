@@ -16,6 +16,8 @@ class WorldModel():
     def __init__(self, robot, map):
         self.init_geometric_map(map)
         self.reset(robot)
+        self.sit7 = False
+        self.sit3 = False
 
     def reset(self, robot):
         self.g = copy.deepcopy(g)
@@ -75,56 +77,32 @@ class WorldModel():
 
         if self.robot.start == 'down':
             self.start = URIRef("http://example.com/intersection/road_down/lane1")
-
-            #tmp = self.map_dict[URIRef("http://example.com/intersection/road_down/lane2")]
-            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane2")] = self.map_dict[URIRef("http://example.com/intersection/road_down/lane1")]
-            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane1")] = tmp
-            #input(self.map_dict)
-            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane_left")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane2"))
-
         elif self.robot.start == 'right':
-            self.start = URIRef("http://example.com/intersection/road_right/lane_right")
+            self.start = URIRef("http://example.com/intersection/road_right/lane1")
         elif self.robot.start == 'up':
-            self.start = URIRef("http://example.com/intersection/road_up/lane_right")
+            self.start = URIRef("http://example.com/intersection/road_up/lane1")
         elif self.robot.start == 'left':
-            self.start = URIRef("http://example.com/intersection/road_left/lane_right")
+            self.start = URIRef("http://example.com/intersection/road_left/lane1")
 
         if self.robot.task == 'down':
-            self.goal = URIRef("http://example.com/intersection/road_down/lane_left")
-            self.side_uri = URIRef("http://example.com/intersection/road_down/side_left")
-            
+            self.goal = URIRef("http://example.com/intersection/road_down/lane2")
         if self.robot.task == 'right':
-            self.goal = URIRef("http://example.com/intersection/road_right/lane_left")
-            self.side_uri = URIRef("http://example.com/intersection/road_right/side_left")
-
+            self.goal = URIRef("http://example.com/intersection/road_right/lane2")
         if self.robot.task == 'up':
-            self.goal = URIRef("http://example.com/intersection/road_up/lane_left")
-            self.side_uri = URIRef("http://example.com/intersection/road_up/side_left")
-
+            self.goal = URIRef("http://example.com/intersection/road_up/lane2")
         if self.robot.task == 'left':
             self.goal = URIRef("http://example.com/intersection/road_left/lane2")
-            #self.map_dict[URIRef("http://example.com/intersection/road_left/lane_right")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_left/lane2"))
-            #self.map_dict[URIRef("http://example.com/intersection/road_left/lane_left")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_left/lane1"))
-            
+
 
         self.phi_before = self.map_dict[self.start].get('orientation')
         self.phi_after = self.map_dict[self.goal].get('orientation')
         self.current_pos = self.start
-        #side = self.map_dict[self.side_uri].get('polygon')
-        #centerline = shift_line(side, -0.25*w)
-        #self.extended_centerline = extend_line(centerline, self.phi_after, w)
+
         self.horizon_uri = []
         self.horizon_length = 1
-
-        #self.g.remove((self.start, RDF.type, None))
-        #self.g.remove((self.goal, RDF.type, None))
         self.g.add((self.start, RDF.type, EX.lane_right))
         self.g.add((self.goal, RDF.type, EX.lane_right))
-        start_type = query_type(self.g, self.start)
-        goal_type = query_type(self.g, self.goal)
-        # print(f"start: {self.start}, start type: {start_type}")
-        # print(f"goal: {self.goal}, goal type: {goal_type}")
-        # input('wait')
+
         lane_right_affordances = query_affordances(self.g, EX.lane_right)
         #input(lane_right_affordances)
         for affordance in lane_right_affordances:
@@ -188,16 +166,7 @@ class WorldModel():
         ## dit configureert gelijk wat de right en left lane is
         plan = {}
         lane_left_affordances = query_affordances(self.g, EX.lane_left)
-        #input(lane_left_affordances)
-        # if self.robot.uri == EX.AV1:
-        #     input(lane_left_affordances)
         if start == 'down' and task == 'left':
-            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane_right")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane1"))
-            #self.map_dict[URIRef("http://example.com/intersection/road_down/lane_left")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane2"))
-            #self.map_dict[URIRef("http://example.com/intersection/road_left/lane_right")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane2"))
-            #self.map_dict[URIRef("http://example.com/intersection/road_left/lane_left")] = self.map_dict.pop(URIRef("http://example.com/intersection/road_down/lane1"))
-
-
             plan = {URIRef("http://example.com/intersection/road_down/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
             URIRef("http://example.com/intersection/road_down/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
             URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
@@ -207,9 +176,6 @@ class WorldModel():
             URIRef("http://example.com/intersection/road_left/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
             URIRef("http://example.com/intersection/road_left/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
             }
-            ## miss later queryen?
-            #self.g.remove((URIRef("http://example.com/intersection/road_down/lane_left"), RDF.type, None))
-            #self.g.remove((URIRef("http://example.com/intersection/road_left/lane_left"), RDF.type, None))
             self.g.add((URIRef("http://example.com/intersection/road_down/lane2"), RDF.type, EX.lane_left))
             self.g.add((URIRef("http://example.com/intersection/road_left/lane1"), RDF.type, EX.lane_left))
             
@@ -219,48 +185,198 @@ class WorldModel():
 
         if start == 'down' and task == 'right':
             
-            plan = {URIRef("http://example.com/intersection/road_down/lane_right"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
-            URIRef("http://example.com/intersection/road_down/lane_left"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
-            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane_left")},
-            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane_right")},
+            plan = {URIRef("http://example.com/intersection/road_down/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/road_down/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane2")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane1")},
             URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
             URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
-            URIRef("http://example.com/intersection/road_right/lane_right"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
-            URIRef("http://example.com/intersection/road_right/lane_left"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            URIRef("http://example.com/intersection/road_right/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_right/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
             }
-            self.g.add((URIRef("http://example.com/intersection/road_down/lane_left"), RDF.type, EX.lane_left))
-            self.g.add((URIRef("http://example.com/intersection/road_right/lane_right"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_down/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_right/lane1"), RDF.type, EX.lane_left))
 
             for affordance in lane_left_affordances:
-                self.g.add((URIRef("http://example.com/intersection/road_down/lane_left"), EX.affordance, affordance))
-                self.g.add((URIRef("http://example.com/intersection/road_right/lane_right"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_down/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_right/lane1"), EX.affordance, affordance))
+
+        if start == 'down' and task == 'up':
+            
+            plan = {URIRef("http://example.com/intersection/road_down/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/road_down/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_up/lane2")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_up/lane1")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/road_up/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_up/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_down/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_up/lane1"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_down/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_up/lane1"), EX.affordance, affordance))
+
 
         if start == 'right' and task == 'left':
-            plan = {URIRef("http://example.com/intersection/road_right/lane_right"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
-            URIRef("http://example.com/intersection/road_right/lane_left"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
-            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane_left")},
-            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane_right")},
-            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            plan = {URIRef("http://example.com/intersection/road_right/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/road_right/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane2")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane1")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
             URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
-            URIRef("http://example.com/intersection/road_left/lane_right"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
-            URIRef("http://example.com/intersection/road_left/lane_left"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            URIRef("http://example.com/intersection/road_left/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_left/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
             }
-            self.g.add((URIRef("http://example.com/intersection/road_right/lane_left"), RDF.type, EX.lane_left))
-            self.g.add((URIRef("http://example.com/intersection/road_left/lane_right"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_right/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_left/lane1"), RDF.type, EX.lane_left))
 
             for affordance in lane_left_affordances:
-                self.g.add((URIRef("http://example.com/intersection/road_right/lane_left"), EX.affordance, affordance))
-                self.g.add((URIRef("http://example.com/intersection/road_left/lane_right"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_right/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_left/lane1"), EX.affordance, affordance))
+
+        if start == 'right' and task == 'up':
+            plan = {URIRef("http://example.com/intersection/road_right/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/road_right/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_up/lane1")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_up/lane2")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/road_up/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_up/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_right/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_up/lane1"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_right/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_up/lane1"), EX.affordance, affordance))
+
+        if start == 'right' and task == 'down':
+            plan = {URIRef("http://example.com/intersection/road_right/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/road_right/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_down/lane2")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_down/lane1")},
+            URIRef("http://example.com/intersection/road_down/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_down/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_right/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_down/lane1"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_right/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_up/lane1"), EX.affordance, affordance))
+
+
+        if start == 'left' and task == 'down':
+            plan = {URIRef("http://example.com/intersection/road_left/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/road_left/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_down/lane2")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_down/lane1")},
+            URIRef("http://example.com/intersection/road_down/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_down/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_left/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_down/lane1"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_left/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_down/lane1"), EX.affordance, affordance))
+
+        if start == 'left' and task == 'up':
+            plan = {URIRef("http://example.com/intersection/road_left/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/road_left/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_up/lane1")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_up/lane2")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/road_up/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_up/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_left/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_up/lane1"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_left/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_down/lane1"), EX.affordance, affordance))
+
+        if start == 'left' and task == 'right':
+            plan = {URIRef("http://example.com/intersection/road_left/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/road_left/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane1")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane2")},
+            URIRef("http://example.com/intersection/road_right/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_right/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_left/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_right/lane1"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_left/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_right/lane1"), EX.affordance, affordance))
+
+        if start == 'up' and task == 'right':
+            plan = {URIRef("http://example.com/intersection/road_up/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/road_up/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane1")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_right/lane2")},
+            URIRef("http://example.com/intersection/road_right/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_right/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_up/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_right/lane1"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_up/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_right/lane1"), EX.affordance, affordance))
+
+        if start == 'up' and task == 'left':
+            plan = {URIRef("http://example.com/intersection/road_up/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/road_up/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane2")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_left/lane1")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/road_left/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_left/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_up/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_left/lane1"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_up/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_left/lane1"), EX.affordance, affordance))
+
+        if start == 'up' and task == 'down':
+            plan = {URIRef("http://example.com/intersection/road_up/lane1"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ul")},
+            URIRef("http://example.com/intersection/road_up/lane2"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_ur")},
+            URIRef("http://example.com/intersection/crossing_ul"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dl")},
+            URIRef("http://example.com/intersection/crossing_dl"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_down/lane2")},
+            URIRef("http://example.com/intersection/crossing_ur"): {'phi': self.phi_before, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/crossing_dr")},
+            URIRef("http://example.com/intersection/crossing_dr"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': URIRef("http://example.com/intersection/road_down/lane1")},
+            URIRef("http://example.com/intersection/road_down/lane1"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None},
+            URIRef("http://example.com/intersection/road_down/lane2"): {'phi': self.phi_after, 'velocity': self.robot.velocity_max, 'next_position': None}
+            }
+            self.g.add((URIRef("http://example.com/intersection/road_up/lane2"), RDF.type, EX.lane_left))
+            self.g.add((URIRef("http://example.com/intersection/road_down/lane1"), RDF.type, EX.lane_left))
+
+            for affordance in lane_left_affordances:
+                self.g.add((URIRef("http://example.com/intersection/road_up/lane2"), EX.affordance, affordance))
+                self.g.add((URIRef("http://example.com/intersection/road_down/lane1"), EX.affordance, affordance))
 
         return plan        
         
-    def update(self, sim):
-        #input(query_type(self.g, URIRef("http://example.com/intersection/road_right/lane_right")))
-        if self.horizon_dict:
-            #print(f"last uri in dict: {self.horizon_dict[str(len(self.horizon_dict)-1)]['uri']}")
-            #print(f"last horizon pos: {self.horizon_dict[str(len(self.horizon_dict)-1)]['position']}")
-            pass
-        
+    def update(self, sim):       
         self.update_current_pos(sim)
 
         ## deze miss later andersom doen
@@ -291,6 +407,17 @@ class WorldModel():
             
 
         if self.current_pos == None:
+            if self.robot.uri == EX.AV2:
+                self.robot.reset('up', 'down')
+                self.reset(self.robot)
+            elif self.robot.uri == EX.AV3:
+                self.robot.reset('left', 'right')
+                self.reset(self.robot)
+            else:
+                self.robot.random_reset()
+                self.reset(self.robot)
+
+            return
             if self.robot.uri == EX.AV1:
                 DeductiveClosure(Semantics).expand(self.g)
                 self.g.serialize(format="json-ld", destination='AV1' + ".json")
@@ -310,6 +437,12 @@ class WorldModel():
             self.update_av_is_on()
 
 
+    def update_av_is_on(self):
+        self.g.remove((self.robot.uri, EX.is_on, None))
+        self.g.add((self.robot.uri, EX.is_on, self.current_pos))
+        self.robot.pos_uri = self.current_pos
+
+
     def update_horizon(self, sim):
         if self.replan:
             self.horizon_dict = {}
@@ -319,6 +452,8 @@ class WorldModel():
             #input('aipuhfuiwheohf')
             self.replan = False
             self.on_left_lane = True
+            #print(self.horizon_dict)
+            #input('aiuoh')
         
         self.update_current_horizon(sim)
 
@@ -341,6 +476,7 @@ class WorldModel():
         ## ga weer n abstractie hoger?
         if self.after_obstacle_rl and self.current_pos==self.after_obstacle_rl['uri']:
             self.plan[URIRef("http://example.com/intersection/road_down/lane1")]['next_position'] = URIRef("http://example.com/intersection/crossing_dr")
+            #self.plan[URIRef("http://example.com/intersection/road_right/lane2")]['next_position'] = URIRef("http://example.com/intersection/crossing_dr")
             self.map_dict[self.after_obstacle_rl['uri']]['weight'] = -1
             self.set_current_wait_pos = False
             self.current_wait_pos = {}
@@ -427,7 +563,9 @@ class WorldModel():
             
 
         if self.set_next_turn_pos and not self.after_obstacle_rl:
+            #input(self.before_obstacle_rl)
             self.plan[URIRef("http://example.com/intersection/road_down/lane1")]['next_position'] = self.before_obstacle_rl['uri']
+          
             
             plan_step = copy.deepcopy(self.plan[URIRef("http://example.com/intersection/road_down/lane1")])
             plan_step['next_position'] = self.before_obstacle_ll['uri']
@@ -438,9 +576,12 @@ class WorldModel():
             new_map['weight'] = 1
             self.map_dict[self.before_obstacle_rl['uri']] = new_map
 
-
-            plan_step = copy.deepcopy(self.plan[URIRef("http://example.com/intersection/road_down/lane2")])
-            plan_step['next_position'] = URIRef("http://example.com/intersection/road_down/lane2")
+            if self.sit7:
+                plan_step = copy.deepcopy(self.plan[URIRef("http://example.com/intersection/road_right/lane1")])
+                plan_step['next_position'] = URIRef("http://example.com/intersection/road_right/lane1")
+            else:
+                plan_step = copy.deepcopy(self.plan[URIRef("http://example.com/intersection/road_down/lane2")])
+                plan_step['next_position'] = URIRef("http://example.com/intersection/road_down/lane2")
             self.plan[self.before_obstacle_ll['uri']] = plan_step
             new_map = {}
             new_map['polygon'] = self.before_obstacle_ll['polygon']
@@ -691,7 +832,7 @@ class WorldModel():
 
             
        #elif horizon_type == EX.crossing and self.plan_configured and not self.add_next_horizon:
-        elif horizon_type == EX.crossing and (self.plan_configured or self.obstacle_on_crossing):
+        elif horizon_type == EX.crossing and (self.plan_configured or self.obstacle_on_crossing or horizon==EX.before_obstacle_ll):
             #max_intersection = max(previous_horizon_dict['semantic_position'], key=previous_horizon_dict['semantic_position'].get)
             #print(previous_horizon_dict)
             crossing_intersect = previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/crossing_dr"), 0) + \
@@ -751,8 +892,8 @@ class WorldModel():
                         (x+(offset+H)*math.cos(phi)+lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)+lane_width*math.cos(phi)),
                         (x+offset*math.cos(phi)+lane_width*math.sin(phi), y+offset*math.sin(phi)+lane_width*math.cos(phi))]).intersection(cn_pos)
 
-                    pos_x = x + (0.5*previous_horizon_dict['length']+0.5*H)*math.cos(phi)
-                    pos_y = y + (0.5*previous_horizon_dict['length']+0.5*H)*math.sin(phi)
+                    pos_x = x + (0.5*H+0.5*H)*math.cos(phi) # first H was previous_horizon_dict['position']
+                    pos_y = y + (0.5*H+0.5*H)*math.sin(phi) # first H was previous_horizon_dict['position']
                     horizon_pos = [pos_x, pos_y]
                     horizon_length = H
 
@@ -831,8 +972,14 @@ class WorldModel():
             self.map_dict[next_horizon]['weight'] = -1
             self.plan_configured = True
             self.after_obstacle_configured =  True
-            self.plan[self.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
-            self.plan[self.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
+            if not self.sit7:
+                self.plan[self.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
+            if self.sit3:
+                self.plan[self.after_obstacle_ll['uri']]['phi'] -= math.pi
+            else:
+                self.plan[self.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
+            #print(self.plan[self.before_obstacle_rl['uri']]['phi'])
+            #input('poiu')
 
         self.extend_horizon = []
 
@@ -895,27 +1042,9 @@ class WorldModel():
                 self.map_dict[uri] = new_map
                 
                 self.g.add((self.robot.uri, EX.approaches, uri))
-        #for obstacle in sim.obstacles.values():
-        #    if self.robot.horizon.intersects(obstacle.polygon) and self.robot.horizon.intersection(obstacle.polygon).area > 2:
-                #self.obstacles.append(obstacle)
-                #intersection = self.robot.horizon.intersection(obstacle.polygon)
-                #self.robot.obstructed_area = intersection
-                #obstacle.semantic_pos = self.get_max_intersection(intersection)
-                #print(obstacle_pos)
                 self.g.add((uri, EX.obstructs, self.robot.uri))
                 self.g.add((uri, RDF.type, EX.obstacle))
                 self.plan_configured = False
-                #print(f"uri: {uri}, type: {query_type(self.g, uri)}")
-                #input('wait')
-                #self.g.add((uri, RDF.type, EX.polygon))
-                #self.g.add((uri, RDF.type, EX.geometry))
-                #self.g.remove((obstacle_pos, EX.affordance, None))
-                #self.g.add((self.robot.uri, EX.approaches, uri))
-                # if not self.wait_pos:
-                #     self.wait_pos = {}
-                #     self.wait_pos['polygon'] = self.prev_pos
-                #     self.wait_pos['color'] = 'black'
-                    #self.robot.horizon_dict[str(len(self.robot.horizon_dict))] = self.wait_pos
 
 
     
@@ -923,6 +1052,8 @@ class WorldModel():
         self.g.remove((None, EX.passes, self.robot.uri))
         self.robot.vehicle_area = None
         for robot in sim.robots.values():
+            self.g.remove((robot.uri, EX.is_on, None))
+            self.g.add((robot.uri, EX.is_on, robot.pos_uri))
             if self.robot.horizon.intersects(robot.polygon) and self.robot.uri != robot.uri:
                 intersection = self.robot.horizon.intersection(robot.polygon)
                 self.robot.vehicle_area = intersection
@@ -940,34 +1071,27 @@ class WorldModel():
                     intersection = self.robot.horizon.intersection(robot.horizon)
                     self.robot.approaching_vehicle_area = intersection
                     self.g.add((robot.uri, EX.conflict, self.robot.uri))
-                    self.associate_direction(robot)
+
+                    self.associate_right_of(robot)
                     #self.g.add((self.robot.uri, EX.approaches, robot.uri))
 
     def associate_approaching(self):
-        #self.robot.approaching_horizon = None
-        #self.g.remove((self.robot.uri, EX.approaches, None))
         approaching_areas = self.get_intersections(self.map_dict, self.robot.horizon_dict[str(len(self.robot.horizon_dict)-1)]['polygon'])
         for uri, area in approaching_areas.items():
             if area>5:
-                #print(f'approaching area: {uri}')
-                #print(f'uri: {uri}')
                 self.g.add((self.robot.uri, EX.approaches, uri))
-                #self.approaching_dict[uri] = area
-                # if not self.wait_pos and self.prev_pos:
-                #     self.wait_pos = {}
-                #     self.wait_pos['polygon'] = self.prev_pos
-                #     self.wait_pos['color'] = 'black'
-                    #self.robot.horizon_dict[str(len(self.robot.horizon_dict))] = self.wait_pos
 
 
-    def associate_direction(self, vehicle):
+    def associate_right_of(self, vehicle):
         ## later generieker doen met regels die je declaratief aan een road of intersection kunt plaatsen
 
         road_vehicle = query_road(self.g, vehicle.uri)
         road_current = query_road(self.g, self.robot.uri)
-        #print(f'road current: {road_current}, road vehicle: {road_vehicle}')
-        #print(f'road_current: {road_current}')
-        #print(f'road_vehicle: {road_vehicle}')
+
+        #print(road_current)
+        #print(road_vehicle)
+        #input('asdf')
+
         if road_current == URIRef("http://example.com/intersection/road_down"):
             if road_vehicle == URIRef("http://example.com/intersection/road_right"):
                 self.g.add((vehicle.uri, EX.right_of, self.robot.uri))
@@ -982,17 +1106,6 @@ class WorldModel():
         if road_current == URIRef("http://example.com/intersection/road_left"):
             if road_vehicle == URIRef("http://example.com/intersection/road_down"):
                 self.g.add((vehicle.uri, EX.right_of, self.robot.uri))
-
-
-    def update_av_is_on(self):
-        self.g.remove((self.robot.uri, EX.is_on, None))
-        self.g.add((self.robot.uri, EX.is_on, self.current_pos))
-        #if self.current_pos in self.extend_horizon:
-        #    self.extend_horizon.remove(self.current_pos)
-        # if self.horizon_uris:
-        #     self.horizon_uris[0] = self.current_pos
-        # else:
-        #     self.horizon_uris.append(self.current_pos)
 
     def update_is_on(self, sim):
         self.g.remove((None, EX.obstructs, self.robot.uri))

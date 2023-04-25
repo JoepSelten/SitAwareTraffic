@@ -271,98 +271,102 @@ class Robot():
         if start == 'down':
             self.pos = np.array([l+0.75*w, self.length/2])
             self.yaw = 0.5*math.pi
+            self.pos_uri = URIRef("http://example.com/intersection/road_down/lane1")
         elif start == 'up':
             self.pos = np.array([l+0.25*w,2*l+w-self.length/2])
             self.yaw = -0.5*math.pi
+            self.pos_uri = URIRef("http://example.com/intersection/road_up/lane1")
         elif start == 'left':
             self.pos = np.array([self.length/2,l+0.25*w])
             self.yaw = 0
+            self.pos_uri = URIRef("http://example.com/intersection/road_left/lane1")
         elif start == 'right':
             self.pos = np.array([2*l+w-self.length/2,l+0.75*w])
             self.yaw = math.pi
+            self.pos_uri = URIRef("http://example.com/intersection/road_right/lane1")
         self.polygon = trans(self.pos, self.yaw, self.length, self.width)
 
-    def init_plan(self, phi_after, phi_before, extended_centerline):
-        if self.start == 'down':
-            if self.task == 'right':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_down/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '2': {'uri': URIRef("http://example.com/intersection/road_right/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
-            if self.task == 'up':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_down/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '2': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '3': {'uri': URIRef("http://example.com/intersection/road_up/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
-            if self.task == 'left':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_down/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '2': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '3': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}},
-                    '4': {'uri': URIRef("http://example.com/intersection/road_left/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
+    # def init_plan(self, phi_after, phi_before, extended_centerline):
+    #     if self.start == 'down':
+    #         if self.task == 'right':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_down/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/road_right/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
+    #         if self.task == 'up':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_down/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '3': {'uri': URIRef("http://example.com/intersection/road_up/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
+    #         if self.task == 'left':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_down/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '3': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}},
+    #                 '4': {'uri': URIRef("http://example.com/intersection/road_left/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
 
-        if self.start == 'right':
-            if self.task == 'up':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_right/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '2': {'uri': URIRef("http://example.com/intersection/road_up/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
-            if self.task == 'left':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_right/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '2': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '3': {'uri': URIRef("http://example.com/intersection/road_left/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
-            if self.task == 'down':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_right/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '2': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '3': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}},
-                    '4': {'uri': URIRef("http://example.com/intersection/road_down/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
+    #     if self.start == 'right':
+    #         if self.task == 'up':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_right/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/road_up/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
+    #         if self.task == 'left':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_right/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '3': {'uri': URIRef("http://example.com/intersection/road_left/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
+    #         if self.task == 'down':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_right/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '3': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}},
+    #                 '4': {'uri': URIRef("http://example.com/intersection/road_down/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
 
-        if self.start == 'up':
-            if self.task == 'left':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_up/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '2': {'uri': URIRef("http://example.com/intersection/road_left/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
-            if self.task == 'down':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_up/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '2': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '3': {'uri': URIRef("http://example.com/intersection/road_down/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
-            if self.task == 'right':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_up/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '2': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '3': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}},
-                    '4': {'uri': URIRef("http://example.com/intersection/road_right/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
+    #     if self.start == 'up':
+    #         if self.task == 'left':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_up/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/road_left/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
+    #         if self.task == 'down':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_up/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '3': {'uri': URIRef("http://example.com/intersection/road_down/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
+    #         if self.task == 'right':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_up/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_ul"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '3': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}},
+    #                 '4': {'uri': URIRef("http://example.com/intersection/road_right/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
 
-        if self.start == 'left':
-            if self.task == 'down':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_left/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '2': {'uri': URIRef("http://example.com/intersection/road_down/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
-            if self.task == 'right':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_left/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '2': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '3': {'uri': URIRef("http://example.com/intersection/road_right/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
-            if self.task == 'up':
-                self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_left/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '1': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
-                    '2': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
-                    '3': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}},
-                    '4': {'uri': URIRef("http://example.com/intersection/road_up/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
-                }
-        return self.plan
+    #     if self.start == 'left':
+    #         if self.task == 'down':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_left/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/road_down/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
+    #         if self.task == 'right':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_left/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '3': {'uri': URIRef("http://example.com/intersection/road_right/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
+    #         if self.task == 'up':
+    #             self.plan = {'0': {'uri': URIRef("http://example.com/intersection/road_left/lane_right"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '1': {'uri': URIRef("http://example.com/intersection/crossing_dl"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_before, 'velocity': self.velocity_max}},
+    #                 '2': {'uri': URIRef("http://example.com/intersection/crossing_dr"), 'skill': 'turn', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max, 'turn_line': extended_centerline}},
+    #                 '3': {'uri': URIRef("http://example.com/intersection/crossing_ur"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}},
+    #                 '4': {'uri': URIRef("http://example.com/intersection/road_up/lane_left"), 'skill': 'move_in_lane', 'parameters': {'phi': phi_after, 'velocity': self.velocity_max}}
+    #             }
+    #     return self.plan
 
 class Obstacle():
     def __init__(self, uri, pos):
@@ -377,6 +381,6 @@ class Obstacle():
     
     def plot(self):
         #self.polygon = trans(self.pos, self.yaw, self.length, self.width)
-        plt.fill(*self.polygon.exterior.xy, edgecolor='black', hatch='//', fill=False)
+        plt.fill(*self.polygon.exterior.xy, edgecolor='red', hatch='//', fill=False)
 
     

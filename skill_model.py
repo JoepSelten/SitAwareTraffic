@@ -113,10 +113,13 @@ class SkillModel():
             right_of = query_right_of(world.g, world.robot.uri)
             #input(right_of)
             if right_of:
+                #print(world.robot.uri)
                 world.skill = 'wait'
 
         elif not world.set_next_wait_pos:
-            world.skill = 'wait'
+            #print(world.robot.uri)
+            #world.skill = 'wait'
+            pass
 
         else:
             world.skill = 'drive'
@@ -185,6 +188,8 @@ class SkillModel():
             #if world.plan_configured:
             if world.after_obstacle_configured and not world.switch_phi:
                 world.plan[world.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
+                #print(world.plan[world.before_obstacle_rl['uri']]['phi'])
+                #input('askdhjflda')
                 world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
                 world.switch_phi = True
 
@@ -205,7 +210,7 @@ class SkillModel():
 
 
     def execute_skill(self, world, control):
-        #print(f'Skill: {world.skill}')
+        #print(f'{world.robot.uri}, skill: {world.skill}')
         if world.skill == 'drive':
             control.drive(world)
         elif world.skill == 'wait':

@@ -1,134 +1,18 @@
 [
   {
-    "@id": "http://example.com/road/lane1",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/road/lane2"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right/lane2",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/road_right/lane1"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/lane2",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/road_up/lane1"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right/lane1",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/road_right/lane2"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/crossing",
-    "@type": [
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/affordance": [
-      {
-        "@id": "http://example.com/drivable"
-      }
-    ]
-  },
-  {
-    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "@id": "http://example.com/has_a",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ],
     "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
       {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane1",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/road_down/lane2"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/connects",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://example.com/connects"
+        "@id": "http://example.com/has_a"
       }
     ]
   },
   {
     "@id": "http://www.w3.org/2000/01/rdf-schema#Resource",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/road",
-    "@type": [
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/road/lane1"
-      },
-      {
-        "@id": "http://example.com/road/lane2"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@value": "road"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/lane2",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/road_left/lane1"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/geometry",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
@@ -155,17 +39,23 @@
     ]
   },
   {
-    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+    "@id": "http://example.com/lane_left",
     "@type": [
+      "http://example.com/geometry",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/affordance": [
+      {
+        "@id": "http://example.com/drivable"
+      }
     ]
   },
   {
     "@id": "http://example.com/intersection/road_left",
     "@type": [
       "http://example.com/road",
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
     ],
     "http://example.com/connects": [
       {
@@ -174,22 +64,141 @@
     ],
     "http://example.com/has_a": [
       {
-        "@id": "http://example.com/intersection/road_left/lane1"
+        "@id": "http://example.com/intersection/road_left/lane2"
       },
+      {
+        "@id": "http://example.com/intersection/road_left/lane1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/road/lane2",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/road/lane1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/road",
+    "@type": [
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/road/lane1"
+      },
+      {
+        "@id": "http://example.com/road/lane2"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "road"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/lane_right",
+    "@type": [
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/affordance": [
+      {
+        "@id": "http://example.com/drivable"
+      },
+      {
+        "@id": "http://example.com/waiting"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_up/lane1",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/road_up/lane2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/crossing"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_right/lane1"
+      },
+      {
+        "@id": "http://example.com/intersection/road_right/lane2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/lane1",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
       {
         "@id": "http://example.com/intersection/road_left/lane2"
       }
     ]
   },
   {
-    "@id": "http://example.com/has_a",
+    "@id": "http://example.com/waiting",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/connects",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ],
     "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
       {
-        "@id": "http://example.com/has_a"
+        "@id": "http://example.com/connects"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/2000/01/rdf-schema#label",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#label"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf"
       }
     ]
   },
@@ -198,6 +207,147 @@
     "@type": [
       "http://example.com/geometry",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down",
+    "@type": [
+      "http://example.com/road",
+      "http://www.w3.org/2000/01/rdf-schema#Resource",
+      "http://example.com/geometry"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/crossing"
+      }
+    ],
+    "http://example.com/has_a": [
+      {
+        "@id": "http://example.com/intersection/road_down/lane2"
+      },
+      {
+        "@id": "http://example.com/intersection/road_down/lane1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane1",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/road_down/lane2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/lane1",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/road_right/lane2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_down/lane2",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/road_down/lane1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/geometry",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/road/lane1",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/road/lane2"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_right/lane2",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/road_right/lane1"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/affordance",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+      {
+        "@id": "http://example.com/affordance"
+      }
+    ]
+  },
+  {
+    "@id": "http://example.com/drivable",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/crossing",
+    "@type": [
+      "http://example.com/geometry",
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/affordance": [
+      {
+        "@id": "http://example.com/drivable"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ]
+  },
+  {
+    "@id": "http://example.com/intersection/road_left/lane2",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Resource"
+    ],
+    "http://example.com/connects": [
+      {
+        "@id": "http://example.com/intersection/road_left/lane1"
+      }
     ]
   },
   {
@@ -225,155 +375,6 @@
       {
         "@id": "http://example.com/intersection/road_left"
       }
-    ]
-  },
-  {
-    "@id": "http://example.com/affordance",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://example.com/affordance"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/road/lane2",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/road/lane1"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/lane_left",
-    "@type": [
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/affordance": [
-      {
-        "@id": "http://example.com/drivable"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_up/lane1",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/road_up/lane2"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_left/lane1",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/road_left/lane2"
-      }
-    ]
-  },
-  {
-    "@id": "http://www.w3.org/2000/01/rdf-schema#label",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#label"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_right",
-    "@type": [
-      "http://example.com/road",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/crossing"
-      }
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_right/lane2"
-      },
-      {
-        "@id": "http://example.com/intersection/road_right/lane1"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down",
-    "@type": [
-      "http://example.com/road",
-      "http://www.w3.org/2000/01/rdf-schema#Resource",
-      "http://example.com/geometry"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/crossing"
-      }
-    ],
-    "http://example.com/has_a": [
-      {
-        "@id": "http://example.com/intersection/road_down/lane2"
-      },
-      {
-        "@id": "http://example.com/intersection/road_down/lane1"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/intersection/road_down/lane2",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/connects": [
-      {
-        "@id": "http://example.com/intersection/road_down/lane1"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/lane_right",
-    "@type": [
-      "http://example.com/geometry",
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ],
-    "http://example.com/affordance": [
-      {
-        "@id": "http://example.com/drivable"
-      },
-      {
-        "@id": "http://example.com/waiting"
-      }
-    ]
-  },
-  {
-    "@id": "http://example.com/drivable",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
-    ]
-  },
-  {
-    "@id": "http://example.com/waiting",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Resource"
     ]
   },
   {
@@ -406,14 +407,13 @@
     ]
   },
   {
-    "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf",
+    "@id": "http://example.com/intersection/road_up/lane2",
     "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property",
       "http://www.w3.org/2000/01/rdf-schema#Resource"
     ],
-    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf": [
+    "http://example.com/connects": [
       {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#subPropertyOf"
+        "@id": "http://example.com/intersection/road_up/lane1"
       }
     ]
   }
