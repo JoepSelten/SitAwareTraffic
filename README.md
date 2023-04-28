@@ -47,7 +47,7 @@
 ## 3 vehicles, obstruction after intersection
 ![Alt Text](https://github.com/JoepSelten/SitAwareTraffic/blob/main/simulations/3VehiclesObstructionAfter_right.gif)
 
-## 3 vehicles, obstruction before and on intersection
+## 3 vehicles, obstruction before intersection
 ![Alt Text](https://github.com/JoepSelten/SitAwareTraffic/blob/main/simulations/3VehiclesObstructionBeforeAndOn_going_wrong.gif)
 
 
