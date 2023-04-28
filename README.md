@@ -50,4 +50,8 @@
 ## 3 vehicles, obstruction before intersection
 ![Alt Text](https://github.com/JoepSelten/SitAwareTraffic/blob/main/simulations/3VehiclesObstructionBeforeAndOn_going_wrong.gif)
 
+## 3 vehicles, obstruction before intersection
+![Alt Text](https://github.com/JoepSelten/SitAwareTraffic/blob/main/simulations/3VehiclesObstructionBeforeAndOn.gif)
+
+
 
