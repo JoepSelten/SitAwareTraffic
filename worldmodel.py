@@ -17,7 +17,7 @@ class WorldModel():
         self.init_geometric_map(map)
         self.reset(robot)
         self.sit7 = False
-        self.sit3 = False
+        self.sit3 = True
 
     def reset(self, robot):
         self.g = copy.deepcopy(g)

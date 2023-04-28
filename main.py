@@ -28,21 +28,21 @@ simulator.set_map(map)
 
 
 
-simulator.add_robot(EX.AV1, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='right', delay=0)
+simulator.add_robot(EX.AV1, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='down', task='left', delay=0)
 simulator.add_robot(EX.AV2, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='left', delay=0)
-#simulator.add_robot(EX.AV3, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='up', task='down', delay=0)
+simulator.add_robot(EX.AV3, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='left', task='down', delay=0)
 
 simulator.add_obstacle(EX.obstacle1, np.array([55, 20]))
 simulator.add_obstacle(EX.obstacle2, np.array([55, 25]))
 simulator.add_obstacle(EX.obstacle3, np.array([55, 35]))
-simulator.add_obstacle(EX.obstacle4, np.array([55, 45]))
+#simulator.add_obstacle(EX.obstacle4, np.array([55, 45]))
 #simulator.add_obstacle(EX.obstacle5, np.array([55, 55]))
 #simulator.add_obstacle(EX.obstacle6, np.array([35, 55]))
 #simulator.add_obstacle(EX.obstacle7, np.array([65, 45]))
 
 AV1_world = WorldModel(simulator.robots[EX.AV1], simulator.map)
 AV2_world = WorldModel(simulator.robots[EX.AV2], simulator.map)
-#AV3_world = WorldModel(simulator.robots[EX.AV3], simulator.map)
+AV3_world = WorldModel(simulator.robots[EX.AV3], simulator.map)
 
 skill_model = SkillModel()
 control = Control()
@@ -76,16 +76,16 @@ while True:
     
     skill_model.monitor_skills(AV1_world, control)
     skill_model.monitor_skills(AV2_world, control) 
-    #skill_model.monitor_skills(AV3_world, control) 
+    skill_model.monitor_skills(AV3_world, control) 
 
     #if t > 0.3:
     control.actuate(AV1_world, simulator, t)
     control.actuate(AV2_world, simulator, t)
-    #control.actuate(AV3_world, simulator, t)
+    control.actuate(AV3_world, simulator, t)
 
     AV1_world.update(simulator)
     AV2_world.update(simulator)
-    #AV3_world.update(simulator)
+    AV3_world.update(simulator)
     #print(AV1_world.plan_step)
     #print(AV1_world.plan[str(AV1_world.plan_step)])
 

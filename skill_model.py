@@ -110,6 +110,8 @@ class SkillModel():
             world.skill = 'wait'
 
         elif conflict_robot:
+            if EX.waiting in affordances_current:
+                world.skill = 'wait'
             right_of = query_right_of(world.g, world.robot.uri)
             #input(right_of)
             if right_of:
