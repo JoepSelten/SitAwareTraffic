@@ -32,9 +32,9 @@ simulator.add_robot(EX.AV1, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='d
 simulator.add_robot(EX.AV2, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='right', task='left', delay=0)
 #simulator.add_robot(EX.AV3, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, start='up', task='down', delay=0)
 
-#simulator.add_obstacle(EX.obstacle1, np.array([55, 20]))
-#simulator.add_obstacle(EX.obstacle2, np.array([55, 25]))
-#simulator.add_obstacle(EX.obstacle3, np.array([55, 35]))
+simulator.add_obstacle(EX.obstacle1, np.array([55, 20]))
+simulator.add_obstacle(EX.obstacle2, np.array([55, 25]))
+simulator.add_obstacle(EX.obstacle3, np.array([55, 35]))
 simulator.add_obstacle(EX.obstacle4, np.array([55, 45]))
 #simulator.add_obstacle(EX.obstacle5, np.array([55, 55]))
 #simulator.add_obstacle(EX.obstacle6, np.array([35, 55]))
