@@ -8,7 +8,7 @@ from shapely.geometry import Polygon, Point, LineString, CAP_STYLE, box
 from basic_functions import *
 from perception import Perception
 from worldmodel import WorldModel
-from skill_model import SkillModel
+from skill_model import Algorithm_TrafficRules
 from reasoner import Reasoner
 from simulator import Simulator
 from monitor import Monitor
@@ -44,7 +44,7 @@ AV1_world = WorldModel(simulator.robots[EX.AV1], simulator.map)
 AV2_world = WorldModel(simulator.robots[EX.AV2], simulator.map)
 AV3_world = WorldModel(simulator.robots[EX.AV3], simulator.map)
 
-skill_model = SkillModel()
+algorithm = Algorithm_TrafficRules()
 control = Control()
 
 figure(num=1, figsize=(8, 8), dpi=80)
@@ -74,9 +74,9 @@ while True:
     # plt.text(0.05, 12, "AV2: ", fontsize = 16)
     # plt.text(0.05, 8, AV2_world.robot.task, fontsize = 16)
     
-    skill_model.monitor_skills(AV1_world, control)
-    skill_model.monitor_skills(AV2_world, control) 
-    skill_model.monitor_skills(AV3_world, control) 
+    algorithm.run(AV1_world, control)
+    algorithm.run(AV2_world, control) 
+    algorithm.run(AV3_world, control) 
 
     #if t > 0.3:
     control.actuate(AV1_world, simulator, t)
