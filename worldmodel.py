@@ -1,5 +1,4 @@
 import numpy as np
-from traffic_areas import *
 from rdflib import URIRef
 from closure_graph import Semantics
 from owlrl import DeductiveClosure
@@ -24,13 +23,12 @@ class WorldModel():
         self.robot = robot
         self.horizon_dict = {}
         self.position_dict = {}
-        #g.remove((self.robot.uri, None, None))
-        self.g.add((self.robot.uri, RDF.type, EX.vehicle))
+        self.g.add((self.robot.uri, RDF.type, EX.AV))
         self.current_pos = None
-        self.skill_selected = False
-        self.skill_configured = False
-        self.skill_finished = True
-        self.same_situation = True
+        self.behaviour_selected = False
+        self.behaviour_configured = False
+        self.behaviour_finished = True
+        #self.same_situation = True
         self.before_intersection = True
         self.approaching = False
         self.condition_failed = False
@@ -38,7 +36,7 @@ class WorldModel():
         self.horizon = None
         self.omega = 0
         self.velocity = 0
-        self.skill = 'drive'
+        self.behaviour = 'drive'
         self.plan_configured = True
         self.replan = False
         self.switch_lane_configured = False
@@ -376,22 +374,21 @@ class WorldModel():
 
         return plan        
         
-    def update(self, sim):       
-        self.update_current_pos(sim)
+    def update(self, sim):
+        ## associate is-on       
+        self.update_current_pos()
 
-        ## deze miss later andersom doen
-        
-            
-        self.associate_positions()
+        ## save positions from previous horizon that might be important for configuring behaviours
+        self.save_positions()
+
+        ## update horizon
         self.update_horizon(sim)
 
-        #Associate the things that are in the robots horizon
+        ## associate the things that are in the robots horizon
         self.associate(sim)
         
 
-    def update_current_pos(self, sim):
-        prev_pos = self.current_pos
-        #self.current_pos = self.current_area()
+    def update_current_pos(self):
         self.intersect_dict = self.get_intersections(self.map_dict, self.robot.polygon)
         self.weight_dict = {}
         for uri, intersection in self.intersect_dict.items():
@@ -400,41 +397,11 @@ class WorldModel():
 
         if self.weight_dict:
             self.current_pos = max(self.weight_dict, key=self.weight_dict.get)
+            self.update_av_is_on()
         else:
             self.current_pos = None
-
-        #print(f'Current position: {self.current_pos}')
-            
-
-        if self.current_pos == None:
-            if self.robot.uri == EX.AV2:
-                self.robot.reset('up', 'down')
-                self.reset(self.robot)
-            elif self.robot.uri == EX.AV3:
-                self.robot.reset('left', 'right')
-                self.reset(self.robot)
-            else:
-                self.robot.random_reset()
-                self.reset(self.robot)
-
-            return
-            if self.robot.uri == EX.AV1:
-                DeductiveClosure(Semantics).expand(self.g)
-                self.g.serialize(format="json-ld", destination='AV1' + ".json")
-                exit(0)
-            elif self.robot.uri == EX.AV2:
-                self.robot.reset('down', 'right')
-                self.reset(self.robot)
-            else:
-                self.robot.random_reset()
-                self.reset(self.robot)
-            return
-
-        if self.current_pos == prev_pos:
-            self.same_situation = True
-        else:
-            self.same_situation = False          
-            self.update_av_is_on()
+            self.robot.random_reset()
+            self.reset(self.robot)            
 
 
     def update_av_is_on(self):
@@ -444,25 +411,24 @@ class WorldModel():
 
 
     def update_horizon(self, sim):
+        ## if the path is reconfigured, the horizon resets
         if self.replan:
             self.horizon_dict = {}
             self.horizon_dict = copy.deepcopy(self.horizon_before_turn)
             self.horizon_dict[str(len(self.horizon_dict))] = self.before_obstacle_ll
-            #print(self.horizon_dict)
-            #input('aipuhfuiwheohf')
             self.replan = False
             self.on_left_lane = True
-            #print(self.horizon_dict)
-            #input('aiuoh')
-        
+
+        ## update the horizon that is directly in front of the AV
         self.update_current_horizon(sim)
 
-        #print(f'extend horizon: {self.extend_horizon}')
+        ## extend the horizon if necessary
         if self.extend_horizon:
             self.update_extended_horizon(sim)
 
+        ## deleting the part of the extended horizon that is intersect by the newly added horizon in front of the AV
         self.delete_extended_horizon(sim)
-        
+
 
         self.robot.horizon_dict = self.horizon_dict
 
@@ -472,8 +438,7 @@ class WorldModel():
         self.robot.horizon = unary_union(self.horizon_list)
 
     
-    def associate_positions(self):
-        ## ga weer n abstractie hoger?
+    def save_positions(self):
         if self.after_obstacle_rl and self.current_pos==self.after_obstacle_rl['uri']:
             self.plan[URIRef("http://example.com/intersection/road_down/lane1")]['next_position'] = URIRef("http://example.com/intersection/crossing_dr")
             #self.plan[URIRef("http://example.com/intersection/road_right/lane2")]['next_position'] = URIRef("http://example.com/intersection/crossing_dr")
@@ -484,7 +449,6 @@ class WorldModel():
             self.set_current_turn_pos = False
             self.set_next_wait_pos = False 
             self.set_next_turn_pos = False          
-            #query_part_of()
 
         if self.set_next_wait_pos and self.plan_configured and self.after_obstacle_rl and self.after_obstacle_rl['uri'] not in self.intersect_dict:
             self.map_dict[self.after_obstacle_rl['uri']]['weight'] = 1
@@ -517,21 +481,16 @@ class WorldModel():
             self.before_obstacle_rl['position'] = self.prev_dict['position']
             self.before_obstacle_rl['semantic_position'] = self.get_intersections(self.map_dict, self.before_obstacle_rl['polygon'])
             self.before_obstacle_rl['uri'] =  EX.before_obstacle_rl
-            #print(self.before_obstacle_rl['semantic_position'])
             for key, value in self.before_obstacle_rl['semantic_position'].items():
                 if value > 60:
                     self.g.add((key, EX.has_a, self.before_obstacle_rl['uri']))
             self.before_obstacle_rl['color'] = 'red'
             self.before_obstacle_rl['type'] = 'before_right'
             self.position_dict[str(len(self.position_dict))] = self.before_obstacle_rl
-            # print(self.prev_dict['type'])
-            # print(self.current_dict['type'])
             self.horizon_before_turn = copy.deepcopy(self.horizon_dict)
-            #print(self.current_dict['type'])
             
             if self.current_dict['type'] == 'crossing':
                 self.horizon_before_turn.pop(str(len(self.horizon_dict)-1))
-            #print(self.horizon_before_turn)
            
             lane_type = query_type(self.g, self.prev_dict['uri'])
             lane_affordances = query_affordances(self.g, self.prev_dict['uri'])
@@ -553,15 +512,9 @@ class WorldModel():
             self.g.add((self.before_obstacle_ll['uri'], RDF.type, lane_type))
             for affordance in lane_affordances:
                 self.g.add((self.before_obstacle_ll['uri'], EX.affordance, affordance))
-                
-
-
 
             self.g.add((self.before_obstacle_rl['uri'], EX.connects, self.before_obstacle_ll['uri']))
-            #DeductiveClosure(Semantics).expand(self.g)
             
-            
-
         if self.set_next_turn_pos and not self.after_obstacle_rl:
             #input(self.before_obstacle_rl)
             self.plan[URIRef("http://example.com/intersection/road_down/lane1")]['next_position'] = self.before_obstacle_rl['uri']
@@ -594,9 +547,7 @@ class WorldModel():
             self.after_obstacle_rl['position'] = self.current_dict['position']
             self.after_obstacle_rl['semantic_position'] = self.current_dict['semantic_position']
             self.after_obstacle_rl['max_semantic_position'] = self.current_dict['max_semantic_position']
-            # max(self.current_dict['semantic_position'], key=self.current_dict['semantic_position'].get)
-            # #print(f"last horizon pos: {self.horizon_dict[str(len(self.horizon_dict)-1)]['position']}")
-            # input('hoi')
+
             self.after_obstacle_rl['uri'] = EX.after_obstacle_rl
             self.after_obstacle_rl['color'] = 'yellow'
             self.after_obstacle_rl['type'] = 'after_right'
@@ -609,9 +560,7 @@ class WorldModel():
                 self.g.add((self.after_obstacle_rl['uri'], EX.affordance, affordance))
             
             plan_step = copy.deepcopy(self.plan[self.current_dict['uri']])
-            #print(f"next pos: {self.current_dict['max_semantic_position']}")
             plan_step['next_position'] = self.current_dict['max_semantic_position']
-            #plan_step['next_position'] = self.plan[self.current_dict['uri']]['next_position']
             self.plan[self.after_obstacle_rl['uri']] = plan_step
             new_map = {}
             new_map['polygon'] = self.after_obstacle_rl['polygon']
@@ -634,10 +583,7 @@ class WorldModel():
             self.g.add((self.after_obstacle_ll['uri'], RDF.type, lane_type))
             for affordance in lane_affordances:
                 self.g.add((self.after_obstacle_ll['uri'], EX.affordance, affordance))
-      
 
-            #print(lane_uri)
-            #input('hoi')
             plan_step = copy.deepcopy(self.plan[lane_uri])
             plan_step['next_position'] = EX.after_obstacle_rl
             self.plan[EX.after_obstacle_ll] = plan_step
@@ -649,40 +595,12 @@ class WorldModel():
             self.g.add((EX.after_obstacle_ll, EX.connects, EX.after_obstacle_rl))
 
             self.positions_configured = True
-            #DeductiveClosure(Semantics).expand(self.g)
-            #print(self.plan)
 
         self.robot.position_dict = self.position_dict
-
 
         if self.horizon_dict:
             self.prev_dict = self.horizon_dict[str(len(self.horizon_dict)-1)]
 
-    def get_left_lane(self, next_drivable_pos):
-        #print(f'next_drivable_pos: {next_drivable_pos}')
-        max_intersect = self.get_max_intersection(self.map_dict, next_drivable_pos['polygon'])
-        phi = self.plan[max_intersect]['phi']
-        x = next_drivable_pos['position'][0]
-        y = next_drivable_pos['position'][1]
-        relative_phi = phi+0.5*math.pi
-
-        offset = 5
-        H = 10
-        lane_width = 5
-
-        horizon_polygon = Polygon([(x+offset*math.cos(relative_phi)-lane_width*math.sin(relative_phi), y+offset*math.sin(relative_phi)-lane_width*math.cos(relative_phi)),
-            (x+(offset+H)*math.cos(relative_phi)-lane_width*math.sin(relative_phi), y+(offset+H)*math.sin(relative_phi)-lane_width*math.cos(relative_phi)),
-            (x+(offset+H)*math.cos(relative_phi)+lane_width*math.sin(relative_phi), y+(offset+H)*math.sin(relative_phi)+lane_width*math.cos(relative_phi)),
-            (x+offset*math.cos(relative_phi)+lane_width*math.sin(relative_phi), y+offset*math.sin(relative_phi)+lane_width*math.cos(relative_phi))])
-
-        pos_x = x + (offset+0.5*H)*math.cos(relative_phi)
-        pos_y = y + (offset+0.5*H)*math.sin(relative_phi)
-        horizon_pos = [pos_x, pos_y]
-
-        horizon_uri = self.get_max_intersection(self.map_dict, horizon_polygon)
-
-        return horizon_polygon, horizon_pos, horizon_uri
-    
     def update_current_horizon(self, sim):
         x = self.robot.pos[0]
         y = self.robot.pos[1]
@@ -691,17 +609,14 @@ class WorldModel():
         H = 10
 
         phi = self.plan[self.current_pos]['phi']
-        #print(f"current pos: {self.current_pos}, next pos: {self.plan[self.current_pos]['next_position']}")
         current_plan = []
         current_plan.append(self.map_dict[self.current_pos]['polygon'])
         pos = self.current_pos
         while self.plan[pos]['next_position']:
-                #cn_pos = unary_union([self.map_dict[pos]['polygon'], self.map_dict[self.plan[pos]['next_position']]['polygon']])
             current_plan.append(self.map_dict[self.plan[pos]['next_position']]['polygon'])
             if len(current_plan)>1:
                 break
             pos = self.plan[pos]['next_position']
-                #cn_pos = self.map_dict[self.current_pos]['polygon']
         cn_pos = unary_union(current_plan)
             
         horizon_polygon = Polygon([(x+offset*math.cos(phi)-lane_width*math.sin(phi), y+offset*math.sin(phi)-lane_width*math.cos(phi)),
@@ -716,22 +631,14 @@ class WorldModel():
         self.add_horizon(self.current_pos, horizon_polygon, horizon_pos, H, 'current', 'blue')
 
     def update_extended_horizon(self, sim):
-        #horizon = self.extend_horizon[-1]
-        #print(self.current_dict)
-        #semantic_pos_dict = self.current_dict['semantic_position']
         max_weight = -5
         for ext_horizon in self.extend_horizon:
             weight = self.map_dict[ext_horizon]['weight']
-            #intersection = semantic_pos_dict.get(ext_horizon, 0)
             if weight >= max_weight:
                 max_weight = weight
                 horizon = ext_horizon
 
         horizon_type = query_type(self.g, horizon)
-        #print(f'horizon: {horizon}, horizon type: {horizon_type}')
-        #print(f'intersections horizon: {self.get_intersections(self.map_dict, horizon)}')
-        #print(f'plan configured: {self.plan_configured}')
-        #print(f'Add next horizon {self.add_next_horizon}')
         previous_horizon_dict = self.horizon_dict[str(len(self.horizon_dict)-1)]
         if horizon_type == EX.obstacle:
             obstacle = sim.obstacles[horizon]
@@ -740,7 +647,6 @@ class WorldModel():
             y = obstacle.pos[1]
             lane_width = 20
             phi = self.plan[semantic_pos]['phi']
-            #print(semantic_pos)
             offset = -0.5*obstacle.length
             H = obstacle.length
             horizon_polygon = Polygon([(x+offset*math.cos(phi)-lane_width*math.sin(phi), y+offset*math.sin(phi)-lane_width*math.cos(phi)),
@@ -755,8 +661,6 @@ class WorldModel():
 
             if type_semantic_pos == EX.lane_right or type_semantic_pos == EX.lane_left:
                 previous_horizon_dict = self.horizon_dict[str(len(self.horizon_dict)-1)]
-                #x = self.obstacles[0].pos[0]
-                #y = self.obstacles[0].pos[1]
                 x = previous_horizon_dict['position'][0]
                 y = previous_horizon_dict['position'][1]
                 lane_width = 20
@@ -764,17 +668,9 @@ class WorldModel():
                 offset = 0.5*previous_horizon_dict['length']
                 H = 10
 
-                # if self.plan[semantic_pos]['next_position']:
-                #     cn_pos = unary_union([self.map_dict[semantic_pos]['polygon'], self.map_dict[self.plan[semantic_pos]['next_position']]['polygon']])
-                # else:
-                #     cn_pos = self.map_dict[semantic_pos]['polygon']
-
-
                 current_plan = []
                 current_plan.append(self.map_dict[semantic_pos]['polygon'])
                 pos = semantic_pos
-                #print(self.plan[pos]['next_position'])
-                #input('hoi')
                 while self.plan[pos]['next_position']:
                     current_plan.append(self.map_dict[self.plan[pos]['next_position']]['polygon'])
                     if len(current_plan)>1:
@@ -803,7 +699,6 @@ class WorldModel():
                     horizon_pos = self.map_dict[next_horizon]['position']
                     horizon_length = 10
                 elif next_horizon_type == EX.lane_left or next_horizon_type == EX.lane_right:
-                    #self.add_next_horizon = False
                     x, y = self.map_dict[semantic_pos]['position']
                     lane_width = 20
                     phi = self.plan[semantic_pos]['phi']
@@ -827,55 +722,34 @@ class WorldModel():
                     pos_y = y + (0.5*previous_horizon_dict['length']+0.5*H)*math.sin(phi)
                     horizon_pos = [pos_x, pos_y]
                     horizon_length = H
-                #horizon_polygon = self.map_dict[self.plan[semantic_pos]['next_position']]['polygon']
             self.add_horizon(semantic_pos, horizon_polygon, horizon_pos, H, 'next_horizon')
 
-            
-       #elif horizon_type == EX.crossing and self.plan_configured and not self.add_next_horizon:
+
         elif horizon_type == EX.crossing and (self.plan_configured or self.obstacle_on_crossing or horizon==EX.before_obstacle_ll):
-            #max_intersection = max(previous_horizon_dict['semantic_position'], key=previous_horizon_dict['semantic_position'].get)
-            #print(previous_horizon_dict)
             crossing_intersect = previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/crossing_dr"), 0) + \
                 previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/crossing_ur"), 0) + \
                     previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/crossing_dl"), 0) + \
                     previous_horizon_dict['semantic_position'].get(URIRef("http://example.com/intersection/crossing_ul"), 0)
-            #print(crossing_intersect)
-            #input('qwerr')
             if crossing_intersect < 95:
-
-            # print(previous_horizon_dict['semantic_position'])
-            # print(horizon)
-            # print(crossing_intersect)
-            # input('asd')
                 if horizon == EX.after_obstacle_rl:
-                    #uri = self.plan[horizon]['next_position']
                     horizon = URIRef("http://example.com/intersection/crossing_dr")
-                    #print(horizon)
 
                 horizon_polygon = self.map_dict[horizon]['polygon']
                 horizon_pos = self.map_dict[horizon]['position']
                 horizon_length = 10
-                #self.add_horizon(horizon, horizon_polygon, horizon_pos, 10, 'crossing')
                 self.add_next_horizon = True
             
-        
-            #elif horizon_type == EX.crossing and self.add_next_horizon:
             else:
                 previous_horizon_dict = self.horizon_dict[str(len(self.horizon_dict)-1)]
                 next_horizon_type = query_type(self.g, self.plan[horizon]['next_position'])
-                #print(self.plan[horizon]['next_position'])
-                #input('asdf')
-                #print(f"next horizon: {self.plan[horizon]['next_position']}, next horizon type: {next_horizon_type}")
                 if next_horizon_type == EX.crossing:
                     horizon_polygon = self.map_dict[self.plan[horizon]['next_position']]['polygon']
                     horizon_pos = self.map_dict[self.plan[horizon]['next_position']]['position']
                     horizon_length = 10
                 elif next_horizon_type == EX.lane_left or next_horizon_type == EX.lane_right:
-                    #self.add_next_horizon = False
                     x, y = self.map_dict[horizon]['position']
                     lane_width = 20
                     phi = self.plan[horizon]['phi']
-                    #input(phi)
                     offset = 5
                     H = 10
                     if self.plan_configured:
@@ -897,15 +771,7 @@ class WorldModel():
                     horizon_pos = [pos_x, pos_y]
                     horizon_length = H
 
-            # if previous_horizon_dict['type'] == 'before_obstacle_ll':
-            #     new_horizon_polygon = horizon_polygon.difference(self.before_obstacle_ll['polygon'])
-            #     horizon_polygon = new_horizon_polygon
-            #     input('apgjn')
-            self.add_horizon(horizon, horizon_polygon, horizon_pos, horizon_length, 'crossing')
-                    #self.add_next_horizon = True
-                    #self.crossing_approaching = True
-
-                
+            self.add_horizon(horizon, horizon_polygon, horizon_pos, horizon_length, 'crossing')           
 
         elif horizon_type==EX.lane_left and not horizon == EX.after_obstacle_ll:
             previous_horizon_dict = self.horizon_dict[str(len(self.horizon_dict)-1)]
@@ -919,19 +785,11 @@ class WorldModel():
             current_plan.append(self.map_dict[horizon]['polygon'])
             pos = horizon
             while self.plan[pos]['next_position']:
-                    #cn_pos = unary_union([self.map_dict[pos]['polygon'], self.map_dict[self.plan[pos]['next_position']]['polygon']])
                 current_plan.append(self.map_dict[self.plan[pos]['next_position']]['polygon'])
                 if len(current_plan)>2:
                     break
                 pos = self.plan[pos]['next_position']
-                    #cn_pos = self.map_dict[self.current_pos]['polygon']
             cn_pos = unary_union(current_plan)
-            # print(self.plan[horizon]['next_position'])
-            # input('hallo')
-            # if self.plan[horizon]['next_position']:
-            #     cn_pos = unary_union([self.map_dict[horizon]['polygon'], self.map_dict[self.plan[horizon]['next_position']]['polygon']])
-            # else:
-            #     cn_pos = self.map_dict[horizon]['polygon']
 
             horizon_polygon = Polygon([(x+offset*math.cos(phi)-lane_width*math.sin(phi), y+offset*math.sin(phi)-lane_width*math.cos(phi)),
                 (x+(offset+H)*math.cos(phi)-lane_width*math.sin(phi), y+(offset+H)*math.sin(phi)-lane_width*math.cos(phi)),
@@ -940,10 +798,6 @@ class WorldModel():
                 
             if horizon == EX.before_obstacle_ll:
                 self.map_dict[horizon]['weight'] = -2
-            # else:
-            #     horizon_type = 'left_lane'
-            #     new_horizon_polygon = horizon_polygon.difference(self.before_obstacle_ll['polygon'])
-            #     horizon_polygon = new_horizon_polygon
 
             pos_x = x + (0.5*H+0.5*H)*math.cos(phi)
             pos_y = y + (0.5*H+0.5*H)*math.sin(phi)
@@ -962,12 +816,7 @@ class WorldModel():
             next_horizon = self.plan[horizon]['next_position']
             horizon_polygon = self.map_dict[next_horizon]['polygon']
             horizon_pos = self.map_dict[next_horizon]['position']
-            
-            
 
-        #elif horizon == EX.after_obstacle_rl:
-            # horizon_polygon = self.map_dict[horizon]['polygon']
-            # horizon_pos = self.map_dict[horizon]['position']
             self.add_horizon(next_horizon, horizon_polygon, horizon_pos, 10, 'after_obstacle')
             self.map_dict[next_horizon]['weight'] = -1
             self.plan_configured = True
@@ -978,8 +827,6 @@ class WorldModel():
                 self.plan[self.after_obstacle_ll['uri']]['phi'] -= math.pi
             else:
                 self.plan[self.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
-            #print(self.plan[self.before_obstacle_rl['uri']]['phi'])
-            #input('poiu')
 
         self.extend_horizon = []
 
@@ -1022,34 +869,26 @@ class WorldModel():
         self.horizon_dict = new_horizon_dict
 
     def associate(self, sim):
+        self.g.remove((self.robot.uri, EX.approaches, None))
         self.associate_obstacles(sim)
         self.associate_vehicles(sim)
         self.associate_approaching_vehicles(sim)
         self.associate_approaching()
 
     def associate_obstacles(self, sim):
-        self.g.remove((None, EX.obstructs, self.robot.uri))
-        self.g.remove((self.robot.uri, EX.approaches, None))
-        #self.robot.obstructed_area = None
         approaching_obstacles = self.get_intersections(sim.obstacles_dict, self.robot.horizon_dict[str(len(self.robot.horizon_dict)-1)]['polygon'])
         for uri, area in approaching_obstacles.items():
-            if area>2:
-                #print(f'approaching area: {uri}')
-
+            if area>2:  # extra margin
                 new_map = {}
                 new_map['polygon'] = sim.obstacles_dict[uri]['polygon']
                 new_map['weight'] = 1
                 self.map_dict[uri] = new_map
                 
                 self.g.add((self.robot.uri, EX.approaches, uri))
-                self.g.add((uri, EX.obstructs, self.robot.uri))
                 self.g.add((uri, RDF.type, EX.obstacle))
                 self.plan_configured = False
-
-
     
     def associate_vehicles(self, sim):
-        self.g.remove((None, EX.passes, self.robot.uri))
         self.robot.vehicle_area = None
         for robot in sim.robots.values():
             self.g.remove((robot.uri, EX.is_on, None))
@@ -1057,8 +896,8 @@ class WorldModel():
             if self.robot.horizon.intersects(robot.polygon) and self.robot.uri != robot.uri:
                 intersection = self.robot.horizon.intersection(robot.polygon)
                 self.robot.vehicle_area = intersection
-                self.g.add((robot.uri, EX.passes, self.robot.uri))
-                #self.g.add((self.robot.uri, EX.approaches, robot.uri))
+                self.g.add((self.robot.uri, EX.approaches, robot.uri))
+                self.g.add((robot.uri, RDF.type, EX.AV))
 
 
     def associate_approaching_vehicles(self, sim):
@@ -1073,7 +912,6 @@ class WorldModel():
                     self.g.add((robot.uri, EX.conflict, self.robot.uri))
 
                     self.associate_right_of(robot)
-                    #self.g.add((self.robot.uri, EX.approaches, robot.uri))
 
     def associate_approaching(self):
         approaching_areas = self.get_intersections(self.map_dict, self.robot.horizon_dict[str(len(self.robot.horizon_dict)-1)]['polygon'])
@@ -1083,14 +921,8 @@ class WorldModel():
 
 
     def associate_right_of(self, vehicle):
-        ## later generieker doen met regels die je declaratief aan een road of intersection kunt plaatsen
-
         road_vehicle = query_road(self.g, vehicle.uri)
         road_current = query_road(self.g, self.robot.uri)
-
-        #print(road_current)
-        #print(road_vehicle)
-        #input('asdf')
 
         if road_current == URIRef("http://example.com/intersection/road_down"):
             if road_vehicle == URIRef("http://example.com/intersection/road_right"):
@@ -1107,50 +939,6 @@ class WorldModel():
             if road_vehicle == URIRef("http://example.com/intersection/road_down"):
                 self.g.add((vehicle.uri, EX.right_of, self.robot.uri))
 
-    def update_is_on(self, sim):
-        self.g.remove((None, EX.obstructs, self.robot.uri))
-        self.robot_is_on = False
-        self.approaching = False
-        self.robot_dict = sim.robots.copy()
-        self.robots_is_on = []
-        self.scope = URIRef("http://example.com/intersection")
-        del self.robot_dict[self.robot.name]
-        if self.robot.horizon:
-            for robot in self.robot_dict.values():
-                if robot.polygon:
-                    if self.robot.horizon.intersects(robot.polygon):
-                        self.robots_is_on.append(robot)
-                        self.robot.is_on_horizon = self.robot.horizon.intersection(robot.polygon)
-                        ##  dit kunnen er later ook meer zijn
-                        label = self.get_label(self.robot.is_on_horizon)
-                        self.robot.obstructed_area = self.map_dict[label]['polygon']
-                        self.g.add((robot.uri, EX.obstructs, self.robot.uri))
-                        self.g.add((self.robot.uri, EX.obstructs, label))
-                        self.g.remove((robot.uri, EX.approaches, self.robot.uri))
-                        self.robot_is_on = True
-
-    def get_label(self, geom):
-        prev_intersection = 0
-        for key, value in self.map_dict.items():
-            if geom.intersects(value['polygon']):
-                intersect_area = geom.intersection(value['polygon']).area
-                if intersect_area > prev_intersection:
-                    new_key = key
-        return new_key
-
-    def current_area(self):
-        self.current_areas = {}
-        total = 0
-        for key, value in self.map_dict.items():
-            if self.robot.polygon.intersects(value['polygon']):
-                intersect_area = self.robot.polygon.intersection(value['polygon']).area
-                self.current_areas[key] = intersect_area
-                total += intersect_area
-        if total > 0.98*self.robot.polygon.area:
-            #print(f'current_areas: {self.current_areas}')
-            return max(self.current_areas, key=self.current_areas.get)
-
-
     def get_intersections(self, dict, area):
         intersection_dict = {}
         for key, value in dict.items():
@@ -1165,6 +953,30 @@ class WorldModel():
         intersections = self.get_intersections(dict, area) 
         return max(intersections, key=intersections.get)
 
+    def get_left_lane(self, next_drivable_pos):
+        #print(f'next_drivable_pos: {next_drivable_pos}')
+        max_intersect = self.get_max_intersection(self.map_dict, next_drivable_pos['polygon'])
+        phi = self.plan[max_intersect]['phi']
+        x = next_drivable_pos['position'][0]
+        y = next_drivable_pos['position'][1]
+        relative_phi = phi+0.5*math.pi
 
+        offset = 5
+        H = 10
+        lane_width = 5
+
+        horizon_polygon = Polygon([(x+offset*math.cos(relative_phi)-lane_width*math.sin(relative_phi), y+offset*math.sin(relative_phi)-lane_width*math.cos(relative_phi)),
+            (x+(offset+H)*math.cos(relative_phi)-lane_width*math.sin(relative_phi), y+(offset+H)*math.sin(relative_phi)-lane_width*math.cos(relative_phi)),
+            (x+(offset+H)*math.cos(relative_phi)+lane_width*math.sin(relative_phi), y+(offset+H)*math.sin(relative_phi)+lane_width*math.cos(relative_phi)),
+            (x+offset*math.cos(relative_phi)+lane_width*math.sin(relative_phi), y+offset*math.sin(relative_phi)+lane_width*math.cos(relative_phi))])
+
+        pos_x = x + (offset+0.5*H)*math.cos(relative_phi)
+        pos_y = y + (offset+0.5*H)*math.sin(relative_phi)
+        horizon_pos = [pos_x, pos_y]
+
+        horizon_uri = self.get_max_intersection(self.map_dict, horizon_polygon)
+
+        return horizon_polygon, horizon_pos, horizon_uri
+    
 
  
