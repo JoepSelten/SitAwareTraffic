@@ -6,17 +6,13 @@ import json
 from rdflib import URIRef
 from shapely.geometry import Polygon, Point, LineString, CAP_STYLE, box
 from basic_functions import *
-from perception import Perception
 from worldmodel import WorldModel
-from skill_model import Algorithm_TrafficRules
-from reasoner import Reasoner
+from algorithm import Algorithm_TrafficRules
 from simulator import Simulator
-from monitor import Monitor
 from control import Control
 from global_variables import g, dt, AV_LENGTH, AV_WIDTH, AV_VELOCITY, AV_OMEGA, w, l, EX    
 from queries import *      
 import time
-from skills import *
 from sys import argv
 
 ## Situation to test
@@ -86,8 +82,6 @@ while True:
     AV1_world.update(simulator)
     AV2_world.update(simulator)
     AV3_world.update(simulator)
-    #print(AV1_world.plan_step)
-    #print(AV1_world.plan[str(AV1_world.plan_step)])
 
     plt.pause(dt/10)
     #round(t/dt) % 10

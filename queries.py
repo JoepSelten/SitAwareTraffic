@@ -54,6 +54,18 @@ def query_type(g, subject):
     
     return answer
 
+def query_type_AV(g, subject):
+    query = """
+        PREFIX ex: <http://example.com/>
+
+        ASK {
+            ?subject rdf:type ex:AV .
+        }
+        """
+    for r in g.query(query, initBindings={'subject': subject}):
+            answer = r
+    return answer
+
 def query_part_of(g, part):
     query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>

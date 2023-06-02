@@ -9,20 +9,18 @@ from basic_functions import shift_line, extend_line
 
 class Algorithm_TrafficRules():
     def __init__(self):
-        self.condition_failed = False
-        self.traffic_rules = None
-        self.init_replan = True
+        pass
 
     def run(self, world, control):
         self.check_pos(world)
 
         self.check_approaches(world)
 
-        #self.check_conflict(world)
+        self.check_conflict(world)
 
-        self.config_skill(world)
+        self.config(world)
 
-        self.execute_skill(world, control)
+        self.execute(world, control)
 
 
     def check_pos(self, world):
@@ -32,15 +30,18 @@ class Algorithm_TrafficRules():
         
     def check_approaches(self, world):
         approaches_list = query_approaches(world.g, world.robot.uri)
+        approaching_AV = False
 
         if approaches_list:
             waiting_number = 0
             drivable_number = 0
-            #print(approaches_list)
             for area in approaches_list:
-                next_affordances = query_affordances(world.g, area)
 
-                #print(f'area: {area}, next_affordances: {next_affordances}')
+                type_AV = query_type_AV(world.g, area)
+                if type_AV:
+                    approaching_AV = True
+
+                next_affordances = query_affordances(world.g, area)
 
                 if EX.waiting in next_affordances:
                     waiting_number+=1             
@@ -61,74 +62,60 @@ class Algorithm_TrafficRules():
                     
                 
                 if world.set_current_turn_pos and drivable_number==len(approaches_list):
-                    #print('next drivable pos found')
                     world.set_next_turn_pos = True
                     
 
-                if not EX.waiting in next_affordances or not EX.drivable in next_affordances:
-                    #if world.plan_configured
+                if not type_AV and (not EX.waiting in next_affordances or not EX.drivable in next_affordances):
                     world.extend_horizon.append(area)
 
-        
-        passing_robot = query_passes(world.g, world.robot.uri)
-        conflict_robot = query_conflict(world.g, world.robot.uri)
-        obstruct_robot = query_obstructs(world.g, world.robot.uri)
+        if not world.plan_configured:
+            world.behaviour = 'replan'
 
-        if obstruct_robot or not world.plan_configured:
-            world.skill = 'replan'
-
-        elif passing_robot:
-            world.skill = 'wait'
-
-        elif conflict_robot:
-            if EX.waiting in self.affordances_current:
-                world.skill = 'wait'
-            right_of = query_right_of(world.g, world.robot.uri)
-            if right_of:
-                world.skill = 'wait'
+        elif approaching_AV:
+            world.behaviour = 'wait'
 
         elif not world.set_next_wait_pos:
             pass
 
         else:
-            world.skill = 'drive'
+            world.behaviour = 'drive'
             world.wait_pos = None
 
-        
+    def check_conflict(self, world):
+        conflict_robot = query_conflict(world.g, world.robot.uri)
+        if conflict_robot:
+            if EX.waiting in self.affordances_current:
+                world.behaviour = 'wait'
+            right_of = query_right_of(world.g, world.robot.uri)
+            if right_of:
+                world.behaviour = 'wait'
 
-    def config_skill(self, world):
-        if world.skill == 'drive':
+    def config(self, world):
+        if world.behaviour == 'drive':
             world.wait_pos = None
             world.turn_area = None
-        elif world.skill == 'wait':
+        elif world.behaviour == 'wait':
             if world.current_wait_pos:
                 world.wait_pos = world.current_wait_pos['polygon']
             else:
-                world.skill = 'drive'
-        elif world.skill == 'check_priority':
-            priority_vehicles = query_right_of(world.g, world.robot.uri)
-            if priority_vehicles:
-                world.skill = 'wait'
-                if not world.wait_pos:
-                    world.wait_pos = world.horizon_list[0]
-            else:
-                world.skill = 'drive'
-        elif world.skill == 'replan':
+                world.behaviour = 'drive'
+
+        elif world.behaviour == 'replan':
             if world.after_obstacle_configured and not world.switch_phi:
                 world.plan[world.before_obstacle_rl['uri']]['phi'] += 0.5*math.pi
                 world.plan[world.after_obstacle_ll['uri']]['phi'] -= 0.5*math.pi
                 world.switch_phi = True
             if world.current_wait_pos:
                 world.wait_pos = world.current_wait_pos['polygon']
-                world.skill = 'wait'
+                world.behaviour = 'wait'
             else:
-                world.skill = 'drive'
+                world.behaviour = 'drive'
 
 
-    def execute_skill(self, world, control):
-        if world.skill == 'drive':
+    def execute(self, world, control):
+        if world.behaviour == 'drive':
             control.drive(world)
-        elif world.skill == 'wait':
+        elif world.behaviour == 'wait':
             if world.robot.polygon.intersects(world.wait_pos) and world.robot.polygon.intersection(world.wait_pos).area > 0.75 * world.robot.polygon.area:
                 control.stop(world)
             else:
